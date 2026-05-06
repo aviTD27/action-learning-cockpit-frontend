@@ -7,538 +7,582 @@
 
 ---
 
-## 📋 Project TODO — Full Development Checklist
+## 🗂️ Repositories
 
-> Check off tasks as you complete them. Work through phases in order — each phase depends on the previous one.
+| Repo | Description | Tech |
+|------|-------------|------|
+| [`alc`](.) | Root coordination repo — shared docs, architecture, docker-compose, this TODO | — |
+| [`alc-frontend`](https://github.com/YOUR_ORG/alc-frontend) | Student, faculty & admin dashboards | React TypeScript |
+| [`alc-backend`](https://github.com/YOUR_ORG/alc-backend) | API gateway, auth, multi-tenancy, business logic | Spring Boot Maven |
+| [`alc-ai-service`](https://github.com/YOUR_ORG/alc-ai-service) | Document validation & reflection quality scoring | Python FastAPI |
+
+> This repo (`alc`) is the **root coordination repo** — it holds shared docs, architecture diagrams, the cross-repo `docker-compose.yml`, and this master TODO list. No application code lives here.
+
+---
+
+## 📋 Master TODO — Full Development Checklist
+
+> Each task is tagged with the repo it belongs to:
+> **`[root]`** = this repo · **`[frontend]`** = alc-frontend · **`[backend]`** = alc-backend · **`[ai]`** = alc-ai-service
+>
+> Work through phases in order — each phase depends on the previous one.
 
 ---
 
 ## ⚙️ Phase 0 — Environment & Project Setup
 
-### Git & Repository
-- [ ] Create a `.gitignore` file covering Java, Node, Python, and IDE files
-- [ ] Add a `README.md` with project description and setup instructions
-- [ ] Define branch strategy in the wiki: `main`, `dev`, `feature/*`, `fix/*`
-- [ ] Set up branch protection rules on `main` (require PR + 1 review before merge)
-- [ ] Create a GitHub Project board with columns: Backlog → In Progress → Review → Done
-- [ ] Create GitHub issue labels: `frontend`, `backend`, `ai`, `devops`, `security`, `research`, `bug`
+### GitHub Organisation & Repos
+- [ ] `[root]` Create a GitHub Organisation (e.g. `alc-project`) and transfer all four repos into it
+- [ ] `[root]` Replace the placeholder URLs in the Repositories table above with the real repo links
+- [ ] `[root]` Apply the same branch strategy across all four repos: `main`, `dev`, `feature/*`, `fix/*`
+- [ ] `[root]` Set up branch protection on `main` in every repo: require PR + at least 1 approval before merge
+- [ ] `[root]` Create a GitHub Project board (org-level) with columns: Backlog → In Progress → Review → Done
+- [ ] `[root]` Add the same issue labels to every repo: `frontend`, `backend`, `ai`, `devops`, `security`, `research`, `bug`
+- [ ] `[root]` Add a `.gitignore` to this root repo covering OS files (`.DS_Store`, `Thumbs.db`) and env files (`.env`)
 
-### Monorepo Structure
-- [ ] Create top-level folders: `/frontend`, `/backend`, `/ai-service`, `/infra`, `/docs`
-- [ ] Add a root-level `docker-compose.yml` for running all services locally
-- [ ] Add a root-level `Makefile` with shortcuts: `make dev`, `make test`, `make build`
+### Root Repo Structure
+- [ ] `[root]` Create folder structure: `/docs`, `/infra`
+- [ ] `[root]` Create `/docs/adr/` — Architecture Decision Records
+- [ ] `[root]` Create `/docs/architecture/` — system diagrams, ERD, schema design
+- [ ] `[root]` Create `/docs/requirements/` — RBAC matrix, API contract, validation rules
+- [ ] `[root]` Create `/docs/research/` — interview notes and pain-point summaries
+- [ ] `[root]` Create `/docs/wireframes/` — UI sketches and mockups
+- [ ] `[root]` Create `/docs/testing/` — load test scripts and results
+- [ ] `[root]` Create `docker-compose.yml` that starts all four services (frontend, backend, ai-service, postgres) for local development
+- [ ] `[root]` Create a `Makefile` with shortcuts: `make dev` (docker-compose up), `make stop`, `make logs`
+- [ ] `[root]` Add a `.env.example` at the root listing every required environment variable across all services
 
-### Frontend Setup (React + TypeScript)
-- [ ] Scaffold frontend with `npx create-react-app frontend --template typescript`
-- [ ] Install React Router: `npm install react-router-dom`
-- [ ] Install Axios for HTTP requests: `npm install axios`
-- [ ] Install a UI component library (e.g. shadcn/ui or MUI): follow library setup guide
-- [ ] Install React Query for server state management: `npm install @tanstack/react-query`
-- [ ] Install a charting library for dashboards: `npm install recharts`
-- [ ] Set up environment variable file `.env` with `REACT_APP_API_BASE_URL`
-- [ ] Configure absolute imports in `tsconfig.json` using `baseUrl: "src"`
-- [ ] Set up ESLint + Prettier with TypeScript rules
-- [ ] Create `/src/api/`, `/src/components/`, `/src/pages/`, `/src/hooks/`, `/src/types/` folder structure
-- [ ] Add a global `axios` instance in `/src/api/axiosClient.ts` with base URL and interceptors
+### `alc-frontend` Setup (React + TypeScript)
+- [ ] `[frontend]` Add a Node `.gitignore` covering `node_modules/`, `build/`, `.env`
+- [ ] `[frontend]` Scaffold the project in the repo root: `npx create-react-app . --template typescript`
+- [ ] `[frontend]` Install React Router: `npm install react-router-dom`
+- [ ] `[frontend]` Install Axios for HTTP requests: `npm install axios`
+- [ ] `[frontend]` Install a UI component library (e.g. shadcn/ui or MUI) — follow its setup guide
+- [ ] `[frontend]` Install React Query for server state: `npm install @tanstack/react-query`
+- [ ] `[frontend]` Install a charting library for dashboards: `npm install recharts`
+- [ ] `[frontend]` Install react-dropzone for file uploads: `npm install react-dropzone`
+- [ ] `[frontend]` Create `.env` file (not committed) with `REACT_APP_API_BASE_URL=http://localhost:8080`
+- [ ] `[frontend]` Create `.env.example` (committed) with the same keys but empty values
+- [ ] `[frontend]` Configure absolute imports in `tsconfig.json`: set `"baseUrl": "src"`
+- [ ] `[frontend]` Set up ESLint + Prettier with TypeScript rules and add a `lint` script to `package.json`
+- [ ] `[frontend]` Create folder structure inside `src/`: `api/`, `components/`, `pages/`, `hooks/`, `types/`, `context/`
+- [ ] `[frontend]` Create a global Axios instance at `src/api/axiosClient.ts` with the base URL and request/response interceptors
+- [ ] `[frontend]` Verify the app starts with no errors: `npm start` — confirm it loads at `localhost:3000`
+- [ ] `[frontend]` Write a `Dockerfile`: multi-stage — build with `node:20-alpine`, serve the `/build` output with `nginx:alpine`
+- [ ] `[frontend]` Create `.github/workflows/ci.yml`: runs `npm run build` and `npm test -- --watchAll=false` on every push to `dev` and `main`
 
-### Backend Setup (Spring Boot + Maven)
-- [ ] Generate Spring Boot project at `start.spring.io` with dependencies: Web, JPA, Security, Validation, PostgreSQL Driver, Lombok, Actuator
-- [ ] Place generated project in `/backend` folder
-- [ ] Verify project builds successfully: `mvn clean install`
-- [ ] Configure `application.yml` with placeholders for DB URL, JWT secret, AWS keys
-- [ ] Add `application-dev.yml` and `application-prod.yml` profiles
-- [ ] Create package structure: `controller`, `service`, `repository`, `model`, `dto`, `config`, `security`, `exception`
-- [ ] Add Maven wrapper (`mvnw`) so the project builds without a global Maven install
-- [ ] Install Lombok and verify IDE annotation processing is enabled
+### `alc-backend` Setup (Spring Boot + Maven)
+- [ ] `[backend]` Add a Java `.gitignore` covering `target/`, `.mvn/`, `*.class`, `.env`
+- [ ] `[backend]` Generate the project at `start.spring.io` with: Spring Web, Spring Data JPA, Spring Security, Validation, PostgreSQL Driver, Lombok, Spring Boot Actuator, Spring WebFlux
+- [ ] `[backend]` Unzip the generated project into the repo root and verify it builds: `./mvnw clean install -DskipTests`
+- [ ] `[backend]` Create `src/main/resources/application.yml` with placeholder properties for DB URL, JWT secret, AWS credentials, AI service URL
+- [ ] `[backend]` Create `src/main/resources/application-dev.yml` with local development values
+- [ ] `[backend]` Create `src/main/resources/application-prod.yml` referencing environment variables only — no hardcoded secrets
+- [ ] `[backend]` Create Java package structure under `com.alc.backend`: `controller`, `service`, `repository`, `model`, `dto`, `config`, `security`, `exception`
+- [ ] `[backend]` Verify Lombok works: create a class with `@Data` and confirm no compilation errors
+- [ ] `[backend]` Add Flyway dependency to `pom.xml` for versioned database migrations
+- [ ] `[backend]` Create `src/main/resources/db/migration/` folder where all Flyway SQL scripts will live
+- [ ] `[backend]` Write a `Dockerfile`: multi-stage — build with `maven:3.9-eclipse-temurin-21`, run with `eclipse-temurin:21-jre-alpine`
+- [ ] `[backend]` Create `.github/workflows/ci.yml`: runs `./mvnw test` on every push to `dev` and `main`
+- [ ] `[backend]` Add GitHub Secrets to the repo: `DB_URL`, `DB_USER`, `DB_PASS`, `JWT_SECRET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AI_SERVICE_URL`
 
-### AI Service Setup (Python + FastAPI)
-- [ ] Create `/ai-service` folder and initialize with `python -m venv venv`
-- [ ] Create `requirements.txt` with: `fastapi`, `uvicorn`, `pydantic`, `python-multipart`, `python-docx`, `PyMuPDF`, `transformers`, `torch`, `scikit-learn`
-- [ ] Install dependencies: `pip install -r requirements.txt`
-- [ ] Create project structure: `/routers`, `/services`, `/schemas`, `/models`
-- [ ] Create `main.py` with a root FastAPI app and a `/health` endpoint returning `{"status": "ok"}`
-- [ ] Verify FastAPI runs: `uvicorn main:app --reload`
-- [ ] Add `.env` file for Python service with `SPRING_GATEWAY_URL`
+### `alc-ai-service` Setup (Python + FastAPI)
+- [ ] `[ai]` Add a Python `.gitignore` covering `venv/`, `__pycache__/`, `*.pyc`, `.env`, `*.egg-info`
+- [ ] `[ai]` Create a virtual environment in the repo root: `python -m venv venv`
+- [ ] `[ai]` Create `requirements.txt` with: `fastapi`, `uvicorn[standard]`, `pydantic`, `pydantic-settings`, `python-multipart`, `python-docx`, `PyMuPDF`, `sentence-transformers`, `torch`, `scikit-learn`, `httpx`, `boto3`, `pytest`, `pytest-asyncio`
+- [ ] `[ai]` Install all dependencies: `pip install -r requirements.txt`
+- [ ] `[ai]` Create folder structure in the repo root: `routers/`, `services/`, `schemas/`, `models/`, `tests/`
+- [ ] `[ai]` Create `main.py` with a root `FastAPI` app, CORS middleware, and a `GET /health` endpoint returning `{"status": "ok"}`
+- [ ] `[ai]` Create `.env` file (not committed) with `AWS_REGION`, `S3_BUCKET_NAME`, `BACKEND_URL`
+- [ ] `[ai]` Create `.env.example` (committed) with the same keys and empty values
+- [ ] `[ai]` Create `config.py` using `pydantic-settings BaseSettings` to load all env vars with type validation
+- [ ] `[ai]` Verify the service starts: `uvicorn main:app --reload` — confirm `GET /health` returns `200 {"status": "ok"}`
+- [ ] `[ai]` Write a `Dockerfile`: use `python:3.11-slim`, copy `requirements.txt`, install deps, copy source, run `uvicorn`
+- [ ] `[ai]` Create `.github/workflows/ci.yml`: runs `pytest` on every push to `dev` and `main`
+- [ ] `[ai]` Add GitHub Secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET_NAME`
 
 ### Database Setup (PostgreSQL)
-- [ ] Install PostgreSQL locally or run it via Docker: `docker run -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres`
-- [ ] Create database: `alc_db`
-- [ ] Create a dedicated database user with limited privileges: `alc_user`
-- [ ] Add Flyway Maven dependency to `pom.xml` for database migrations
-- [ ] Create `/backend/src/main/resources/db/migration/` folder for Flyway SQL scripts
-- [ ] Test that Spring Boot connects to PostgreSQL on startup (check logs for Hibernate dialect)
-
-### Docker & Local Dev
-- [ ] Write `Dockerfile` for the Spring Boot backend (multi-stage: build with Maven, run with JRE)
-- [ ] Write `Dockerfile` for the FastAPI AI service
-- [ ] Write `Dockerfile` for the React frontend (build with Node, serve with nginx)
-- [ ] Configure `docker-compose.yml` to start: `postgres`, `backend`, `ai-service`, `frontend`
-- [ ] Test that `docker-compose up` starts all four services without errors
-- [ ] Add a `docker-compose.override.yml` for local dev with volume mounts for hot reload
+- [ ] `[root]` Add a `postgres` service to `docker-compose.yml` using the `postgres:16` image with a named volume for data persistence
+- [ ] `[root]` Set environment variables in docker-compose: `POSTGRES_DB=alc_db`, `POSTGRES_USER=alc_user`, `POSTGRES_PASSWORD=dev_password`
+- [ ] `[backend]` Point `application-dev.yml` to the docker-compose PostgreSQL instance: `jdbc:postgresql://localhost:5432/alc_db`
+- [ ] `[backend]` Confirm Spring Boot connects on startup — look for Flyway and Hibernate logs with no errors
 
 ### AWS Setup
-- [ ] Create an AWS account or use existing one
-- [ ] Create an IAM user for the project with programmatic access only
-- [ ] Attach a policy to the IAM user allowing only `s3:PutObject`, `s3:GetObject`, `s3:DeleteObject` on the project bucket
-- [ ] Create an S3 bucket named `alc-documents-dev` in your chosen region
-- [ ] Enable versioning on the S3 bucket
-- [ ] Add a lifecycle policy to delete incomplete multipart uploads after 7 days
-- [ ] Block all public access on the S3 bucket (files accessed only via pre-signed URLs)
-- [ ] Store AWS credentials in `.env` — never commit them to git (verify `.gitignore` covers `.env`)
-
-### CI/CD Pipeline (GitHub Actions)
-- [ ] Create `.github/workflows/backend.yml`: runs `mvn test` on every push to `dev` and `main`
-- [ ] Create `.github/workflows/frontend.yml`: runs `npm run build` and `npm test` on push
-- [ ] Create `.github/workflows/ai-service.yml`: runs `pytest` on push
-- [ ] Add GitHub Secrets for: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DB_URL`, `JWT_SECRET`
+- [ ] `[root]` Create an IAM user with programmatic access only — no console login
+- [ ] `[root]` Attach an inline policy allowing only `s3:PutObject`, `s3:GetObject`, `s3:DeleteObject` on the project bucket ARN
+- [ ] `[root]` Create an S3 bucket `alc-documents-dev` with versioning enabled
+- [ ] `[root]` Enable "Block all public access" on the bucket — files served via pre-signed URLs only
+- [ ] `[root]` Add a lifecycle rule to abort incomplete multipart uploads after 7 days
+- [ ] `[root]` Store the IAM credentials in the `.env` of both `alc-backend` and `alc-ai-service` — never commit them
 
 ---
 
 ## 📝 Phase 1 — Requirements & Design
 
 ### Stakeholder Research
-- [ ] Write a list of 10 questions to ask students about their pain points with current tools
-- [ ] Write a list of 10 questions to ask academic advisors about manual admin tasks
-- [ ] Conduct at least 3 student interviews and document findings in `/docs/research/student-interviews.md`
-- [ ] Conduct at least 2 advisor interviews and document findings in `/docs/research/advisor-interviews.md`
-- [ ] Summarize pain points into a ranked list in `/docs/research/pain-points.md`
+- [ ] `[root]` Write 10 interview questions for students covering pain points with Teams, Excel, and shared drives
+- [ ] `[root]` Write 10 interview questions for advisors covering manual admin tasks and time spent on compliance checks
+- [ ] `[root]` Conduct at least 3 student interviews — document findings in `/docs/research/student-interviews.md`
+- [ ] `[root]` Conduct at least 2 advisor interviews — document findings in `/docs/research/advisor-interviews.md`
+- [ ] `[root]` Summarize all findings into a ranked pain-point list in `/docs/research/pain-points.md`
 
 ### Submission Rules Definition
-- [ ] Document allowed file types: PDF, DOCX only
-- [ ] Document file naming convention format (e.g. `LASTNAME_StudentID_Stage_v1.pdf`)
-- [ ] Document word count rules per AL stage: minimum and maximum per stage
-- [ ] Document required section headings per stage (Problem, Action, Reflection, Learning)
-- [ ] Store all rules in `/docs/requirements/validation-rules.md`
+- [ ] `[root]` Document allowed file types: PDF and DOCX only
+- [ ] `[root]` Document the file naming convention format (e.g. `LASTNAME_StudentID_Stage_v1.pdf`)
+- [ ] `[root]` Document word count rules per Action Learning stage: minimum and maximum per stage
+- [ ] `[root]` Document required section headings per stage: Problem, Action, Reflection, Learning
+- [ ] `[root]` Document which rules are configurable per tenant vs fixed globally
+- [ ] `[root]` Save everything in `/docs/requirements/validation-rules.md`
 
 ### User Roles & Permissions
-- [ ] List all user roles: Student, Lecturer, Academic Advisor, Tenant Admin, Super Admin
-- [ ] Create a permission matrix table: rows = roles, columns = actions (view, submit, review, approve, configure, manage tenants)
-- [ ] Define what data each role can see: own data only vs cohort data vs all tenants
-- [ ] Document the permission matrix in `/docs/requirements/rbac-matrix.md`
+- [ ] `[root]` List all user roles: Student, Lecturer, Academic Advisor, Tenant Admin, Super Admin
+- [ ] `[root]` Create a permission matrix table — rows = roles, columns = actions (view, submit, review, approve, configure, manage tenants)
+- [ ] `[root]` Define data visibility rules per role: own data only vs whole cohort vs all tenants
+- [ ] `[root]` Save the complete RBAC matrix in `/docs/requirements/rbac-matrix.md`
 
 ### Wireframes
-- [ ] Sketch the Student Dashboard layout: AL stage tracker, deadline countdown, recent submission status
-- [ ] Sketch the Submission Form: file upload zone, validation result panel, stage selector
-- [ ] Sketch the Faculty/Advisor Dashboard: cohort submission table, compliance rate, pending reviews
-- [ ] Sketch the AI Feedback Panel: per-criterion scores, specific improvement suggestions
-- [ ] Sketch the Admin Console: tenant list, tenant settings form, cohort management
-- [ ] Sketch the Analytics Dashboard: charts for on-time rate, quality score, cross-institution benchmarks
-- [ ] Upload all wireframes as images to `/docs/wireframes/`
+- [ ] `[root]` Sketch the Student Dashboard: AL stage tracker stepper, deadline card, recent submission status list
+- [ ] `[root]` Sketch the Submission Form: drag-and-drop upload zone, validation result panel, stage selector
+- [ ] `[root]` Sketch the Faculty Dashboard: cohort submission table with filters, compliance rate summary card
+- [ ] `[root]` Sketch the AI Feedback Panel: per-criterion score bars, suggestion text, overall score indicator
+- [ ] `[root]` Sketch the Advisor Review Panel: document content preview, validation results, approve/reject buttons
+- [ ] `[root]` Sketch the Admin Console: tenant list, settings form, cohort and milestone management
+- [ ] `[root]` Sketch the Analytics Dashboard: charts for trends, quality scores, benchmark comparisons
+- [ ] `[root]` Save all wireframe images in `/docs/wireframes/`
 
 ### API Contract
-- [ ] List all REST endpoints grouped by resource: `/auth`, `/users`, `/tenants`, `/cohorts`, `/submissions`, `/analytics`
-- [ ] For each endpoint define: HTTP method, path, request body shape, response shape, required role
-- [ ] Define standard error response format: `{ "code": "...", "message": "...", "details": {} }`
-- [ ] Save the API contract in `/docs/requirements/api-contract.md`
+- [ ] `[root]` List all backend REST endpoints grouped by resource: `/auth`, `/users`, `/tenants`, `/cohorts`, `/submissions`, `/analytics`, `/reports`
+- [ ] `[root]` For each endpoint define: HTTP method, path, request body, success response, required role
+- [ ] `[root]` Define the standard error response format: `{ "code": "...", "message": "...", "details": {} }`
+- [ ] `[root]` List all AI service endpoints: `GET /health`, `POST /validate/document`, `POST /analysis/reflection-quality`
+- [ ] `[root]` Save the full API contract in `/docs/requirements/api-contract.md`
 
 ### Architecture Decision Records
-- [ ] Write ADR for: shared-schema multi-tenancy (tenant_id column) vs schema-per-tenant
-- [ ] Write ADR for: React vs Angular (document final choice and why)
-- [ ] Write ADR for: JWT stateless auth vs session-based auth
-- [ ] Write ADR for: FastAPI standalone service vs embedding Python in Spring Boot via subprocess
-- [ ] Save all ADRs in `/docs/adr/`
+- [ ] `[root]` Write ADR: shared-schema multi-tenancy (`tenant_id` column) vs schema-per-tenant
+- [ ] `[root]` Write ADR: JWT stateless auth vs session-based auth
+- [ ] `[root]` Write ADR: FastAPI standalone service vs embedding Python in Spring Boot
+- [ ] `[root]` Write ADR: S3 pre-signed URL upload vs server-side proxied upload
+- [ ] `[root]` Save all ADRs in `/docs/adr/`
 
 ---
 
 ## 🔬 Phase 2 — Research & Architecture
 
 ### Literature Review
-- [ ] Write a section on multi-tenant SaaS architecture patterns (shared, hybrid, silo)
-- [ ] Write a section comparing existing academic platforms: Moodle, Turnitin, Canvas — identify gaps
-- [ ] Write a section on microservices vs monolith — justify microservice choice for this project
-- [ ] Write a section on NLP for educational text: reflection quality, structure detection, semantic scoring
-- [ ] Write a section on learning analytics dashboard design principles
-- [ ] Compile full literature review in `/docs/literature-review.md` with references
+- [ ] `[root]` Write a section on multi-tenant SaaS architecture patterns: shared, hybrid, silo — justify your choice
+- [ ] `[root]` Write a section comparing existing academic platforms: Moodle, Turnitin, Canvas — identify gaps ALC fills
+- [ ] `[root]` Write a section justifying the multi-repo microservice approach over a monolith
+- [ ] `[root]` Write a section on NLP for educational text: reflection quality, structure detection, semantic scoring
+- [ ] `[root]` Write a section on learning analytics dashboard design: which charts aid academic decision-making
+- [ ] `[root]` Compile all sections with references into `/docs/literature-review.md`
 
-### NLP Research
-- [ ] Identify and compare 3 pre-trained models for text quality scoring (e.g. BERT, RoBERTa, sentence-transformers)
-- [ ] Test each model locally on a sample student reflection text
-- [ ] Document inference time, accuracy, and resource usage for each model
-- [ ] Choose a final model and document the decision in an ADR
-- [ ] Research document parsing: compare `python-docx` for DOCX and `PyMuPDF` for PDF — test on sample files
-- [ ] Research structure detection approaches: regex on headings vs ML-based classifier
+### NLP Research (`alc-ai-service`)
+- [ ] `[ai]` Identify 3 candidate sentence-transformer models (e.g. `all-MiniLM-L6-v2`, `paraphrase-mpnet-base-v2`, `all-distilroberta-v1`)
+- [ ] `[ai]` Test each model locally on a sample student reflection text — compare output quality
+- [ ] `[ai]` Measure inference time and memory usage for each model
+- [ ] `[ai]` Choose the final model and record the decision in a new ADR in the root repo
+- [ ] `[ai]` Test `python-docx` on a sample DOCX file — verify text and heading extraction
+- [ ] `[ai]` Test `PyMuPDF` on a sample PDF file — verify text extraction across multiple pages
+- [ ] `[ai]` Research structure detection: compare regex-based heading detection vs a classifier — document the chosen approach
 
 ### System Architecture
-- [ ] Draw the full system architecture diagram: React → Spring Boot → PostgreSQL, FastAPI, S3, AWS
-- [ ] Define all service-to-service communication: REST endpoints between Spring Boot and FastAPI
-- [ ] Define the multi-tenant data schema: all tables with `tenant_id` column, indexes, foreign keys
-- [ ] Draw the database entity-relationship diagram (ERD) for all tables
-- [ ] Define the S3 folder structure: `/{tenant_id}/{student_id}/{stage}/{filename}`
-- [ ] Save diagrams in `/docs/architecture/`
+- [ ] `[root]` Draw the full system architecture diagram: React → Spring Boot → PostgreSQL, FastAPI, S3, AWS
+- [ ] `[root]` Document all cross-service calls: which Spring Boot endpoints call which FastAPI endpoints and when
+- [ ] `[root]` Draw the database ERD: all tables with columns, data types, primary keys, and foreign keys
+- [ ] `[root]` Define the S3 folder structure: `/{tenant_id}/{student_id}/{stage}/{filename}`
+- [ ] `[root]` Save all diagrams in `/docs/architecture/`
 
 ### Database Schema Design
-- [ ] Design `tenants` table: id, name, subdomain, custom_rules (JSONB), created_at
-- [ ] Design `users` table: id, tenant_id, email, password_hash, role, name, created_at
-- [ ] Design `cohorts` table: id, tenant_id, name, lecturer_id, academic_year
-- [ ] Design `cohort_students` join table: cohort_id, student_id
-- [ ] Design `submissions` table: id, tenant_id, student_id, cohort_id, stage, s3_key, s3_version, status, submitted_at
-- [ ] Design `validation_results` table: submission_id, rule_name, passed, message
-- [ ] Design `ai_feedback` table: submission_id, criterion, score, suggestion, generated_at
-- [ ] Design `milestones` table: cohort_id, stage, deadline
-- [ ] Design `notifications` table: user_id, type, message, read, created_at
-- [ ] Write all schema designs in `/docs/architecture/database-schema.md`
+- [ ] `[root]` Design `tenants` table: `id`, `name`, `subdomain`, `custom_rules` (JSONB), `created_at`
+- [ ] `[root]` Design `users` table: `id`, `tenant_id`, `email`, `password_hash`, `role`, `full_name`, `created_at`
+- [ ] `[root]` Design `cohorts` table: `id`, `tenant_id`, `name`, `lecturer_id`, `academic_year`
+- [ ] `[root]` Design `cohort_students` join table: `cohort_id`, `student_id`
+- [ ] `[root]` Design `submissions` table: `id`, `tenant_id`, `student_id`, `cohort_id`, `stage`, `s3_key`, `s3_version_id`, `status`, `submitted_at`
+- [ ] `[root]` Design `validation_results` table: `id`, `submission_id`, `rule_name`, `passed`, `message`
+- [ ] `[root]` Design `ai_feedback` table: `id`, `submission_id`, `criterion`, `score`, `suggestion`, `generated_at`
+- [ ] `[root]` Design `al_progress` table: `id`, `student_id`, `cohort_id`, `current_stage`, `stage_status`
+- [ ] `[root]` Design `milestones` table: `id`, `cohort_id`, `stage`, `deadline`
+- [ ] `[root]` Design `notifications` table: `id`, `user_id`, `type`, `message`, `read`, `created_at`
+- [ ] `[root]` Save the complete schema in `/docs/architecture/database-schema.md`
 
 ---
 
 ## 🔧 Phase 3 — Core Backend & Authentication
 
-### Multi-Tenancy Implementation (Spring Boot)
-- [ ] Create `Tenant` entity with all fields from the schema design
-- [ ] Create `TenantRepository` extending `JpaRepository<Tenant, UUID>`
-- [ ] Create a `TenantContext` class using `ThreadLocal<String>` to hold current tenant ID per request
-- [ ] Create a `TenantFilter` (servlet filter) that extracts `tenant_id` from JWT and sets it in `TenantContext`
-- [ ] Implement a `TenantAwareRepository` base class that automatically applies `WHERE tenant_id = ?` to all queries
-- [ ] Write unit test: verify that a request with tenant A cannot retrieve data belonging to tenant B
+### Database Migrations (`alc-backend`)
+- [ ] `[backend]` Create `V1__create_tenants_table.sql`
+- [ ] `[backend]` Create `V2__create_users_table.sql`
+- [ ] `[backend]` Create `V3__create_cohorts_and_cohort_students.sql`
+- [ ] `[backend]` Create `V4__create_submissions_table.sql`
+- [ ] `[backend]` Create `V5__create_validation_results_table.sql`
+- [ ] `[backend]` Create `V6__create_ai_feedback_table.sql`
+- [ ] `[backend]` Create `V7__create_al_progress_table.sql`
+- [ ] `[backend]` Create `V8__create_milestones_table.sql`
+- [ ] `[backend]` Create `V9__create_notifications_table.sql`
+- [ ] `[backend]` Run all migrations and verify the full schema in a PostgreSQL client (e.g. DBeaver or TablePlus)
 
-### Flyway Database Migrations
-- [ ] Create migration `V1__create_tenants_table.sql`
-- [ ] Create migration `V2__create_users_table.sql`
-- [ ] Create migration `V3__create_cohorts_and_cohort_students.sql`
-- [ ] Create migration `V4__create_submissions_table.sql`
-- [ ] Create migration `V5__create_validation_results_table.sql`
-- [ ] Create migration `V6__create_ai_feedback_table.sql`
-- [ ] Create migration `V7__create_milestones_table.sql`
-- [ ] Create migration `V8__create_notifications_table.sql`
-- [ ] Run all migrations and verify schema in PostgreSQL using a DB client (e.g. DBeaver)
+### Multi-Tenancy (`alc-backend`)
+- [ ] `[backend]` Create `Tenant` JPA entity with all fields from the schema design
+- [ ] `[backend]` Create `TenantRepository` extending `JpaRepository<Tenant, UUID>`
+- [ ] `[backend]` Create a `TenantContext` utility class using `ThreadLocal<String>` to hold the current tenant ID per request thread
+- [ ] `[backend]` Create a `TenantFilter` (servlet filter) that extracts `tenant_id` from the JWT and stores it in `TenantContext`
+- [ ] `[backend]` Apply `WHERE tenant_id = ?` filtering in all repository queries using `@Query` annotations
+- [ ] `[backend]` Write a unit test: a request authenticated as Tenant A must not retrieve rows belonging to Tenant B
 
-### Authentication (JWT + Spring Security)
-- [ ] Add `jjwt` library to `pom.xml` for JWT creation and validation
-- [ ] Create `JwtService` with methods: `generateToken(user)`, `validateToken(token)`, `extractClaims(token)`
-- [ ] Include `tenant_id` and `role` as custom claims in the JWT payload
-- [ ] Create `JwtAuthFilter` extending `OncePerRequestFilter` to validate JWT on each request
-- [ ] Configure `SecurityFilterChain` in `SecurityConfig`: permit `/auth/**`, require auth for everything else
-- [ ] Create `AuthController` with `POST /auth/register` endpoint
-- [ ] Create `AuthController` with `POST /auth/login` endpoint returning JWT
-- [ ] Create `AuthController` with `POST /auth/refresh` endpoint for token refresh
-- [ ] Hash passwords using `BCryptPasswordEncoder` — never store plain text passwords
-- [ ] Write integration test for register → login → access protected endpoint flow
+### Authentication & JWT (`alc-backend`)
+- [ ] `[backend]` Add the `jjwt` library to `pom.xml`
+- [ ] `[backend]` Create `JwtService` with methods: `generateToken(UserDetails)`, `validateToken(String)`, `extractClaims(String)`
+- [ ] `[backend]` Include `tenant_id` and `role` as custom claims in the JWT payload
+- [ ] `[backend]` Create `JwtAuthFilter` extending `OncePerRequestFilter` — validate the JWT and populate the `SecurityContext` on every request
+- [ ] `[backend]` Configure `SecurityFilterChain` in `SecurityConfig`: permit `/auth/**` publicly, require auth for everything else
+- [ ] `[backend]` Create `POST /auth/register` — accept name, email, password, tenant subdomain; return a JWT
+- [ ] `[backend]` Create `POST /auth/login` — accept email and password; return a JWT and refresh token
+- [ ] `[backend]` Create `POST /auth/refresh` — accept a valid refresh token; return a new JWT
+- [ ] `[backend]` Hash all passwords with `BCryptPasswordEncoder` — never store or log plain-text passwords
+- [ ] `[backend]` Write an integration test for the full flow: register → login → call a protected endpoint with the JWT
 
-### RBAC (Role-Based Access Control)
-- [ ] Create `Role` enum: `STUDENT`, `LECTURER`, `ADVISOR`, `TENANT_ADMIN`, `SUPER_ADMIN`
-- [ ] Annotate each controller method with `@PreAuthorize("hasRole('...')")` per the permission matrix
-- [ ] Create a `GlobalExceptionHandler` returning `403 Forbidden` with a clear message when role check fails
-- [ ] Write unit tests for each role: verify a STUDENT cannot call advisor-only endpoints
+### RBAC (`alc-backend`)
+- [ ] `[backend]` Create `Role` enum: `STUDENT`, `LECTURER`, `ADVISOR`, `TENANT_ADMIN`, `SUPER_ADMIN`
+- [ ] `[backend]` Annotate every controller method with `@PreAuthorize("hasRole('...')")` per the permission matrix
+- [ ] `[backend]` Create a `GlobalExceptionHandler` using `@RestControllerAdvice` returning a `403` JSON response on role check failures
+- [ ] `[backend]` Write unit tests per role: verify a `STUDENT` token cannot reach advisor-only or admin-only endpoints
 
-### User Management Endpoints
-- [ ] `GET /users/me` — return current user's profile
-- [ ] `PUT /users/me` — update current user's name and profile
-- [ ] `GET /users` — list all users in the tenant (TENANT_ADMIN only)
-- [ ] `POST /users/invite` — invite a user by email to the tenant (TENANT_ADMIN only)
-- [ ] `DELETE /users/{id}` — deactivate a user (TENANT_ADMIN only)
-- [ ] Write unit + integration tests for each endpoint
+### User Management Endpoints (`alc-backend`)
+- [ ] `[backend]` `GET /users/me` — return the current user's profile
+- [ ] `[backend]` `PUT /users/me` — update the current user's name
+- [ ] `[backend]` `GET /users` — list all users in the current tenant (`TENANT_ADMIN` only)
+- [ ] `[backend]` `POST /users/invite` — invite a user by email to the current tenant (`TENANT_ADMIN` only)
+- [ ] `[backend]` `DELETE /users/{id}` — deactivate a user account (`TENANT_ADMIN` only)
+- [ ] `[backend]` Write unit and integration tests for each endpoint
 
-### Tenant Management Endpoints
-- [ ] `POST /tenants` — create a new tenant with name and subdomain (SUPER_ADMIN only)
-- [ ] `GET /tenants` — list all tenants (SUPER_ADMIN only)
-- [ ] `GET /tenants/{id}` — get a single tenant's settings
-- [ ] `PUT /tenants/{id}/rules` — update validation rules for a tenant (TENANT_ADMIN only)
-- [ ] Write unit + integration tests for each endpoint
+### Tenant Management Endpoints (`alc-backend`)
+- [ ] `[backend]` `POST /tenants` — create a new tenant (`SUPER_ADMIN` only)
+- [ ] `[backend]` `GET /tenants` — list all tenants (`SUPER_ADMIN` only)
+- [ ] `[backend]` `GET /tenants/{id}` — get a single tenant's details and current validation rules
+- [ ] `[backend]` `PUT /tenants/{id}/rules` — update validation rules for a tenant (`TENANT_ADMIN` only)
+- [ ] `[backend]` Write unit and integration tests for each endpoint
 
-### AWS S3 Integration (Spring Boot)
-- [ ] Add `aws-java-sdk-s3` dependency to `pom.xml`
-- [ ] Create `S3Config` bean with `AmazonS3` client configured from environment variables
-- [ ] Create `S3Service` with method `generatePresignedUploadUrl(tenantId, studentId, stage, filename)` returning a pre-signed PUT URL valid for 15 minutes
-- [ ] Create `S3Service` method `generatePresignedDownloadUrl(s3Key)` returning a pre-signed GET URL valid for 5 minutes
-- [ ] Create `S3Service` method `deleteFile(s3Key)` for removing rejected submissions
-- [ ] Store the returned S3 key and version ID in the `submissions` table after each upload
-- [ ] Write unit tests for S3Service with mocked `AmazonS3` client
+### AWS S3 Integration (`alc-backend`)
+- [ ] `[backend]` Add `aws-java-sdk-s3` dependency to `pom.xml`
+- [ ] `[backend]` Create `S3Config` bean that builds an `AmazonS3` client from environment variables
+- [ ] `[backend]` Create `S3Service.generatePresignedUploadUrl(tenantId, studentId, stage, filename)` — returns a pre-signed PUT URL valid for 15 minutes
+- [ ] `[backend]` Create `S3Service.generatePresignedDownloadUrl(s3Key)` — returns a pre-signed GET URL valid for 5 minutes
+- [ ] `[backend]` Create `S3Service.deleteFile(s3Key)` for removing rejected or deleted submissions
+- [ ] `[backend]` Write unit tests for `S3Service` using a mocked `AmazonS3` client
 
-### Cohort Management Endpoints
-- [ ] `POST /cohorts` — create a cohort (LECTURER only)
-- [ ] `GET /cohorts` — list cohorts for the current tenant
-- [ ] `POST /cohorts/{id}/students` — add a student to a cohort
-- [ ] `DELETE /cohorts/{id}/students/{studentId}` — remove a student from a cohort
-- [ ] `GET /cohorts/{id}/students` — list students in a cohort
-- [ ] Write unit + integration tests for each endpoint
+### Cohort Management Endpoints (`alc-backend`)
+- [ ] `[backend]` `POST /cohorts` — create a cohort (`LECTURER` only)
+- [ ] `[backend]` `GET /cohorts` — list all cohorts in the current tenant
+- [ ] `[backend]` `GET /cohorts/{id}` — get cohort details
+- [ ] `[backend]` `POST /cohorts/{id}/students` — add a student to a cohort
+- [ ] `[backend]` `DELETE /cohorts/{id}/students/{studentId}` — remove a student from a cohort
+- [ ] `[backend]` `GET /cohorts/{id}/students` — list all students in a cohort
+- [ ] `[backend]` Write unit and integration tests for each endpoint
 
 ---
 
-## 🛡️ Phase 4 — Smart-Gate Submission Validator & Prototype
+## 🛡️ Phase 4 — Smart-Gate Validator & Prototype
 
-### Smart-Gate (Spring Boot — Pre-Upload Validation)
-- [ ] Create `ValidationService` in Spring Boot
-- [ ] Implement rule: check file extension is `.pdf` or `.docx` — reject anything else
-- [ ] Implement rule: check filename matches the tenant's configured naming pattern (regex from tenant rules)
-- [ ] Create `POST /submissions/validate-metadata` endpoint that checks extension + filename before issuing S3 pre-signed URL
-- [ ] Only return a pre-signed URL if metadata validation passes
+### Smart-Gate Metadata Validation (`alc-backend`)
+- [ ] `[backend]` Create `ValidationService` in Spring Boot
+- [ ] `[backend]` Implement rule: reject any file whose extension is not `.pdf` or `.docx`
+- [ ] `[backend]` Implement rule: check the filename matches the tenant's naming pattern regex (stored in tenant rules JSONB)
+- [ ] `[backend]` Create `POST /submissions/validate-metadata` — runs both rules; only returns a pre-signed S3 URL if both pass
+- [ ] `[backend]` Return a structured response even on failure: `{ "passed": false, "results": [{ "rule": "file_extension", "passed": false, "message": "Only PDF and DOCX files are accepted." }] }`
 
-### Smart-Gate (Python FastAPI — Document Content Validation)
-- [ ] Create `/routers/validation.py` in the FastAPI service
-- [ ] Create `POST /validate/document` endpoint that accepts a document (fetched from S3 by key)
-- [ ] Implement DOCX text extraction using `python-docx`
-- [ ] Implement PDF text extraction using `PyMuPDF`
-- [ ] Implement word count check: extract full text, count words, compare to tenant min/max rules
-- [ ] Implement section presence check: search extracted text for required headings using regex (case-insensitive)
-- [ ] Return a structured JSON response: `{ "passed": bool, "results": [{ "rule": "...", "passed": bool, "message": "..." }] }`
-- [ ] Write unit tests for each validation rule with sample DOCX and PDF files
+### Smart-Gate Document Validation (`alc-ai-service`)
+- [ ] `[ai]` Create `routers/validation.py` and register it in `main.py`
+- [ ] `[ai]` Create `POST /validate/document` — accepts `{ "s3_key": "...", "tenant_rules": { ... } }`
+- [ ] `[ai]` Implement S3 file download using `boto3` to fetch the file bytes by key
+- [ ] `[ai]` Implement DOCX text and heading extraction using `python-docx`
+- [ ] `[ai]` Implement PDF text extraction using `PyMuPDF`
+- [ ] `[ai]` Implement word count rule: count words in extracted text and compare to tenant `min_words` and `max_words`
+- [ ] `[ai]` Implement section presence rule: search extracted text for each required heading with case-insensitive regex
+- [ ] `[ai]` Return: `{ "passed": bool, "results": [{ "rule": "...", "passed": bool, "message": "..." }] }`
+- [ ] `[ai]` Write unit tests for each rule using small sample DOCX and PDF files in `tests/fixtures/`
 
-### Submission Flow (Spring Boot)
-- [ ] Create `Submission` entity and `SubmissionRepository`
-- [ ] Create `POST /submissions/request-upload` endpoint: runs metadata validation → generates S3 pre-signed URL → creates a PENDING submission record
-- [ ] Create `POST /submissions/{id}/confirm` endpoint: called by frontend after S3 upload — triggers async FastAPI document validation
-- [ ] Create `GET /submissions` endpoint: list submissions for the current student (filtered by tenant)
-- [ ] Create `GET /submissions/{id}` endpoint: get full submission detail including validation results
-- [ ] Create `GET /cohorts/{id}/submissions` endpoint: list all submissions in a cohort (LECTURER/ADVISOR only)
-- [ ] Implement async call from Spring Boot to FastAPI `/validate/document` using `WebClient`
-- [ ] Store validation results in `validation_results` table after FastAPI responds
-- [ ] Update submission status: `PENDING` → `COMPLIANT` or `NON_COMPLIANT` based on validation results
-- [ ] Write integration test for the full submission + validation flow
+### Submission Flow (`alc-backend`)
+- [ ] `[backend]` Create `Submission` JPA entity and `SubmissionRepository`
+- [ ] `[backend]` Create `POST /submissions/request-upload` — runs metadata validation, creates a `PENDING` submission record, returns the pre-signed S3 URL
+- [ ] `[backend]` Create `POST /submissions/{id}/confirm` — called by the frontend after the S3 upload; triggers an async call to `POST /validate/document` on the AI service
+- [ ] `[backend]` Implement the async call to FastAPI using `WebClient` — do not block the HTTP response thread
+- [ ] `[backend]` Store each validation rule result in the `validation_results` table after FastAPI responds
+- [ ] `[backend]` Update submission status to `COMPLIANT` or `NON_COMPLIANT` based on the validation results
+- [ ] `[backend]` Create `GET /submissions` — list all submissions for the current student (tenant-scoped)
+- [ ] `[backend]` Create `GET /submissions/{id}` — return full submission detail including all validation results
+- [ ] `[backend]` Create `GET /cohorts/{id}/submissions` — list all submissions in a cohort (`LECTURER`/`ADVISOR` only)
+- [ ] `[backend]` Write an integration test for the full flow: request-upload → confirm → validation result stored
 
-### Frontend — Auth Screens
-- [ ] Create `/pages/LoginPage.tsx` with email + password form
-- [ ] Create `/pages/RegisterPage.tsx` with name, email, password form
-- [ ] On login, store JWT in memory (React state + context) — never in `localStorage`
-- [ ] Create `AuthContext.tsx` providing `user`, `login()`, `logout()` to the whole app
-- [ ] Create a `PrivateRoute` component that redirects unauthenticated users to `/login`
-- [ ] Implement silent token refresh using a refresh token stored in an HTTP-only cookie
-- [ ] Add axios request interceptor to attach `Authorization: Bearer <token>` header to every request
-- [ ] Add axios response interceptor to handle `401 Unauthorized` by redirecting to login
+### Frontend — Auth Screens (`alc-frontend`)
+- [ ] `[frontend]` Create `src/pages/LoginPage.tsx` with an email + password form
+- [ ] `[frontend]` Create `src/pages/RegisterPage.tsx` with name, email, and password fields
+- [ ] `[frontend]` Create `src/context/AuthContext.tsx` providing `user`, `token`, `login()`, and `logout()` app-wide
+- [ ] `[frontend]` Store the JWT in React state only — never in `localStorage` or `sessionStorage`
+- [ ] `[frontend]` Create a `PrivateRoute` component that redirects unauthenticated users to `/login`
+- [ ] `[frontend]` Add an Axios request interceptor to attach `Authorization: Bearer <token>` to every outgoing request
+- [ ] `[frontend]` Add an Axios response interceptor: on `401`, clear auth state and redirect to `/login`
 
-### Frontend — Student Dashboard
-- [ ] Create `/pages/student/DashboardPage.tsx`
-- [ ] Display the AL cycle stage tracker: four steps (Problem → Action → Reflection → Learning) with current stage highlighted
-- [ ] Display a deadline countdown card for the current stage
-- [ ] Display a list of past submissions with status badges (Pending, Compliant, Non-Compliant, Approved)
-- [ ] Display the most recent validation result summary inline
+### Frontend — Student Dashboard (`alc-frontend`)
+- [ ] `[frontend]` Create `src/pages/student/DashboardPage.tsx`
+- [ ] `[frontend]` Display the AL cycle stage tracker: four steps (Problem → Action → Reflection → Learning) with the active stage highlighted
+- [ ] `[frontend]` Display a deadline countdown card showing days remaining for the current stage
+- [ ] `[frontend]` Display the student's past submissions with status badges: Pending, Compliant, Non-Compliant, Approved
+- [ ] `[frontend]` Fetch data from `GET /submissions` and `GET /al-progress/{studentId}` on page load
 
-### Frontend — Submission Form
-- [ ] Create `/pages/student/SubmitPage.tsx`
-- [ ] Build a drag-and-drop file upload zone using `react-dropzone` or native HTML drag events
-- [ ] On file select, run client-side pre-checks: file extension and file size (max 10MB warning)
-- [ ] On submit, call `POST /submissions/request-upload` to get the S3 pre-signed URL
-- [ ] Upload the file directly to S3 using the pre-signed URL via `axios.put()`
-- [ ] After S3 upload succeeds, call `POST /submissions/{id}/confirm`
-- [ ] Poll `GET /submissions/{id}` every 3 seconds until status is no longer PENDING
-- [ ] Display the validation result panel: green check or red cross per rule with explanation text
-- [ ] Disable the submit button and show a spinner while validation is in progress
+### Frontend — Submission Form (`alc-frontend`)
+- [ ] `[frontend]` Create `src/pages/student/SubmitPage.tsx`
+- [ ] `[frontend]` Build a drag-and-drop file upload zone using `react-dropzone`
+- [ ] `[frontend]` On file select, run client-side pre-checks: reject non-PDF/DOCX; warn if file exceeds 10MB
+- [ ] `[frontend]` On submit, call `POST /submissions/request-upload` to receive the pre-signed S3 URL
+- [ ] `[frontend]` Upload the file directly to S3 using the pre-signed URL: `axios.put(url, file, { headers: { 'Content-Type': file.type } })`
+- [ ] `[frontend]` After S3 upload succeeds, call `POST /submissions/{id}/confirm`
+- [ ] `[frontend]` Poll `GET /submissions/{id}` every 3 seconds until status changes from `PENDING`
+- [ ] `[frontend]` Display the validation result panel: green checkmark or red cross per rule, with the failure message below each failing rule
+- [ ] `[frontend]` Disable the submit button and show a loading spinner during upload and validation
 
-### Frontend — Faculty Dashboard (Basic)
-- [ ] Create `/pages/faculty/DashboardPage.tsx`
-- [ ] Display a table of all submissions in the lecturer's cohort with columns: Student Name, Stage, Submitted At, Status
-- [ ] Add a filter bar: filter by stage, filter by status, search by student name
-- [ ] Add a compliance rate summary card: "X of Y submissions are compliant"
+### Frontend — Faculty Dashboard (`alc-frontend`)
+- [ ] `[frontend]` Create `src/pages/faculty/DashboardPage.tsx`
+- [ ] `[frontend]` Display a table of all submissions in the cohort: Student Name, Stage, Submitted At, Status
+- [ ] `[frontend]` Add a filter bar: filter by stage, filter by status, search by student name
+- [ ] `[frontend]` Display a compliance rate summary card: "X of Y submissions are compliant this week"
 
 ---
 
 ## 🤖 Phase 5 — Full AL Cycle, AI Feedback & Analytics
 
-### Action Learning Cycle Tracker (Backend)
-- [ ] Add `current_stage` and `stage_status` columns to the `submissions` or a new `al_progress` table
-- [ ] Create `POST /al-progress/{studentId}/advance` endpoint: move student to next stage (ADVISOR only, after approval)
-- [ ] Create stage-locking logic: a student cannot submit to stage N+1 until stage N is in APPROVED status
-- [ ] Create `GET /al-progress/{studentId}` endpoint: return current stage and status for the student
-- [ ] Write unit tests for stage-locking logic with boundary cases
+### Action Learning Cycle Tracker (`alc-backend`)
+- [ ] `[backend]` Create `ALProgress` JPA entity linked to the `al_progress` table
+- [ ] `[backend]` Create `GET /al-progress/{studentId}` — return the student's current stage and status
+- [ ] `[backend]` Create `POST /al-progress/{studentId}/advance` — move to the next stage (`ADVISOR` only, only when current stage is `APPROVED`)
+- [ ] `[backend]` Add stage-locking to `POST /submissions/request-upload`: reject a Stage N submission if Stage N-1 is not yet `APPROVED`
+- [ ] `[backend]` Write unit tests for stage-locking with all boundary cases (first stage, middle, final stage)
 
-### AI Reflection Quality Scoring (Python FastAPI)
-- [ ] Create `/routers/analysis.py` in FastAPI
-- [ ] Load a sentence-transformer model (e.g. `all-MiniLM-L6-v2`) at service startup
-- [ ] Implement `POST /analysis/reflection-quality` endpoint accepting a text body
-- [ ] Score the reflection on 4 criteria: Depth, Coherence, Evidence of Learning, Actionability (0–10 each)
-- [ ] Implement scoring logic using cosine similarity between the student's text and ideal-response embeddings per criterion
-- [ ] Generate a plain-English suggestion for any criterion scoring below 6: e.g. "Your reflection does not describe what you would do differently next time. Try adding a section on future action."
-- [ ] Return: `{ "overall_score": float, "criteria": [{ "name": "...", "score": float, "suggestion": "..." }] }`
-- [ ] Write unit tests with sample reflections — verify low-quality text scores below 5, high-quality above 7
+### AI Reflection Quality Scoring (`alc-ai-service`)
+- [ ] `[ai]` Create `services/model_loader.py` — load the chosen sentence-transformer model once at startup and cache it
+- [ ] `[ai]` Create `routers/analysis.py` and register it in `main.py`
+- [ ] `[ai]` Create `POST /analysis/reflection-quality` — accepts `{ "text": "...", "stage": "reflection" }`
+- [ ] `[ai]` Define reference embeddings for four scoring criteria: Depth, Coherence, Evidence of Learning, Actionability
+- [ ] `[ai]` Score each criterion by computing cosine similarity between the student's text embedding and the reference, scaled to 0–10
+- [ ] `[ai]` Generate a plain-English suggestion for any criterion scoring below 6 (e.g. "Add a paragraph describing what you would do differently next time.")
+- [ ] `[ai]` Return: `{ "overall_score": float, "criteria": [{ "name": "...", "score": float, "suggestion": "..." }] }`
+- [ ] `[ai]` Write unit tests with sample high-quality and low-quality reflections — verify scoring direction is correct
 
-### AI Feedback Integration (Spring Boot)
-- [ ] After a submission is confirmed and validated as COMPLIANT, call FastAPI `/analysis/reflection-quality` via WebClient
-- [ ] Store results in `ai_feedback` table linked to the submission
-- [ ] Create `GET /submissions/{id}/feedback` endpoint returning the stored AI feedback
-- [ ] Write integration test for the full flow: submit → validate → AI score → store feedback
+### AI Feedback Integration (`alc-backend`)
+- [ ] `[backend]` After a submission is validated as `COMPLIANT`, trigger an async `WebClient` call to `POST /analysis/reflection-quality`
+- [ ] `[backend]` Store all returned criteria scores and suggestions in the `ai_feedback` table
+- [ ] `[backend]` Create `GET /submissions/{id}/feedback` — return the stored AI feedback for a submission
+- [ ] `[backend]` Write an integration test: submit a compliant document → verify AI feedback is stored and retrievable
 
-### Frontend — AI Feedback Panel
-- [ ] Create `/components/AIFeedbackPanel.tsx`
-- [ ] Display overall score with a circular progress indicator
-- [ ] Display each criterion as a card with: criterion name, score bar (0–10), and suggestion text
-- [ ] Highlight criteria scoring below 6 in amber, below 4 in red
-- [ ] Add a "How to improve" expandable section per criterion
-- [ ] Embed the panel in the Student Dashboard below the submission list
+### Frontend — AI Feedback Panel (`alc-frontend`)
+- [ ] `[frontend]` Create `src/components/AIFeedbackPanel.tsx`
+- [ ] `[frontend]` Display the overall score with a circular or arc progress indicator
+- [ ] `[frontend]` Display each criterion as a card: criterion name, a score bar (0–10), and the suggestion text
+- [ ] `[frontend]` Apply amber styling to cards scoring below 6 and red styling below 4
+- [ ] `[frontend]` Add an expandable "How to improve" section per criterion
+- [ ] `[frontend]` Fetch from `GET /submissions/{id}/feedback` and embed the panel in the Student Dashboard
 
-### Action Learning Cycle Tracker (Frontend)
-- [ ] Create `/components/ALCycleTracker.tsx`
-- [ ] Render four stage cards: Problem, Action, Reflection, Learning
-- [ ] Each card shows: stage name, submission status, deadline, and a "Submit" button if active
-- [ ] Lock the "Submit" button for stages not yet unlocked (grayed out with tooltip "Complete previous stage first")
-- [ ] Show a "Waiting for advisor approval" badge when the stage submission is under review
+### AL Cycle Tracker Frontend (`alc-frontend`)
+- [ ] `[frontend]` Create `src/components/ALCycleTracker.tsx`
+- [ ] `[frontend]` Render four stage cards: Problem, Action, Reflection, Learning
+- [ ] `[frontend]` Each card shows: stage name, submission status badge, deadline, and a "Submit" button if active
+- [ ] `[frontend]` Disable the "Submit" button on locked stages with tooltip: "Complete the previous stage first"
+- [ ] `[frontend]` Show a "Waiting for advisor approval" badge when a stage submission is under review
 
-### Advisor Review Panel (Frontend)
-- [ ] Create `/pages/advisor/ReviewPage.tsx`
-- [ ] Display submission content inline: extracted text from the document rendered as readable paragraphs
-- [ ] Show the Smart-Gate validation results panel (rules passed/failed)
-- [ ] Show the AI feedback panel with all criterion scores
-- [ ] Add "Approve" and "Request Revision" buttons
-- [ ] On approve: call `POST /al-progress/{studentId}/advance` to unlock the next stage
-- [ ] On request revision: open a textarea for the advisor's comment, submit to `POST /submissions/{id}/comment`
-- [ ] Display a history of all previous advisor comments for the submission
+### Advisor Review Panel (`alc-frontend`)
+- [ ] `[frontend]` Create `src/pages/advisor/ReviewPage.tsx`
+- [ ] `[frontend]` Fetch the submission document text from `GET /submissions/{id}` and render it as readable paragraphs
+- [ ] `[frontend]` Display the Smart-Gate validation results panel
+- [ ] `[frontend]` Display the AI Feedback Panel with all criterion scores
+- [ ] `[frontend]` Add "Approve" and "Request Revision" buttons
+- [ ] `[frontend]` On "Approve": call `POST /al-progress/{studentId}/advance` and show a success toast
+- [ ] `[frontend]` On "Request Revision": show a textarea for the advisor's comment, then submit to `POST /submissions/{id}/comment`
+- [ ] `[frontend]` Display a history of previous advisor comments below the action buttons
 
-### Notifications (Backend)
-- [ ] Add `spring-boot-starter-mail` or integrate AWS SES SDK
-- [ ] Create `NotificationService` with method `sendEmail(to, subject, body)`
-- [ ] Send email when: a submission is received (to advisor), validation result is ready (to student), advisor approves/rejects (to student), deadline is 48 hours away (to student)
-- [ ] Create `POST /notifications/mark-read/{id}` endpoint
-- [ ] Create `GET /notifications` endpoint returning unread notifications for the current user
-- [ ] Add a notification bell icon in the frontend navbar showing unread count with a dropdown list
+### Notifications (`alc-backend`)
+- [ ] `[backend]` Add AWS SES SDK or `spring-boot-starter-mail` to `pom.xml`
+- [ ] `[backend]` Create `NotificationService.sendEmail(to, subject, body)`
+- [ ] `[backend]` Send email to advisor when a new submission arrives in their cohort
+- [ ] `[backend]` Send email to student when their validation result is ready
+- [ ] `[backend]` Send email to student when their submission is approved or revision is requested
+- [ ] `[backend]` Create a `@Scheduled` job that sends deadline reminder emails 48 hours before each milestone
+- [ ] `[backend]` Create `GET /notifications` — return all unread notifications for the current user
+- [ ] `[backend]` Create `POST /notifications/{id}/read` — mark a notification as read
 
-### Admin Console (Frontend)
-- [ ] Create `/pages/admin/TenantsPage.tsx` (SUPER_ADMIN only): list all tenants, add new tenant button
-- [ ] Create `/pages/admin/TenantSettingsPage.tsx` (TENANT_ADMIN): edit validation rules (file types, naming pattern, word counts, required sections)
-- [ ] Create `/pages/admin/CohortsPage.tsx`: list cohorts, create cohort form, assign lecturer dropdown
-- [ ] Create `/pages/admin/CohortDetailPage.tsx`: list students in cohort, add/remove student by email
-- [ ] Create `/pages/admin/MilestonesPage.tsx`: set deadline per stage per cohort using a date picker
+### Notifications Frontend (`alc-frontend`)
+- [ ] `[frontend]` Add a notification bell icon in the top navbar
+- [ ] `[frontend]` Show an unread count badge on the bell icon using data from `GET /notifications`
+- [ ] `[frontend]` Clicking the bell opens a dropdown listing recent notifications
+- [ ] `[frontend]` Clicking a notification calls `POST /notifications/{id}/read` and navigates to the relevant page
 
-### Cross-Institution Analytics (Backend)
-- [ ] Create `GET /analytics/cohort/{id}/summary` endpoint: returns on-time rate, compliance rate, average AI score for the cohort
-- [ ] Create `GET /analytics/tenant/summary` endpoint: aggregated stats for the whole tenant
-- [ ] Create `GET /analytics/global/benchmarks` endpoint (SUPER_ADMIN): cross-tenant averages — anonymized
-- [ ] Create `GET /analytics/tenant/{id}/trends` endpoint: monthly submission volume and quality score over time
-- [ ] Write unit tests for each analytics calculation
+### Admin Console (`alc-frontend`)
+- [ ] `[frontend]` Create `src/pages/admin/TenantsPage.tsx` (`SUPER_ADMIN` only): list all tenants and provide an "Add Tenant" form
+- [ ] `[frontend]` Create `src/pages/admin/TenantSettingsPage.tsx` (`TENANT_ADMIN`): form to edit validation rules — file types, naming pattern, word count limits, required sections
+- [ ] `[frontend]` Create `src/pages/admin/CohortsPage.tsx`: list cohorts, create cohort form, assign lecturer via dropdown
+- [ ] `[frontend]` Create `src/pages/admin/CohortDetailPage.tsx`: list students in a cohort, add student by email, remove student
+- [ ] `[frontend]` Create `src/pages/admin/MilestonesPage.tsx`: set and edit submission deadline per stage per cohort with a date picker
 
-### Analytics Dashboard (Frontend)
-- [ ] Create `/pages/analytics/AnalyticsPage.tsx`
-- [ ] Add a line chart: submissions per week over the last 3 months (Recharts `LineChart`)
-- [ ] Add a bar chart: average AI quality score per cohort (Recharts `BarChart`)
-- [ ] Add a pie chart: submission status distribution — Compliant / Non-Compliant / Pending
-- [ ] Add a metric card row: On-Time Rate %, Average Quality Score, Total Submissions This Month
-- [ ] Add a benchmark comparison row: tenant average vs global average for quality score and on-time rate
-- [ ] Make all charts responsive using Recharts `ResponsiveContainer`
+### Cross-Institution Analytics (`alc-backend`)
+- [ ] `[backend]` Create `GET /analytics/cohort/{id}/summary` — on-time rate, compliance rate, average AI score for the cohort
+- [ ] `[backend]` Create `GET /analytics/tenant/summary` — aggregated stats for the whole tenant
+- [ ] `[backend]` Create `GET /analytics/tenant/trends` — monthly submission volume and average quality score over the past 6 months
+- [ ] `[backend]` Create `GET /analytics/global/benchmarks` (`SUPER_ADMIN` only) — cross-tenant averages, anonymized
+- [ ] `[backend]` Write unit tests for each analytics calculation including empty cohort edge cases
+
+### Analytics Dashboard (`alc-frontend`)
+- [ ] `[frontend]` Create `src/pages/analytics/AnalyticsPage.tsx`
+- [ ] `[frontend]` Add a line chart: submissions per week over the past 3 months using `recharts LineChart`
+- [ ] `[frontend]` Add a bar chart: average AI quality score per cohort using `recharts BarChart`
+- [ ] `[frontend]` Add a pie chart: submission status distribution using `recharts PieChart`
+- [ ] `[frontend]` Add a metric card row: On-Time Rate %, Average Quality Score, Total Submissions This Month
+- [ ] `[frontend]` Add a benchmark comparison row: tenant average vs global average
+- [ ] `[frontend]` Wrap all charts in `recharts ResponsiveContainer` so they resize with the browser window
 
 ### Compliance Report Export
-- [ ] Add `itext7` or `apache-pdfbox` dependency to `pom.xml` for PDF generation
-- [ ] Create `GET /reports/cohort/{id}/compliance` endpoint that generates a PDF report listing all students, their stage statuses, and compliance outcomes
-- [ ] Add a "Download Report" button in the Faculty Dashboard that triggers this endpoint and downloads the PDF
+- [ ] `[backend]` Add `itext7` or `apache-pdfbox` to `pom.xml`
+- [ ] `[backend]` Create `GET /reports/cohort/{id}/compliance` — generates and streams a PDF listing all students, their stage statuses, and compliance outcomes
+- [ ] `[frontend]` Add a "Download Compliance Report" button on the Faculty Dashboard that triggers this endpoint and saves the PDF
 
 ### Load Testing
-- [ ] Write a load test script using `k6` or `Locust` simulating 50 concurrent student submissions
-- [ ] Run the test against the local docker-compose setup
-- [ ] Check S3 upload success rate, Spring Boot response times, and FastAPI validation latency
-- [ ] Document results in `/docs/testing/load-test-results.md`
+- [ ] `[root]` Install `k6` locally: `brew install k6` or download from the k6 website
+- [ ] `[root]` Write `infra/load-tests/submission-flow.js` simulating 50 virtual users: login → request-upload → confirm → poll
+- [ ] `[root]` Run the test against the local docker-compose: `k6 run infra/load-tests/submission-flow.js`
+- [ ] `[root]` Record p95 latency, error rate, and S3 success rate in `/docs/testing/load-test-results.md`
 
 ---
 
 ## 🎨 Phase 6 — UX Refinement, Security & Final Delivery
 
 ### UX Testing
-- [ ] Recruit 5 students and 2 advisors for usability testing sessions
-- [ ] Prepare a task script: "Log in, submit a document to Stage 1, view your AI feedback"
-- [ ] Observe and note any points where users hesitate, make errors, or express confusion
-- [ ] Collect written feedback after each session using a simple form
-- [ ] Categorize all feedback into: Navigation, Clarity, Performance, Missing Feature, Bug
-- [ ] Create GitHub issues for each actionable feedback item
+- [ ] `[root]` Recruit 5 students and 2 advisors for 30-minute usability testing sessions
+- [ ] `[root]` Prepare a task script: "Log in → submit to Stage 1 → read validation result → read AI feedback"
+- [ ] `[root]` Note every point where a user hesitates, makes an error, or expresses confusion
+- [ ] `[root]` Collect written feedback after each session using a short form
+- [ ] `[root]` Categorize feedback into: Navigation, Clarity, Performance, Missing Feature, Bug
+- [ ] `[root]` Open a labeled GitHub issue in the relevant repo for each actionable item
 
-### UX Fixes & Polish
-- [ ] Refine information hierarchy on the Student Dashboard — most critical info (next deadline, current status) must be visible without scrolling
-- [ ] Add empty states for all lists: e.g. "No submissions yet — upload your first document to get started"
-- [ ] Add confirmation dialogs before irreversible actions: delete submission, remove student from cohort
-- [ ] Add loading skeleton screens for all dashboard data fetches
-- [ ] Add error boundary components to prevent full-page crashes on API failures
-- [ ] Add toast notifications for: successful submission, validation complete, approval received
-- [ ] Implement responsive layout for all pages at 768px (tablet) and 375px (mobile) breakpoints
-- [ ] Test every page in both light and dark mode if a theme toggle is implemented
+### UX Fixes & Polish (`alc-frontend`)
+- [ ] `[frontend]` Ensure the Student Dashboard shows the next deadline and current stage status without scrolling
+- [ ] `[frontend]` Add empty state components for all lists: e.g. "No submissions yet — upload your first document to get started"
+- [ ] `[frontend]` Add confirmation dialogs before every irreversible action: delete submission, remove student from cohort
+- [ ] `[frontend]` Replace loading spinners with skeleton screen components for all data-fetching pages
+- [ ] `[frontend]` Add a global `ErrorBoundary` component to catch and display unexpected errors without crashing the whole app
+- [ ] `[frontend]` Add toast notifications using `react-hot-toast` for: upload success, validation complete, advisor approval received
+- [ ] `[frontend]` Test and fix layout at 768px (tablet) and 375px (mobile) breakpoints across every page
 
-### Accessibility
-- [ ] Run automated accessibility audit using `axe-core` browser extension on all pages
-- [ ] Fix any color contrast issues (minimum WCAG 2.1 AA: 4.5:1 for normal text)
-- [ ] Add `aria-label` to all icon-only buttons (e.g. the notification bell, close modal button)
-- [ ] Ensure all form inputs have associated `<label>` elements
-- [ ] Test keyboard-only navigation: tab through all interactive elements on each page
-- [ ] Add `alt` text to all images and diagrams
+### Accessibility (`alc-frontend`)
+- [ ] `[frontend]` Run the `axe-core` browser extension on every page — fix all critical violations
+- [ ] `[frontend]` Verify all text meets WCAG 2.1 AA contrast ratio: minimum 4.5:1 for normal text
+- [ ] `[frontend]` Add `aria-label` to all icon-only buttons: notification bell, close modal, drag-and-drop zone
+- [ ] `[frontend]` Ensure every form input has an associated `<label>` element — not just placeholder text
+- [ ] `[frontend]` Test full keyboard navigation on every page: every interactive element reachable via Tab and operable via Enter
+- [ ] `[frontend]` Add descriptive `alt` text to all images
 
 ### Security Audit
-- [ ] Test for IDOR (Insecure Direct Object Reference): log in as Student A, try to fetch Student B's submission by ID — should return 403
-- [ ] Test for tenant data leakage: log in as a user from Tenant A, call endpoints with Tenant B's IDs — should return 403 or 404
-- [ ] Test file upload security: try uploading a `.exe`, `.sh`, and a file with a manipulated MIME type — all should be rejected
-- [ ] Test JWT forgery: modify the JWT payload (change role to SUPER_ADMIN) and sign with a wrong secret — should return 401
-- [ ] Test SQL injection on all string input fields — Spring JPA parameterized queries should prevent this
-- [ ] Review all endpoints: confirm none are publicly accessible without a valid JWT
-- [ ] Implement rate limiting on `POST /auth/login` to prevent brute-force attacks (max 5 failed attempts per minute)
-- [ ] Implement rate limiting on `POST /submissions/request-upload` (max 10 per student per hour)
-- [ ] Ensure all API responses omit sensitive fields (password_hash, internal IDs) using DTOs
+- [ ] `[backend]` Test for IDOR: as Student A, call `GET /submissions/{id}` with Student B's ID — assert `403`
+- [ ] `[backend]` Test tenant isolation: as Tenant A user, call endpoints with Tenant B resource IDs — assert `403` or `404`
+- [ ] `[ai]` Test malicious file upload: send `.exe` and a file with a spoofed MIME type to the validation endpoint — assert both rejected
+- [ ] `[backend]` Test JWT forgery: change `role` claim to `SUPER_ADMIN`, sign with wrong secret — assert `401`
+- [ ] `[backend]` Test SQL injection: submit special characters in all free-text fields — Spring JPA parameterized queries should block this, confirm manually
+- [ ] `[backend]` Review every controller: confirm no endpoint is reachable without a valid JWT
+- [ ] `[backend]` Add login rate limiting to `POST /auth/login`: block after 5 failed attempts per IP in 60 seconds using `Bucket4j`
+- [ ] `[backend]` Add upload rate limiting to `POST /submissions/request-upload`: max 10 per student per hour
+- [ ] `[backend]` Audit all response DTOs: confirm `password_hash` and internal fields never appear in any response body
 
 ### AWS Production Setup
-- [ ] Create an AWS RDS PostgreSQL instance (db.t3.micro for MVP) in a private subnet
-- [ ] Create an ECS cluster with Fargate launch type
-- [ ] Create ECS task definitions for backend and AI service containers
-- [ ] Create an ECS service for each with desired count = 1 (scale up later)
-- [ ] Create an Application Load Balancer with HTTPS listener (SSL certificate via AWS ACM)
-- [ ] Set up Route 53 DNS records pointing your domain to the ALB
-- [ ] Create production S3 bucket `alc-documents-prod` with the same settings as dev
-- [ ] Deploy frontend build to S3 + CloudFront for static hosting
-- [ ] Set up CloudWatch log groups for each ECS service
-- [ ] Set up CloudWatch alarms: alert if backend error rate > 1% or latency > 2s
+- [ ] `[root]` Provision AWS RDS PostgreSQL 16 (`db.t3.micro`) in a private subnet — no public access
+- [ ] `[root]` Create an ECS cluster with Fargate launch type in the same VPC
+- [ ] `[backend]` Push `alc-backend` Docker image to AWS ECR and create an ECS task definition
+- [ ] `[ai]` Push `alc-ai-service` Docker image to AWS ECR and create an ECS task definition
+- [ ] `[frontend]` Run `npm run build` and deploy the `/build` folder to an S3 bucket with static website hosting enabled
+- [ ] `[root]` Create a CloudFront distribution in front of the frontend S3 bucket — enforce HTTPS
+- [ ] `[root]` Create an Application Load Balancer with HTTPS listener — provision SSL certificate via AWS ACM
+- [ ] `[root]` Add Route 53 DNS records: domain → ALB (backend/AI), domain → CloudFront (frontend)
+- [ ] `[root]` Create production S3 bucket `alc-documents-prod` with same versioning and access-block settings as dev
+- [ ] `[root]` Set up CloudWatch log groups for both ECS services
+- [ ] `[root]` Set up CloudWatch alarms: alert if p95 latency > 2s or error rate > 1%
 
 ### Monitoring & Observability
-- [ ] Enable Spring Boot Actuator endpoints: `/actuator/health`, `/actuator/metrics`
-- [ ] Add a CloudWatch dashboard showing: ECS CPU/memory, RDS connections, S3 request count, API response times
-- [ ] Set up an AWS SNS alert that emails the team when any CloudWatch alarm fires
-- [ ] Add structured logging in Spring Boot using `logback` with JSON format for CloudWatch Logs Insights queries
+- [ ] `[backend]` Enable Spring Boot Actuator in production: expose `/actuator/health` and `/actuator/metrics`
+- [ ] `[backend]` Configure `logback-spring.xml` to output structured JSON logs for CloudWatch Logs Insights
+- [ ] `[ai]` Add structured JSON logging to FastAPI using Python's `logging` module with a JSON formatter
+- [ ] `[root]` Create a CloudWatch dashboard: ECS CPU/memory, RDS connections, S3 request count, API p95 latency
+- [ ] `[root]` Create an AWS SNS topic, subscribe team email addresses, and link all CloudWatch alarms to it
 
 ### Documentation
-- [ ] Write `/docs/setup-guide.md`: step-by-step local dev setup from scratch
-- [ ] Write `/docs/api-reference.md`: full list of endpoints with curl examples
-- [ ] Write `/docs/deployment-guide.md`: how to deploy to AWS from scratch
-- [ ] Update this README with final architecture diagram, screenshots, and team contribution notes
+- [ ] `[root]` Write `/docs/setup-guide.md`: clone all four repos and run everything locally with docker-compose
+- [ ] `[root]` Write `/docs/api-reference.md`: every backend endpoint with method, path, required role, and a curl example
+- [ ] `[root]` Write `/docs/ai-service-reference.md`: every AI service endpoint with example request and response payloads
+- [ ] `[root]` Write `/docs/deployment-guide.md`: step-by-step AWS production deployment from scratch
+- [ ] `[root]` Update this README: add the final architecture diagram, screenshots of key screens, and a "Quick Start" section
 
 ### Thesis
-- [ ] Write Chapter 1 — Introduction: problem statement, motivation, objectives
-- [ ] Write Chapter 2 — Literature Review: compile research from Phase 2
-- [ ] Write Chapter 3 — System Design: architecture, database schema, API design
-- [ ] Write Chapter 4 — Implementation: key technical decisions, code snippets, challenges
-- [ ] Write Chapter 5 — Results & Evaluation: load test results, usability test findings, AI scoring accuracy
-- [ ] Write Chapter 6 — Conclusion: what was achieved, limitations, future work
-- [ ] Format bibliography with all cited sources
+- [ ] `[root]` Write Chapter 1 — Introduction: problem statement, motivation, objectives
+- [ ] `[root]` Write Chapter 2 — Literature Review: compile from Phase 2 research docs
+- [ ] `[root]` Write Chapter 3 — System Design: architecture, multi-repo structure, DB schema, API design
+- [ ] `[root]` Write Chapter 4 — Implementation: key decisions, code excerpts, challenges per service
+- [ ] `[root]` Write Chapter 5 — Results & Evaluation: load test results, usability findings, AI scoring accuracy
+- [ ] `[root]` Write Chapter 6 — Conclusion: achievements, limitations, future work
+- [ ] `[root]` Format bibliography with all sources in the agreed citation style
 
 ### Final Presentation
-- [ ] Record a demo video walkthrough: register → submit document → see validation result → receive AI feedback → advisor approves → next stage unlocks
-- [ ] Prepare slides: Problem, Solution, Architecture, Live Demo, Results, Future Work
-- [ ] Rehearse the presentation with all three team members
+- [ ] `[root]` Record a demo video: register → submit → validation result → AI feedback → advisor approves → next stage unlocks
+- [ ] `[root]` Prepare slide deck: Problem, Solution, Architecture, Live Demo, Results, Future Work
+- [ ] `[root]` Rehearse the full presentation with all three team members and time it
 
 ---
 
 ## 📊 Progress Summary
 
-| Phase | Tasks | Status |
-|-------|-------|--------|
-| Phase 0 — Setup | 44 tasks | 🔲 Not started |
-| Phase 1 — Requirements | 28 tasks | 🔲 Not started |
-| Phase 2 — Research | 22 tasks | 🔲 Not started |
-| Phase 3 — Core Backend | 38 tasks | 🔲 Not started |
-| Phase 4 — Prototype | 35 tasks | 🔲 Not started |
-| Phase 5 — MVP | 42 tasks | 🔲 Not started |
-| Phase 6 — Delivery | 40 tasks | 🔲 Not started |
+| Phase | Primary Repo(s) | Tasks | Status |
+|-------|----------------|-------|--------|
+| Phase 0 — Setup | all | 55 tasks | 🔲 Not started |
+| Phase 1 — Requirements | root | 29 tasks | 🔲 Not started |
+| Phase 2 — Research | root, ai | 24 tasks | 🔲 Not started |
+| Phase 3 — Core Backend | backend | 41 tasks | 🔲 Not started |
+| Phase 4 — Prototype | backend, ai, frontend | 37 tasks | 🔲 Not started |
+| Phase 5 — MVP | all | 48 tasks | 🔲 Not started |
+| Phase 6 — Delivery | all | 41 tasks | 🔲 Not started |
 
-**Total: ~249 tasks**
+**Total: ~275 tasks**
 
 ---
 
-## 🗂️ Folder Structure
+## 🗂️ Root Repo Folder Structure
 
 ```
-alc/
-├── frontend/               # React TypeScript app
-├── backend/                # Spring Boot Maven project
-├── ai-service/             # Python FastAPI service
-├── infra/                  # Docker, Terraform, AWS configs
+alc/                          ← this repo (coordination only)
 ├── docs/
-│   ├── adr/                # Architecture Decision Records
-│   ├── architecture/       # Diagrams, ERD, schema
-│   ├── requirements/       # RBAC matrix, API contract, validation rules
-│   ├── research/           # Interview notes, pain points
-│   ├── wireframes/         # UI sketches and mockups
-│   └── testing/            # Load test results
-├── docker-compose.yml
+│   ├── adr/                  ← Architecture Decision Records
+│   ├── architecture/         ← System diagram, ERD, DB schema
+│   ├── requirements/         ← RBAC matrix, API contract, validation rules
+│   ├── research/             ← Interview notes, pain points
+│   ├── wireframes/           ← UI sketches
+│   └── testing/              ← Load test scripts and results
+├── infra/
+│   └── load-tests/           ← k6 scripts
+├── docker-compose.yml        ← Starts all 4 services together for local dev
 ├── Makefile
-└── README.md
+└── README.md                 ← This file
+```
+
+Application code lives in separate repos:
+
+```
+alc-frontend/     ← React TypeScript
+alc-backend/      ← Spring Boot Maven
+alc-ai-service/   ← Python FastAPI
 ```
 
 ---
 
 ## 👥 Team
 
-| Name | Role Focus |
-|------|-----------|
-| DOORGA Trithikraj | Backend (Spring Boot), Multi-tenancy, Security |
-| NGUGI Janice | Frontend (React TypeScript), UI/UX, Analytics |
-| MEYE Jordy | AI/NLP (FastAPI), Document Validation, Infra/DevOps |
+| Name | Focus |
+|------|-------|
+| DOORGA Trithikraj | Backend — Spring Boot, multi-tenancy, security |
+| NGUGI Janice | Frontend — React TypeScript, UI/UX, analytics |
+| MEYE Jordy | AI/NLP — FastAPI, document validation, DevOps/AWS |
 
 ---
 
-*Generated for the Action Learning Cockpit project — EPITA*
+*Action Learning Cockpit — EPITA*
