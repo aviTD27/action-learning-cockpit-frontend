@@ -1,4 +1,4 @@
-import '../styles/uniAdmin.css'
+import '../../styles/uniAdmin.css'
 
 interface Stats {
   totalStudents:  number
