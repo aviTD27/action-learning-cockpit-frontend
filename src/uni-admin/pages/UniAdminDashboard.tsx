@@ -1,9 +1,22 @@
 import Layout from '../../shared/layout/Layout'
+import KPIRow from '../components/KPIRow'
+import { useUniAdminStats } from '../hooks/useUniAdminStats'
 import '../styles/UniAdminDashboard.css'
 
+const NAV = [
+  { label: 'Overview',          icon: '🏠',  path: '/uni-admin'            },
+  { label: 'Cohort Management', icon: '👥',  path: '/uni-admin/cohorts'    },
+  { label: 'Lecturers',         icon: '👩‍🏫', path: '/uni-admin/lecturers'  },
+  { label: 'Students',          icon: '🎓',  path: '/uni-admin/students'   },
+  { label: 'Compliance',        icon: '📋',  path: '/uni-admin/compliance' },
+  { label: 'Analytics',         icon: '📊',  path: '/uni-admin/analytics'  },
+  { label: 'Settings',          icon: '⚙️',  path: '/uni-admin/settings'   },
+]
+
 export default function UniAdminDashboard() {
+  const { stats } = useUniAdminStats()
   return (
-    <Layout>
+    <Layout navItems={NAV}>
       <header className="uni-admin-header">
          <div>
            <h1 className="title">University Admin</h1>
@@ -18,13 +31,16 @@ export default function UniAdminDashboard() {
          </div>
       </header>
 
-      <div className="uni-admin-grid">
+      <KPIRow stats={stats} />
+
+
+      {/* <div className="uni-admin-grid">
         <SectionCard title="Cohorts" description="Overview of active and upcoming cohorts." />
         <SectionCard title="Students" description="Student enrollment and progression." />
         <SectionCard title="Lecturers" description="Lecturer assignments and workload." />
         <SectionCard title="Compliance" description="Compliance status and alerts." />
         <SectionCard title="Benchmark" description="Benchmarking across cohorts and institutions." />
-      </div>
+      </div> */}
     </Layout>
   )
 }
