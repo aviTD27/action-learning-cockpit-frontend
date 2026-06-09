@@ -1,16 +1,21 @@
 import Layout from '../../shared/layout/Layout'
-import KPIRow from '../components/KPIRow'
+import KPIRow from '../components/cards/KPIRow'
 import { useUniAdminStats } from '../hooks/useUniAdminStats'
 import '../styles/UniAdminDashboard.css'
+import CohortTable from '../components/tables/CohortTable'
+import StudentPanel  from '../components/panels/StudentPanel'
+import LecturerPanel from '../components/panels/LecturerPanel'
+import ComplianceStats  from '../components/cards/ComplianceStats'
+import BenchmarkTable from '../components/tables/BenchmarkTable'
 
 const NAV = [
-  { label: 'Overview',          icon: '🏠',  path: '/uni-admin'            },
-  { label: 'Cohort Management', icon: '👥',  path: '/uni-admin/cohorts'    },
-  { label: 'Lecturers',         icon: '👩‍🏫', path: '/uni-admin/lecturers'  },
-  { label: 'Students',          icon: '🎓',  path: '/uni-admin/students'   },
-  { label: 'Compliance',        icon: '📋',  path: '/uni-admin/compliance' },
-  { label: 'Analytics',         icon: '📊',  path: '/uni-admin/analytics'  },
-  { label: 'Settings',          icon: '⚙️',  path: '/uni-admin/settings'   },
+  { label: 'Overview', icon: '🏠',  path: '/uni-admin' },
+  { label: 'Cohort Management', icon: '👥',  path: '/uni-admin/cohorts' },
+  { label: 'Lecturers', icon: '👩‍🏫', path: '/uni-admin/lecturers' },
+  { label: 'Students', icon: '🎓',  path: '/uni-admin/students' },
+  { label: 'Compliance', icon: '📋',  path: '/uni-admin/compliance' },
+  { label: 'Analytics', icon: '📊',  path: '/uni-admin/analytics' },
+  { label: 'Settings', icon: '⚙️',  path: '/uni-admin/settings' },
 ]
 
 export default function UniAdminDashboard() {
@@ -31,7 +36,25 @@ export default function UniAdminDashboard() {
          </div>
       </header>
 
-      <KPIRow stats={stats} />
+      {/* <KPIRow stats={stats} />
+
+      <CohortTable />
+
+      <div className="ua-two-col">
+        <StudentPanel />
+        <LecturerPanel />
+      </div> */}
+
+      <div className="ua-page">
+        <KPIRow stats={stats} />
+        <CohortTable />
+        <div className="ua-two-col">
+          <StudentPanel />
+          <LecturerPanel />
+        </div>
+        <ComplianceStats />
+        <BenchmarkTable />
+      </div>
 
 
       {/* <div className="uni-admin-grid">
@@ -45,11 +68,11 @@ export default function UniAdminDashboard() {
   )
 }
 
-function SectionCard({ title, description }) {
-  return (
-    <section className="uni-admin-card">
-      <h2>{title}</h2>
-      <p>{description}</p>
-    </section>
-  )
-}
+// function SectionCard({ title, description }) {
+//   return (
+//     <section className="uni-admin-card">
+//       <h2>{title}</h2>
+//       <p>{description}</p>
+//     </section>
+//   )
+// }

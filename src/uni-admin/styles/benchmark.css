@@ -1,0 +1,67 @@
+.benchmark-card {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.benchmark-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.benchmark-title {
+  font-weight: 700;
+  color: #1E3A5F;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.benchmark-subtitle {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.benchmark-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.benchmark-table thead {
+  background-color: #1E3A5F;
+}
+
+.benchmark-table thead th {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+
+.benchmark-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.1s;
+}
+
+.benchmark-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.benchmark-table tbody tr.top-row {
+  background-color: #f0fdf4;
+}
+
+.benchmark-table tbody td {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+.cohort-name { font-weight: 600; color: #1E3A5F; }
+.rate-good   { color: #16a34a; font-weight: 600; }
+.rate-mid    { color: #ea580c; font-weight: 600; }
+.rate-bad    { color: #dc2626; font-weight: 600; }
+.rank-cell   { color: #F0A500; font-weight: 700; }
