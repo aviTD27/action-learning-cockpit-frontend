@@ -1,75 +1,36 @@
-import { useState } from 'react'
-import AddLecturerModal from './../modals/AddLecturerModal'
-import '../../styles/panels.css'
+import { Link } from 'react-router-dom'
+import { Presentation } from 'lucide-react'
+import { useLecturers } from '../../hooks/useLecturers'
+import StatusBadge from '../shared/StatusBadge'
+import '../../styles/uniAdmin.css'
 
-const INITIAL_LECTURERS = [
-  { id:'1', name:'Dr. Tim', cohorts:'MSc-2024-Fall, MSc-2024-Spring', role:'Lecturer'},
-  { id:'2', name:'Dr. Jane', cohorts:'MSc-2024-Spring', role:'Lecturer'},
-  { id:'3', name:'Dr. John', cohorts:'MSc-2024-Fall', role:'Senior Lec.'},
-  { id:'4', name:'Dr. Alice', cohorts:'MSc-2024-Fall', role:'Lecturer'},
-  { id:'5', name:'Dr. Rob',  cohorts:'MSc-2023-Fall', role:'Prog. Coord.'},
-]
-
-export default function LecturersPanel() {
-  const [lecturers, setLecturers] = useState(INITIAL_LECTURERS)
-  const [addOpen, setAddOpen] = useState(false)
-
-  const handleAddLecturer = (data: {
-    firstName: string; lastName: string; email: string;
-    staffId: string; role: string; cohorts: string[];
-  }) => {
-    setLecturers(prev => [...prev, {
-      id: Date.now().toString(),
-      name: `${data.firstName} ${data.lastName}`,
-      cohorts: data.cohorts.join(', '),
-      role: data.role,
-    }])
-  }
+export default function LecturerPanel() {
+  const { lecturers, loading } = useLecturers()
+  const recent = lecturers.slice(-5).reverse()
 
   return (
-    <>
-      <div className="panel-card">
-        <div className="panel-header">
-          <p className="panel-title">👩‍🏫 Lecturers</p>
-          <button
-            className="btn btn-success"
-            onClick={() => setAddOpen(true)}
-          >
-            + Add Lecturer
-          </button>
-        </div>
-
-        <table className="panel-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Cohort(s)</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lecturers.map(l => (
-              <tr key={l.id}>
-                <td>{l.name}</td>
-                <td style={{ color: '#2563eb' }}>{l.cohorts}</td>
-                <td style={{ color: '#6b7280' }}>{l.role}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="panel-footer">
-          <p style={{ fontSize: '11px', color: '#9ca3af' }}>
-            {lecturers.length} lecturers total
-          </p>
-        </div>
+    <div className="ua-card">
+      <div className="ua-card-header">
+        <p className="ua-card-title"><Presentation size={14} /> Recent Lecturers</p>
+        <Link to="/uni-admin/lecturers" className="ua-link">View all →</Link>
       </div>
-
-      <AddLecturerModal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        onSave={handleAddLecturer}
-      />
-    </>
+      <div className="ua-panel-body">
+        {loading ? (
+          <p className="ua-table-empty">Loading…</p>
+        ) : recent.length === 0 ? (
+          <p className="ua-table-empty">No lecturers added yet.</p>
+        ) : (
+          recent.map(l => (
+            <div className="ua-stat-row" key={l.id}>
+              <span>
+                <span className="ua-row-name">{l.firstName} {l.lastName}</span>
+                <span className="ua-row-sub"> · {l.programmeNames.join(', ')}</span>
+              </span>
+              <StatusBadge status={l.status} />
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   )
 }
