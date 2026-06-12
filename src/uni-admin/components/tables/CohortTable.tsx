@@ -1,83 +1,65 @@
 import { useState } from 'react'
+import { Pencil, Plus, Users } from 'lucide-react'
 import { useCohorts } from '../../hooks/useCohorts'
-import type { Cohort } from '../../hooks/useCohorts'
+import { useProgrammes } from '../../hooks/useProgrammes'
+import { createCohort, updateCohort } from '../../api/uniAdmin'
+import type { CohortResponse, CreateCohortRequest } from '../../api/types'
 import CohortModal from '../modals/CohortModal'
+import StatusBadge from '../shared/StatusBadge'
 import '../../styles/uniAdmin.css'
 
-const STATUS_LABELS: Record<string, string> = {
-  open: '✅ Open',
-  closed: '🔒 Closed',
-  late: '⚠️ Late',
-  not_started: '🕐 Not started',
-}
-
 export default function CohortTable() {
-  const { cohorts, loading, refetch } = useCohorts()
+  const { cohorts, loading, error, reload } = useCohorts()
+  const { programmes } = useProgrammes()
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [modalOpen,  setModalOpen ] = useState(false)
-  const [editTarget, setEditTarget] = useState<Cohort | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<CohortResponse | null>(null)
 
-  const selected = cohorts.find(c => c.id === selectedId) ?? null
+  const openCreate = () => { setEditTarget(null); setModalOpen(true) }
+  const openEdit = (cohort: CohortResponse) => { setEditTarget(cohort); setModalOpen(true) }
 
-  const openCreate = () => { setEditTarget(null);     setModalOpen(true) }
-  const openEdit   = () => { setEditTarget(selected); setModalOpen(true) }
-
-  const handleSave = async (data: Partial<Cohort>) => {
-    // TODO: API Call for Backend
-    console.log(editTarget ? 'UPDATE' : 'CREATE', data)
-    refetch()
-  }
-
-  const handleArchive = () => {
-    if (!selectedId) return
-    // TODO: API Call for Backend
-    console.log('ARCHIVE', selectedId)
-    setSelectedId(null)
-    refetch()
+  const handleSave = async (data: CreateCohortRequest) => {
+    if (editTarget) await updateCohort(editTarget.id, data)
+    else await createCohort(data)
+    reload()
   }
 
   return (
     <div className="ua-card">
-
       <div className="ua-card-header">
-        <p className="ua-card-title">👥 Cohort Management</p>
+        <p className="ua-card-title"><Users size={14} /> Cohort Management<span className="ua-count">{cohorts.length} total · {cohorts.filter(c => c.status === 'ONGOING').length} ongoing</span></p>
         <button className="ua-btn ua-btn-success" onClick={openCreate}>
-          + Create New Cohort
+          <Plus size={12} /> Create New Cohort
         </button>
       </div>
 
       <div className="ua-table-wrap">
         {loading ? (
           <p className="ua-table-empty">Loading cohorts…</p>
+        ) : error ? (
+          <p className="ua-table-empty">{error}</p>
+        ) : cohorts.length === 0 ? (
+          <p className="ua-table-empty">No cohorts yet. Create the first one.</p>
         ) : (
           <table className="ua-table">
             <thead>
               <tr>
                 <th>Cohort Name</th>
                 <th>Programme</th>
-                <th>Lecturer</th>
-                <th>Students</th>
-                <th>Cycle</th>
                 <th>Status</th>
+                <th className="col-actions">Actions</th>
               </tr>
             </thead>
             <tbody>
               {cohorts.map(c => (
-                <tr
-                  key={c.id}
-                  onClick={() => setSelectedId(c.id)}
-                  className={selectedId === c.id ? 'selected' : ''}
-                >
+                <tr key={c.id}>
                   <td className="col-name">{c.name}</td>
-                  <td className="col-muted">{c.programme}</td>
-                  <td className="col-muted">{c.lecturerName}</td>
-                  <td>{c.studentCount}</td>
-                  <td className="col-highlight">{c.currentCycle} / {c.totalCycles}</td>
-                  <td>
-                    <span className={`ua-badge ua-badge-${c.status}`}>
-                      {STATUS_LABELS[c.status]}
-                    </span>
+                  <td className="col-muted">{c.programmeName}</td>
+                  <td><StatusBadge status={c.status} /></td>
+                  <td className="col-actions">
+                    <button className="ua-icon-btn" title="Edit cohort" onClick={() => openEdit(c)}>
+                      <Pencil size={13} />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -86,19 +68,13 @@ export default function CohortTable() {
         )}
       </div>
 
-      <div className="ua-card-footer">
-        <button className="ua-btn ua-btn-secondary" onClick={openEdit} disabled={!selectedId}>✏️ Edit</button>
-        <button className="ua-btn ua-btn-success" disabled={!selectedId}>➕ Enroll Students</button>
-        <button className="ua-btn ua-btn-ghost" onClick={handleArchive} disabled={!selectedId}>🗄 Archive</button>
-      </div>
-
       <CohortModal
         open={modalOpen}
         existing={editTarget}
+        programmes={programmes}
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
       />
-
     </div>
   )
 }
