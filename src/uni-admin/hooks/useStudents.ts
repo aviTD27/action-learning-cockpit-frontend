@@ -1,29 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { getStudents, getStudentsByCohort } from '../api/uniAdmin'
+import { CURRENT_UNIVERSITY_ID } from '../tenant'
+import type { StudentResponse } from '../api/types'
 
-export type StudentStatus = 'active' | 'at_risk' | 'inactive'
+export function useStudents(cohortId?: number) {
+  const [students, setStudents] = useState<StudentResponse[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-export interface Student {
-  id:         string
-  name:       string
-  cohortName: string
-  status:     StudentStatus
-}
+  const reload = useCallback(() => {
+    setLoading(true)
+    setError(null)
+    const req = cohortId != null ? getStudentsByCohort(cohortId) : getStudents(CURRENT_UNIVERSITY_ID)
+    req
+      .then(res => setStudents(res.data))
+      .catch(() => setError('Failed to load students'))
+      .finally(() => setLoading(false))
+  }, [cohortId])
 
-const MOCK: Student[] = [
-  { id:'1', name:'Jane Doe', cohortName:'MSc-2025-Fall',  status:'active' },
-  { id:'2', name:'Jane Smith', cohortName:'MSc-2025-Fall', status:'at_risk' },
-  { id:'3', name:'John Smith', cohortName:'MSc-2025-Fall', status:'active' },
-  { id:'4', name:'Alex Johnson', cohortName:'MSc-2025-Fall',  status:'active' },
-  { id:'5', name:'Jim Brown', cohortName:'MSc-2025-Fall', status:'inactive' },
-]
+  useEffect(() => { reload() }, [reload])
 
-export function useStudents() {
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading,  setLoading ] = useState(true)
-
-  useEffect(() => {
-    setTimeout(() => { setStudents(MOCK); setLoading(false) }, 400)
-  }, [])
-
-  return { students, loading }
+  return { students, loading, error, reload }
 }
