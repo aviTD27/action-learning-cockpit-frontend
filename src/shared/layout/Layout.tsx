@@ -5,16 +5,16 @@ import Header from './Header'
 import '../styles/layout.css'
 
 interface Props {
-  children:   ReactNode
-  title?:     string
-  subtitle?:  string
-  navItems?:  NavItem[]
-  user?:      SidebarUser
+  children: ReactNode
+  title?: string
+  subtitle?: string
+  navItems?: NavItem[]
+  user?: SidebarUser
 }
 
 export default function Layout({
   children,
-  title    = 'Epita University Admin',
+  title = 'Epita University Admin',
   subtitle = 'Tenant: EPITA · Active Cycle 3 · Live ●',
   navItems,
   user,

@@ -17,10 +17,10 @@ export interface SidebarUser {
 }
 
 const ROLE_NAV: NavItem[] = [
-  { label: 'Platform Admin', icon: Monitor,        path: '/platform-admin' },
-  { label: 'Uni Admin',      icon: Landmark,       path: '/uni-admin' },
-  { label: 'Teacher',        icon: Presentation,   path: '/teacher' },
-  { label: 'Student',        icon: GraduationCap,  path: '/student' },
+  { label: 'Platform Admin', icon: Monitor, path: '/platform-admin' },
+  { label: 'Uni Admin', icon: Landmark, path: '/uni-admin' },
+  { label: 'Teacher', icon: Presentation, path: '/teacher' },
+  { label: 'Student', icon: GraduationCap, path: '/student' },
 ]
 
 interface Props {
@@ -89,7 +89,7 @@ export default function Sidebar({ items, user }: Props) {
             ))}
           </>
         )}
-        <button className="sidebar-logout" onClick={() => { /* TODO: Need to add user logout funcs..*/ }}>
+        <button className="sidebar-logout" onClick={() => { /* TODO: wire to auth */ }}>
           <LogOut size={14} /> Log out
         </button>
       </div>
