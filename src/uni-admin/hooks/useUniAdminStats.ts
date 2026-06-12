@@ -1,33 +1,47 @@
 import { useEffect, useState } from 'react'
+import { getCohorts, getLecturers, getProgrammes, getStudents } from '../api/uniAdmin'
+import { CURRENT_UNIVERSITY_ID } from '../tenant'
 
 export interface UniAdminStats {
-  totalStudents: number
+  totalProgrammes: number
+  totalCohorts: number
   activeCohorts: number
   totalLecturers: number
+  activeLecturers: number
+  totalStudents: number
+  activeStudents: number
   checkpointPassRate: number
   avgNlpScore: number
 }
 
-const MOCK_STATS: UniAdminStats = {
-  totalStudents: 350,
-  activeCohorts: 10,
-  totalLecturers: 25,
-  checkpointPassRate: 82,
-  avgNlpScore: 73,
-}
-
 export function useUniAdminStats() {
   const [stats, setStats] = useState<UniAdminStats | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStats(MOCK_STATS)
-      setLoading(false)
-    }, 400)
-
-    return () => clearTimeout(timer)
+    Promise.all([
+      getProgrammes(CURRENT_UNIVERSITY_ID),
+      getCohorts(CURRENT_UNIVERSITY_ID),
+      getLecturers(CURRENT_UNIVERSITY_ID),
+      getStudents(CURRENT_UNIVERSITY_ID),
+    ])
+      .then(([prog, coh, lec, stu]) => {
+        setStats({
+          totalProgrammes: prog.data.length,
+          totalCohorts: coh.data.length,
+          activeCohorts: coh.data.filter(c => c.status === 'ONGOING').length,
+          totalLecturers: lec.data.length,
+          activeLecturers: lec.data.filter(l => l.status === 'ACTIVE').length,
+          totalStudents: stu.data.length,
+          activeStudents: stu.data.filter(s => s.status === 'ACTIVE').length,
+          checkpointPassRate: 87, // TODO: backend
+          avgNlpScore: 72,        // TODO: backend
+        })
+      })
+      .catch(() => setError('Failed to load stats'))
+      .finally(() => setLoading(false))
   }, [])
 
-  return { stats, loading }
+  return { stats, loading, error }
 }
