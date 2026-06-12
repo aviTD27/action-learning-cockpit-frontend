@@ -1,5 +1,5 @@
 import { Route } from 'react-router-dom'
-import UniAdminOverview from '../uni-admin/pages/UniAdminOverview'
+import UniAdminDashboard from '../uni-admin/pages/UniAdminDashboard'
 import ProgrammesPage from '../uni-admin/pages/ProgrammesPage'
 import CohortsPage from '../uni-admin/pages/CohortsPage'
 import LecturersPage from '../uni-admin/pages/LecturersPage'
@@ -11,7 +11,7 @@ import ProfilePage from '../uni-admin/pages/ProfilePage'
 export default function UniAdminRoutes() {
   return (
     <>
-      <Route path="/uni-admin" element={<UniAdminOverview />} />
+      <Route path="/uni-admin" element={<UniAdminDashboard />} />
       <Route path="/uni-admin/programmes" element={<ProgrammesPage />} />
       <Route path="/uni-admin/cohorts" element={<CohortsPage />} />
       <Route path="/uni-admin/lecturers" element={<LecturersPage />} />
