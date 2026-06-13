@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import UniAdminRoutes from './uniAdmin'
 import PlatformAdminRoutes from './platformAdmin'
-import TeacherRoutes from './teacher'
+import LecturerRoutes from './lecturer'
 import StudentRoutes from './student'
 
 export default function AppRoutes() {
@@ -10,7 +10,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Navigate to="/uni-admin" replace />} />
       {PlatformAdminRoutes()}
       {UniAdminRoutes()}
-      {TeacherRoutes()}
+      {LecturerRoutes()}
       {StudentRoutes()}
     </Routes>
   )
