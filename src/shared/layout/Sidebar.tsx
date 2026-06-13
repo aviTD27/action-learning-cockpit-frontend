@@ -19,7 +19,7 @@ export interface SidebarUser {
 const ROLE_NAV: NavItem[] = [
   { label: 'Platform Admin', icon: Monitor, path: '/platform-admin' },
   { label: 'Uni Admin', icon: Landmark, path: '/uni-admin' },
-  { label: 'Teacher', icon: Presentation, path: '/teacher' },
+  { label: 'Lecturer', icon: Presentation, path: '/lecturer' },
   { label: 'Student', icon: GraduationCap, path: '/student' },
 ]
 
@@ -89,7 +89,7 @@ export default function Sidebar({ items, user }: Props) {
             ))}
           </>
         )}
-        <button className="sidebar-logout" onClick={() => { /* TODO: wire to auth */ }}>
+        <button className="sidebar-logout" onClick={() => { /* TODO: Login + logout */ }}>
           <LogOut size={14} /> Log out
         </button>
       </div>
