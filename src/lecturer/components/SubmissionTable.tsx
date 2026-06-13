@@ -4,8 +4,9 @@ import { ClipboardList, Eye, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useCohorts } from '../../uni-admin/hooks/useCohorts'
 import { useSubmissions } from '../hooks/useSubmissions'
 import SubmissionModal from './SubmissionModal'
+import ConfirmDialog from './ConfirmDialog'
 import type { Submission } from '../types'
-import '../../uni-admin/styles/uniAdmin.css'
+import '../styles/lecturer.css'
 
 export default function SubmissionTable() {
   const { submissions, create, update, remove, error } = useSubmissions()
@@ -13,6 +14,7 @@ export default function SubmissionTable() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Submission | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Submission | null>(null)
   const [cohortFilter, setCohortFilter] = useState<number | ''>('')
 
   const visible = cohortFilter === ''
@@ -82,7 +84,7 @@ export default function SubmissionTable() {
                     <button
                       className="ua-icon-btn"
                       title="Delete submission"
-                      onClick={() => remove(s.id)}
+                      onClick={() => setDeleteTarget(s)}
                     >
                       <Trash2 size={13} />
                     </button>
@@ -102,6 +104,17 @@ export default function SubmissionTable() {
           if (editTarget) update(editTarget.id, data)
           else create(data)
         }}
+      />
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete submission?"
+        message={deleteTarget
+          ? `"${deleteTarget.title}" and all of its student grades will be permanently deleted. This cannot be undone.`
+          : ''}
+        confirmLabel="Delete"
+        onConfirm={() => { if (deleteTarget) remove(deleteTarget.id) }}
+        onClose={() => setDeleteTarget(null)}
       />
     </div>
   )
