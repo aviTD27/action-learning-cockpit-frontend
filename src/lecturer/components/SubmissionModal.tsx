@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useCohorts } from '../../uni-admin/hooks/useCohorts'
 import FileTypeSelect from './FileTypeSelect'
 import type { CreateSubmissionData, Submission } from '../types'
-import '../../uni-admin/styles/uniAdmin.css'
+import '../styles/lecturer.css'
 
 interface Props {
   open: boolean
@@ -123,7 +123,7 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
 
         <div className="ua-modal-field">
           <label className="ua-modal-label">Template File</label>
-          {/* TODO (backend): real upload needs file storage — only the name is kept for now */}
+          {/* TODO (backend): Need to save file.*/}
           <input className="ua-modal-input" type="file"
             onChange={e => setTemplateFileName(e.target.files?.[0]?.name ?? '')} />
         </div>

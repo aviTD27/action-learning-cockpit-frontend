@@ -1,0 +1,87 @@
+/*  Grade classification bands  */
+.ua-badge-fail         { background:#fee2e2; color:#b91c1c; }
+.ua-badge-pass         { background:#fef9c3; color:#a16207; }
+.ua-badge-good         { background:#dbeafe; color:#1d4ed8; }
+.ua-badge-distinction  { background:#dcfce7; color:#15803d; }
+
+/*  Student submission status  */
+.ua-badge-submitted    { background:#dcfce7; color:#15803d; }
+.ua-badge-missing      { background:#f3f4f6; color:#6b7280; }
+
+/*  Grade modal / table helpers  */
+.ua-grade-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: #6b7280;
+}
+.ua-grade-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/*  Confirm dialog  */
+.ua-btn-danger { background:#dc2626; color:white; }
+.ua-btn-danger:hover:not(:disabled) { background:#b91c1c; }
+.ua-modal-sm { max-width: 420px; }
+.ua-confirm-icon { color:#dc2626; vertical-align:-2px; }
+.ua-confirm-text { font-size:0.85rem; color:#4b5563; line-height:1.5; margin:0 0 1rem; }
+
+/*  Dashboard widgets  */
+.ua-dash-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 860px) { .ua-dash-cols { grid-template-columns: 1fr; } }
+
+/* Cohort progress cards */
+.ua-cohort-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+.ua-cohort-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.ua-cohort-head { display: flex; flex-direction: column; }
+.ua-cohort-name { font-weight: 700; color: #1E3A5F; font-size: 0.85rem; }
+.ua-cohort-prog { font-size: 10px; color: #9ca3af; }
+.ua-cohort-stats { font-size: 11px; color: #6b7280; display: flex; gap: 6px; }
+.ua-dot-sep { color: #d1d5db; }
+.ua-cohort-avg { font-size: 11px; color: #6b7280; }
+.ua-cohort-avg strong { color: #1E3A5F; }
+
+/* Generic progress bar */
+.ua-progress { display: flex; flex-direction: column; gap: 3px; }
+.ua-progress-label { display: flex; justify-content: space-between; font-size: 10px; color: #6b7280; }
+.ua-progress-track { height: 6px; background: #f3f4f6; border-radius: 9999px; overflow: hidden; }
+.ua-progress-fill { height: 100%; background: #1E3A5F; border-radius: 9999px; }
+
+/* Upcoming deadlines list */
+.ua-deadline-list { list-style: none; margin: 0; padding: 0; }
+.ua-deadline-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 1rem; border-bottom: 1px solid #f3f4f6;
+}
+.ua-deadline-row:last-child { border-bottom: none; }
+.ua-deadline-main { display: flex; flex-direction: column; }
+.ua-deadline-title { font-size: 0.82rem; color: #1f2937; font-weight: 600; }
+.ua-deadline-cohort { font-size: 10px; color: #9ca3af; }
+.ua-deadline-meta { display: flex; align-items: center; gap: 8px; }
+.ua-deadline-date { font-size: 11px; color: #6b7280; }
+
+/* Submissions-by-cohort bars */
+.ua-bar-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.ua-bar-label { width: 110px; flex-shrink: 0; font-size: 11px; color: #4b5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ua-bar-track { flex: 1; height: 10px; background: #f3f4f6; border-radius: 9999px; overflow: hidden; }
+.ua-bar-fill { height: 100%; background: #2E5F9E; border-radius: 9999px; }
+.ua-bar-value { width: 20px; text-align: right; font-size: 11px; font-weight: 700; color: #1E3A5F; }

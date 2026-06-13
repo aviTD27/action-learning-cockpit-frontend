@@ -1,7 +1,7 @@
 import Layout from '../../shared/layout/Layout'
 import { LECTURER_NAV, LECTURER_USER } from '../nav'
 import SubmissionTable from '../components/SubmissionTable'
-import '../../uni-admin/styles/uniAdmin.css'
+import '../styles/lecturer.css'
 
 export default function SubmissionsPage() {
   return (
