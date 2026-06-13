@@ -1,0 +1,51 @@
+.panel-card {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel-title {
+  font-weight: 700;
+  color: #1E3A5F;
+  margin: 0;
+}
+
+.panel-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.panel-table th {
+  text-align: left;
+  font-size: 11px;
+  color: #6b7280;
+  padding: 0.5rem;
+}
+
+.panel-table td {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.panel-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.status-active   { color: #16a34a; font-weight: 600; }
+.status-at_risk  { color: #dc2626; font-weight: 600; }
+.status-inactive { color: #9ca3af; font-weight: 600; }

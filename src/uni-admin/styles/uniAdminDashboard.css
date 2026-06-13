@@ -1,0 +1,77 @@
+.uni-admin-header {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.uni-admin-header .title {
+  font-size: 24px; 
+  font-weight: 600;
+  color: #0A1A2F;
+}
+
+.uni-admin-header .subtitle {
+  font-size: 0.85rem;
+  color: #6b7280; 
+  margin-top: 2px;
+}
+
+.uni-admin-header .user-info {
+  text-align: right;
+}
+
+.uni-admin-header .user-info .name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #111827; 
+}
+
+.uni-admin-header .user-info .role {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.uni-admin-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .uni-admin-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .uni-admin-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.uni-admin-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb; 
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.uni-admin-card:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.uni-admin-card h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0A1A2F;
+  margin-bottom: 6px;
+}
+
+.uni-admin-card p {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
