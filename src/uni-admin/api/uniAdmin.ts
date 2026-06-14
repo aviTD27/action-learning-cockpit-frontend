@@ -1,4 +1,4 @@
-import axios from 'axios'
+import apiClient from '../../api/apiClient'
 import type {
   CohortResponse,
   CreateCohortRequest,
@@ -12,10 +12,7 @@ import type {
   UniversityResponse,
 } from './types'
 
-const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
-  headers: { 'Content-Type': 'application/json' },
-})
+const api = apiClient
 
 // Universities
 export const getUniversities = () => api.get<UniversityResponse[]>('/universities')

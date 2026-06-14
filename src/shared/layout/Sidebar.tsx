@@ -1,6 +1,7 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { GraduationCap, Landmark, LogOut, Monitor, Presentation } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useAuth } from '../../auth/AuthContext'
 import '../styles/layout.css'
 
 export interface NavItem {
@@ -38,8 +39,20 @@ function initials(name: string) {
     .toUpperCase()
 }
 
+function formatRoleLabel(role: string | null): string {
+  if (!role) return ''
+  return role.replace(/^ROLE_/, '').replace(/_/g, ' ')
+}
+
 export default function Sidebar({ items, user }: Props) {
   const nav = items ?? ROLE_NAV
+  const { logout, displayName, role: authRole } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <aside className="sidebar">
@@ -50,14 +63,14 @@ export default function Sidebar({ items, user }: Props) {
         <div className="sidebar-logo-sub">Action Learning Cockpit</div>
       </div>
 
-      {user && (
+      {displayName && (
         <div className="sidebar-user">
-          <div className="sidebar-avatar">{initials(user.name)}</div>
-          <p className="sidebar-user-name">{user.name}</p>
-          {user.institution && (
+          <div className="sidebar-avatar">{initials(displayName)}</div>
+          <p className="sidebar-user-name">{displayName}</p>
+          {user?.institution && (
             <p className="sidebar-user-institution">{user.institution}</p>
           )}
-          <span className="sidebar-badge">{user.role}</span>
+          <span className="sidebar-badge">{formatRoleLabel(authRole)}</span>
         </div>
       )}
 
@@ -89,7 +102,7 @@ export default function Sidebar({ items, user }: Props) {
             ))}
           </>
         )}
-        <button className="sidebar-logout" onClick={() => { /* TODO: Login + logout */ }}>
+        <button className="sidebar-logout" onClick={handleLogout}>
           <LogOut size={14} /> Log out
         </button>
       </div>
