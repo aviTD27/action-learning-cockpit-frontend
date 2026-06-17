@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Pencil, Plus, Presentation } from 'lucide-react'
+import { Pencil, Plus, Presentation, Upload } from 'lucide-react'
 import { useLecturers } from '../../hooks/useLecturers'
 import { useProgrammes } from '../../hooks/useProgrammes'
 import { createLecturer, updateLecturer } from '../../api/uniAdmin'
 import type { CreateLecturerRequest, LecturerResponse } from '../../api/types'
 import LecturerModal from '../modals/LecturerModal'
+import ImportCSVModal from '../modals/ImportCSVModal'
 import StatusBadge from '../shared/StatusBadge'
 import '../../styles/uniAdmin.css'
 
@@ -13,6 +14,7 @@ export default function LecturerTable() {
   const { programmes } = useProgrammes()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<LecturerResponse | null>(null)
 
   const openCreate = () => { setEditTarget(null); setModalOpen(true) }
@@ -28,9 +30,14 @@ export default function LecturerTable() {
     <div className="ua-card">
       <div className="ua-card-header">
         <p className="ua-card-title"><Presentation size={14} /> Lecturers<span className="ua-count">{lecturers.length} total · {lecturers.filter(l => l.status === 'ACTIVE').length} active</span></p>
-        <button className="ua-btn ua-btn-success" onClick={openCreate}>
-          <Plus size={12} /> Add Lecturer
-        </button>
+        <div className="ua-header-actions">
+          <button className="ua-btn ua-btn-secondary" onClick={() => setImportOpen(true)}>
+            <Upload size={12} /> Import CSV
+          </button>
+          <button className="ua-btn ua-btn-success" onClick={openCreate}>
+            <Plus size={12} /> Add Lecturer
+          </button>
+        </div>
       </div>
 
       <div className="ua-table-wrap">
@@ -78,6 +85,15 @@ export default function LecturerTable() {
         programmes={programmes}
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
+      />
+
+      <ImportCSVModal
+        open={importOpen}
+        mode="lecturer"
+        programmes={programmes}
+        cohorts={[]}
+        onClose={() => setImportOpen(false)}
+        onImported={reload}
       />
     </div>
   )
