@@ -89,8 +89,8 @@ export default function LoginPage() {
         </form>
 
         <p className="auth-footer">
-          Don't have an account?{' '}
-          <Link to="/register">Create one</Link>
+          New university?{' '}
+          <Link to="/request-access">Request access</Link>
         </p>
       </div>
     </div>
