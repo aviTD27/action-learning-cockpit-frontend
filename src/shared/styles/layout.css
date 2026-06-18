@@ -103,6 +103,27 @@
   border-top: 1px solid #2E5F9E;
 }
 
+.sidebar-change-pw {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  font-size: 11px;
+  color: #A8C8E8;
+  background: none;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+  margin-bottom: 2px;
+}
+
+.sidebar-change-pw:hover {
+  color: white;
+  background-color: rgba(46, 95, 158, 0.4);
+}
+
 .sidebar-logout {
   display: flex;
   align-items: center;

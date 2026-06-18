@@ -83,6 +83,8 @@
 .lp-input:focus { border-color: #2E5F9E; }
 .lp-input.error { border-color: #dc2626; }
 .lp-field-error { display: block; color: #dc2626; font-size: 12px; margin-top: 3px; }
+.lp-field-hint  { display: block; color: #6b7280; font-size: 12px; margin-top: 3px; }
+.lp-submit-error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 8px; padding: .6rem .8rem; font-size: 13px; margin-bottom: 1rem; }
 .lp-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 560px) { .lp-two-col { grid-template-columns: 1fr; } }
 .lp-form-foot { text-align: center; color: #6b7280; font-size: 13px; margin-top: 1.25rem; }
