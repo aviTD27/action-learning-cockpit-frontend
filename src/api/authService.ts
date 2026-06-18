@@ -18,3 +18,6 @@ export const loginUser = (email: string, password: string) =>
 
 export const registerUser = (payload: RegisterRequest) =>
   apiClient.post<AuthResponse>('/auth/register', payload)
+
+export const changePassword = (currentPassword: string, newPassword: string) =>
+  apiClient.patch('/auth/change-password', { currentPassword, newPassword })
