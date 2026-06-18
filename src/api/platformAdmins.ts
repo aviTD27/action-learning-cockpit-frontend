@@ -5,8 +5,10 @@ export interface PlatformAdmin {
   firstName: string
   surname: string
   email: string
-  active: boolean
-  createdAt?: string
+  role: 'ROLE_ADMIN' | 'ROLE_PLATFORM_ADMIN'
+  blocked: boolean
+  deleted: boolean
+  dateOfBirth?: string | null
 }
 
 export interface CreatePlatformAdminRequest {
@@ -15,14 +17,17 @@ export interface CreatePlatformAdminRequest {
   email: string
 }
 
-export const listPlatformAdmins = () =>
+export const listPlatformAdmins    = () =>
   apiClient.get<PlatformAdmin[]>('/super-admin/platform-admins')
 
-export const createPlatformAdmin = (data: CreatePlatformAdminRequest) =>
+export const createPlatformAdmin   = (data: CreatePlatformAdminRequest) =>
   apiClient.post<PlatformAdmin>('/super-admin/platform-admins', data)
 
-export const deactivatePlatformAdmin = (id: number) =>
-  apiClient.patch<PlatformAdmin>(`/super-admin/platform-admins/${id}/deactivate`)
+export const blockPlatformAdmin    = (id: number) =>
+  apiClient.patch<PlatformAdmin>(`/super-admin/platform-admins/${id}/block`)
 
-export const reactivatePlatformAdmin = (id: number) =>
-  apiClient.patch<PlatformAdmin>(`/super-admin/platform-admins/${id}/reactivate`)
+export const unblockPlatformAdmin  = (id: number) =>
+  apiClient.patch<PlatformAdmin>(`/super-admin/platform-admins/${id}/unblock`)
+
+export const deletePlatformAdmin   = (id: number) =>
+  apiClient.delete(`/super-admin/platform-admins/${id}`)
