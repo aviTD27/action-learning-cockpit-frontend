@@ -26,10 +26,9 @@ export default function SubmissionDetailPage() {
   const [gradeTarget, setGradeTarget] = useState<StudentResponse | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
-  // TODO (backend): Email notifs
   const handleNotify = () => {
     notify(submissionId)
-    setNotice(`Notification queued for ${students.length} student${students.length === 1 ? '' : 's'} — emails will be sent once the backend notification service exists.`)
+    setNotice(`Notification sent ${students.length} student${students.length === 1 ? '' : 's'} emailed and notified on the platform.`)
   }
 
   const handleRelease = () => {
