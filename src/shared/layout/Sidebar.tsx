@@ -47,8 +47,9 @@ function formatRoleLabel(role: string | null): string {
 }
 
 export default function Sidebar({ items, user }: Props) {
-  const nav = items ?? ROLE_NAV
+  const nav = items ?? []
   const { logout, displayName, role: authRole } = useAuth()
+  const showSwitchRole = authRole === 'ROLE_SUPER_ADMIN' || authRole === 'ROLE_PLATFORM_ADMIN'
   const navigate = useNavigate()
   const [showChangePw, setShowChangePw] = useState(false)
 
@@ -94,7 +95,7 @@ export default function Sidebar({ items, user }: Props) {
       </nav>
 
       <div className="sidebar-footer">
-        {items && (
+        {showSwitchRole && (
           <>
             <p className="sidebar-footer-label">Switch role</p>
             {ROLE_NAV.map(r => (

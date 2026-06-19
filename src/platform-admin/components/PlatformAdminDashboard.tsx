@@ -1,9 +1,5 @@
-import Layout from '../../shared/layout/Layout'
+import { Navigate } from 'react-router-dom'
 
 export default function PlatformAdminDashboard() {
-  return (
-    <Layout>
-      <p className="page-title">Platform Admin Dashboard</p>
-    </Layout>
-  )
+  return <Navigate to="/super-admin" replace />
 }
