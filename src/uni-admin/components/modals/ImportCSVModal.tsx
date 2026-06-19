@@ -14,9 +14,8 @@ import '../../styles/uniAdmin.css'
 type ImportMode = 'student' | 'lecturer'
 type AnyRequest = CreateStudentRequest | CreateLecturerRequest
 
-const DEFAULT_PASSWORD = 'Changeme@123'
-const STUDENT_HEADERS = ['firstName', 'lastName', 'email', 'studentRef', 'programme', 'cohort', 'password', 'status']
-const LECTURER_HEADERS = ['firstName', 'lastName', 'email', 'lecturerRef', 'programmes', 'password', 'status']
+const STUDENT_HEADERS = ['firstName', 'lastName', 'email', 'studentRef', 'programme', 'cohort', 'status']
+const LECTURER_HEADERS = ['firstName', 'lastName', 'email', 'lecturerRef', 'programmes', 'status']
 const EMAIL_RE = /^\S+@\S+\.\S+$/
 
 interface PreparedRow {
@@ -72,8 +71,8 @@ function parseRecords(text: string): Record<string, string>[] {
 
 function templateFor(mode: ImportMode): string {
   return mode === 'student'
-    ? [STUDENT_HEADERS.join(','), 'Jane,Smith,jane.smith@epita.fr,STU-2026-001,MSc-SE,MSc-2026-Fall,,ACTIVE'].join('\r\n')
-    : [LECTURER_HEADERS.join(','), 'John,Doe,john.doe@epita.fr,LEC-2026-001,MSc-SE; MSc-DS,,ACTIVE'].join('\r\n')
+    ? [STUDENT_HEADERS.join(','), 'Jane,Smith,jane.smith@epita.fr,STU-2026-001,MSc-SE,MSc-2026-Fall,ACTIVE'].join('\r\n')
+    : [LECTURER_HEADERS.join(','), 'John,Doe,john.doe@epita.fr,LEC-2026-001,MSc-SE; MSc-DS,ACTIVE'].join('\r\n')
 }
 
 function downloadCsv(filename: string, content: string): void {
@@ -116,7 +115,7 @@ function prepareStudents(records: Record<string, string>[], programmes: Programm
       line, label,
       request: {
         firstName: rec.firstname, lastName: rec.lastname, email: rec.email,
-        password: rec.password || DEFAULT_PASSWORD, studentRef: rec.studentref,
+        studentRef: rec.studentref,
         programmeId, status: status as CreateStudentRequest['status'], cohortId,
       },
     }
@@ -146,7 +145,7 @@ function prepareLecturers(records: Record<string, string>[], programmes: Program
       request: {
         firstName: rec.firstname, lastName: rec.lastname, email: rec.email,
         lecturerRef: rec.lecturerref, programmeIds,
-        password: rec.password || DEFAULT_PASSWORD, status: status as CreateLecturerRequest['status'],
+        status: status as CreateLecturerRequest['status'],
       },
     }
   })
@@ -236,7 +235,7 @@ export default function ImportCSVModal({ open, mode, programmes, cohorts, onClos
               <code>{headers.join(', ')}</code>
               <p className="ua-csv-hint">
                 Programme matches by code or name{mode === 'student' ? ', cohort by name' : ' (separate multiple with ";")'}.
-                Blank <code>status</code> defaults to ACTIVE; blank <code>password</code> defaults to "{DEFAULT_PASSWORD}".
+                Blank <code>status</code> defaults to ACTIVE. A temporary password is generated and emailed to each new account.
               </p>
             </div>
 
