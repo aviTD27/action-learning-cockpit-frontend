@@ -18,8 +18,8 @@ export default function AppRoutes() {
       <Route path="/request-access" element={<RequestAccessPage />} />
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Super Admin — role-enforced */}
-      <Route element={<RoleProtectedRoute allowedRoles={['ROLE_SUPER_ADMIN']} />}>
+      {/* Super Admin + Platform Admin — same access, same pages */}
+      <Route element={<RoleProtectedRoute allowedRoles={['ROLE_SUPER_ADMIN', 'ROLE_PLATFORM_ADMIN']} />}>
         {SuperAdminRoutes()}
       </Route>
 
