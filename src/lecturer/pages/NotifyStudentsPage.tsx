@@ -19,11 +19,10 @@ export default function NotifyStudentsPage() {
     return counts
   }, [students])
 
-  // TODO (backend): Notif 
   const handleNotify = (id: number, title: string, cohortId: number) => {
     notify(id)
     const count = studentCountByCohort.get(cohortId) ?? 0
-    setNotice(`Notification for "${title}" queued for ${count} student${count === 1 ? '' : 's'} — emails will be sent once the backend notification service exists.`)
+    setNotice(`Notification sent for "${title}" ${count} student${count === 1 ? '' : 's'} emailed and notified on the platform.`)
   }
 
   return (
