@@ -29,7 +29,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [studentRef, setStudentRef] = useState('')
   const [programmeId, setProgrammeId] = useState<number | ''>('')
   const [cohortId, setCohortId] = useState<number | ''>('')
@@ -42,7 +41,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
       setFirstName(existing?.firstName ?? '')
       setLastName(existing?.lastName ?? '')
       setEmail(existing?.email ?? '')
-      setPassword('')
       setStudentRef(existing?.studentRef ?? '')
       setProgrammeId(existing?.programmeId ?? '')
       setCohortId(existing?.cohortId ?? '')
@@ -60,7 +58,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
   const submit = async () => {
     if (!firstName.trim() || !lastName.trim()) { setError('First and last name are required'); return }
     if (!/^\S+@\S+\.\S+$/.test(email)) { setError('A valid email is required'); return }
-    if (!existing && !password) { setError('Password is required'); return }
     if (!studentRef.trim()) { setError('Student reference is required'); return }
     if (programmeId === '') { setError('Programme is required'); return }
     if (cohortId === '') { setError('Cohort is required'); return }
@@ -70,7 +67,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
-        password,
         studentRef: studentRef.trim(),
         programmeId,
         status,
@@ -108,18 +104,10 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
             onChange={e => setEmail(e.target.value)} placeholder="name@student.edu" />
         </div>
 
-        <div className="ua-two-col">
-          <div className="ua-modal-field">
-            <label className="ua-modal-label">Password *</label>
-            <input className="ua-modal-input" type="password" value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder={existing ? 'Leave blank to keep current' : ''} />
-          </div>
-          <div className="ua-modal-field">
-            <label className="ua-modal-label">Student Ref *</label>
-            <input className="ua-modal-input" value={studentRef}
-              onChange={e => setStudentRef(e.target.value)} placeholder="e.g. STU-2026-001" />
-          </div>
+        <div className="ua-modal-field">
+          <label className="ua-modal-label">Student Ref *</label>
+          <input className="ua-modal-input" value={studentRef}
+            onChange={e => setStudentRef(e.target.value)} placeholder="e.g. STU-2026-001" />
         </div>
 
         <div className="ua-modal-field">

@@ -96,7 +96,6 @@ export interface CreateLecturerRequest {
   email: string
   lecturerRef: string
   programmeIds: number[]
-  password?: string
   status?: LecturerStatus
 }
 
@@ -104,7 +103,6 @@ export interface CreateStudentRequest {
   firstName: string
   lastName: string
   email: string
-  password: string
   studentRef: string
   programmeId: number
   status: StudentStatus

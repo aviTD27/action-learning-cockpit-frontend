@@ -23,7 +23,6 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [programmeIds, setProgrammeIds] = useState<number[]>([])
-  const [password, setPassword] = useState('')
   const [lecturerRef, setLecturerRef] = useState('')
   const [status, setStatus] = useState<LecturerStatus>('ACTIVE')
   const [error, setError] = useState<string | null>(null)
@@ -35,7 +34,6 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
       setLastName(existing?.lastName ?? '')
       setEmail(existing?.email ?? '')
       setProgrammeIds(existing?.programmeIds ?? [])
-      setPassword('')
       setLecturerRef(existing?.lecturerRef ?? '')
       setStatus(existing?.status ?? 'ACTIVE')
       setError(null)
@@ -49,7 +47,6 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
     if (!/^\S+@\S+\.\S+$/.test(email)) { setError('A valid email is required'); return }
     if (!lecturerRef.trim()) { setError('Lecturer reference is required'); return }
     if (programmeIds.length === 0) { setError('Select at least one programme'); return }
-    if (!existing && !password) { setError('Password is required'); return }
     setSaving(true)
     try {
       await onSave({
@@ -58,7 +55,6 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
         email: email.trim(),
         lecturerRef: lecturerRef.trim(),
         programmeIds,
-        ...(password ? { password } : {}),
         ...(existing ? { status } : {}),
       })
       onClose()
@@ -93,18 +89,10 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
             onChange={e => setEmail(e.target.value)} placeholder="name@university.edu" />
         </div>
 
-        <div className="ua-two-col">
-          <div className="ua-modal-field">
-            <label className="ua-modal-label">{existing ? 'Password' : 'Password *'}</label>
-            <input className="ua-modal-input" type="password" value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder={existing ? 'Leave blank to keep current' : ''} />
-          </div>
-          <div className="ua-modal-field">
-            <label className="ua-modal-label">Lecturer Ref *</label>
-            <input className="ua-modal-input" value={lecturerRef}
-              onChange={e => setLecturerRef(e.target.value)} placeholder="e.g. LEC-2026-001" />
-          </div>
+        <div className="ua-modal-field">
+          <label className="ua-modal-label">Lecturer Ref *</label>
+          <input className="ua-modal-input" value={lecturerRef}
+            onChange={e => setLecturerRef(e.target.value)} placeholder="e.g. LEC-2026-001" />
         </div>
 
         <div className="ua-modal-field">
