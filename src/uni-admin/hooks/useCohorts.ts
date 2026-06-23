@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getCohorts } from '../api/uniAdmin'
-import { CURRENT_UNIVERSITY_ID } from '../tenant'
+import { useAuth } from '../../auth/AuthContext'
 import type { CohortResponse } from '../api/types'
 
 export function useCohorts() {
+  const { universityId } = useAuth()
   const [cohorts, setCohorts] = useState<CohortResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -11,11 +12,11 @@ export function useCohorts() {
   const reload = useCallback(() => {
     setLoading(true)
     setError(null)
-    getCohorts(CURRENT_UNIVERSITY_ID)
+    getCohorts(universityId ?? undefined)
       .then(res => setCohorts(res.data))
       .catch(() => setError('Failed to load cohorts'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [universityId])
 
   useEffect(() => { reload() }, [reload])
 

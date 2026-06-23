@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { BookOpen, Pencil, Plus } from 'lucide-react'
 import { useProgrammes } from '../../hooks/useProgrammes'
 import { createProgramme, updateProgramme } from '../../api/uniAdmin'
-import { CURRENT_UNIVERSITY_ID } from '../../tenant'
+import { useAuth } from '../../../auth/AuthContext'
 import ProgrammeModal from '../modals/ProgrammeModal'
 import type { ProgrammeFormData } from '../modals/ProgrammeModal'
 import type { ProgrammeResponse } from '../../api/types'
 import '../../styles/uniAdmin.css'
 
 export default function ProgrammeTable() {
+  const { universityId } = useAuth()
   const { programmes, loading, error, reload } = useProgrammes()
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<ProgrammeResponse | null>(null)
@@ -17,8 +18,8 @@ export default function ProgrammeTable() {
   const openEdit = (programme: ProgrammeResponse) => { setEditTarget(programme); setModalOpen(true) }
 
   const handleSave = async (data: ProgrammeFormData) => {
-    if (editTarget) await updateProgramme(editTarget.id, { ...data, universityId: CURRENT_UNIVERSITY_ID })
-    else await createProgramme({ ...data, universityId: CURRENT_UNIVERSITY_ID })
+    if (editTarget) await updateProgramme(editTarget.id, { ...data, universityId: universityId! })
+    else await createProgramme({ ...data, universityId: universityId! })
     reload()
   }
 
