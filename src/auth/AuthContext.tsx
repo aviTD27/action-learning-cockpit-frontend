@@ -3,6 +3,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 interface DecodedToken {
   sub: string
   role: string
+  universityId?: number
   firstName?: string
   surname?: string
   name?: string
@@ -14,6 +15,7 @@ interface AuthContextValue {
   token: string | null
   role: string | null
   email: string | null
+  universityId: number | null
   displayName: string | null
   isAuthenticated: boolean
   login: (token: string) => void
@@ -69,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       token,
       role: decoded?.role ?? null,
       email: decoded?.sub ?? null,
+      universityId: decoded?.universityId ?? null,
       displayName: decoded ? buildDisplayName(decoded) : null,
       isAuthenticated: !!token,
       login,
