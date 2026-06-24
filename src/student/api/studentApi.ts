@@ -16,3 +16,17 @@ export interface StudentProfile {
 
 export const getMyProfile = () =>
   apiClient.get<StudentProfile>('/students/me').then(r => r.data)
+
+export interface AssignmentItem {
+  id: number
+  title: string
+  description: string | null
+  dueDate: string
+  maxPoints: number
+  allowedFileTypes: string | null
+  lateAllowed: boolean
+  lecturerId: number | null
+}
+
+export const getAssignmentsForCohort = (cohortId: number) =>
+  apiClient.get<AssignmentItem[]>(`/submissions?cohortId=${cohortId}`).then(r => r.data)
