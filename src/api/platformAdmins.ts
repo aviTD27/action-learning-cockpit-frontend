@@ -5,7 +5,7 @@ export interface PlatformAdmin {
   firstName: string
   surname: string
   email: string
-  role: 'ROLE_ADMIN' | 'ROLE_PLATFORM_ADMIN'
+  role: 'ROLE_UNI_ADMIN' | 'ROLE_PLATFORM_ADMIN'
   blocked: boolean
   deleted: boolean
   dateOfBirth?: string | null
