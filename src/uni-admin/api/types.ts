@@ -30,6 +30,7 @@ export interface UniversityResponse {
   id: number
   name: string
   code: string
+  domain: string | null
 }
 
 export interface CreateUniversityRequest {
@@ -104,7 +105,8 @@ export interface CreateLecturerRequest {
 export interface CreateStudentRequest {
   firstName: string
   lastName: string
-  email: string
+  /** Only required when creating — platform email is auto-generated server-side. */
+  personalEmail?: string
   studentRef: string
   programmeId: number
   status: StudentStatus
