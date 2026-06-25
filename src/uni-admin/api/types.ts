@@ -75,6 +75,8 @@ export interface StudentResponse {
   programmeName: string
   status: StudentStatus
   cohortId: number
+  cohortName: string | null
+  universityName: string | null
 }
 
 export interface CreateProgrammeRequest {
@@ -107,4 +109,41 @@ export interface CreateStudentRequest {
   programmeId: number
   status: StudentStatus
   cohortId: number
+}
+
+//   Analytics (tenant-scoped)                          ─
+export interface TenantSummary {
+  totalStudents: number
+  activeStudents: number
+  totalLecturers: number
+  activeLecturers: number
+  totalProgrammes: number
+  totalCohorts: number
+  activeCohorts: number
+  totalSubmissions: number
+  releasedGrades: number
+  gradedThisMonth: number
+  avgScorePct: number
+}
+
+export interface TrendPoint {
+  month: string
+  submissions: number
+  avgScore: number
+}
+
+export interface GradeDistribution {
+  band: string
+  count: number
+}
+
+export interface CohortBenchmark {
+  cohortId: number
+  cohortName: string
+  programmeName: string | null
+  students: number
+  submissions: number
+  releasedGrades: number
+  avgScorePct: number
+  rank: number
 }

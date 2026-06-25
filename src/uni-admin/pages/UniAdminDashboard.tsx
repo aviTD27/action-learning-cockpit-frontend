@@ -1,30 +1,29 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
   BarChart, Bar,
 } from 'recharts'
 import Layout from '../../shared/layout/Layout'
-import { UNI_ADMIN_NAV, UNI_ADMIN_USER } from '../nav'
+import { UNI_ADMIN_NAV } from '../nav'
 import { getCohorts, getLecturers, getProgrammes, getStudents } from '../api/uniAdmin'
 import type { StudentResponse, LecturerResponse, CohortResponse, ProgrammeResponse } from '../api/types'
 import { useAuth } from '../../auth/AuthContext'
 import '../../shared/styles/dashboard.css'
 import '../styles/uniAdmin.css'
 
-// ── Palette ───────────────────────────────────────────────────────────────────
 const C = ['#6366f1', '#10b981', '#f59e0b', '#0ea5e9', '#ef4444', '#8b5cf6', '#f97316']
 
 const STATUS_COLORS: Record<string, string> = {
-  ACTIVE:          '#10b981',
-  INACTIVE:        '#94a3b8',
-  GRADUATED:       '#6366f1',
-  PROBATION:       '#f59e0b',
+  ACTIVE: '#10b981',
+  INACTIVE: '#94a3b8',
+  GRADUATED: '#6366f1',
+  PROBATION: '#f59e0b',
   PAYMENT_PENDING: '#0ea5e9',
-  SUSPENDED:       '#ef4444',
-  EXPELLED:        '#7f1d1d',
-  DROPPED_OUT:     '#6b7280',
-  COMPLETED:       '#8b5cf6',
+  SUSPENDED: '#ef4444',
+  EXPELLED: '#7f1d1d',
+  DROPPED_OUT: '#6b7280',
+  COMPLETED: '#8b5cf6',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -42,17 +41,6 @@ const COHORT_STATUS_COLORS: Record<string, string> = {
   ARCHIVED:    '#d1d5db',
 }
 
-// Mock enrollment trend (replace with backend analytics when available)
-const ENROLLMENT_TREND = [
-  { month: 'Jan', students: 42, active: 38 },
-  { month: 'Feb', students: 58, active: 51 },
-  { month: 'Mar', students: 74, active: 65 },
-  { month: 'Apr', students: 89, active: 78 },
-  { month: 'May', students: 105, active: 91 },
-  { month: 'Jun', students: 125, active: 108 },
-]
-
-// ── Custom tooltip ─────────────────────────────────────────────────────────────
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
@@ -68,9 +56,8 @@ function ChartTooltip({ active, payload, label }: any) {
   )
 }
 
-// ── Component ──────────────────────────────────────────────────────────────────
 export default function UniAdminDashboard() {
-  const { universityId } = useAuth()
+  const { universityId, displayName } = useAuth()
   const [students,   setStudents]   = useState<StudentResponse[]>([])
   const [lecturers,  setLecturers]  = useState<LecturerResponse[]>([])
   const [cohorts,    setCohorts]    = useState<CohortResponse[]>([])
@@ -92,7 +79,12 @@ export default function UniAdminDashboard() {
     }).finally(() => setLoading(false))
   }, [universityId])
 
-  // ── Derived chart data ─────────────────────────────────────────────────────
+  const institution = useMemo(
+    () => programmes.find(p => p.universityName)?.universityName ?? '',
+    [programmes],
+  )
+  const sidebarUser = { name: displayName ?? '', role: 'Uni Admin', institution }
+
   const studentStatusData = useMemo(() => {
     const counts: Record<string, number> = {}
     students.forEach(s => { counts[s.status] = (counts[s.status] ?? 0) + 1 })
@@ -113,6 +105,15 @@ export default function UniAdminDashboard() {
       .slice(0, 6)
   }, [students])
 
+  const studentsPerCohort = useMemo(() => {
+    const counts: Record<number, number> = {}
+    students.forEach(s => { counts[s.cohortId] = (counts[s.cohortId] ?? 0) + 1 })
+    return cohorts
+      .map(c => ({ name: c.name.length > 14 ? c.name.slice(0, 13) + '…' : c.name, students: counts[c.id] ?? 0, fullName: c.name }))
+      .sort((a, b) => b.students - a.students)
+      .slice(0, 8)
+  }, [students, cohorts])
+
   const cohortStatusData = useMemo(() => {
     const counts: Record<string, number> = {}
     cohorts.forEach(c => { counts[c.status] = (counts[c.status] ?? 0) + 1 })
@@ -123,8 +124,7 @@ export default function UniAdminDashboard() {
   const activeLecturers  = lecturers.filter(l => l.status === 'ACTIVE').length
   const ongoingCohorts   = cohorts.filter(c => c.status === 'ONGOING').length
 
-  // Top-student mock leaderboard — sorted by name for deterministic display
-  const topStudents = useMemo(() =>
+  const activeStudentList = useMemo(() =>
     [...students]
       .filter(s => s.status === 'ACTIVE')
       .sort((a, b) => a.lastName.localeCompare(b.lastName))
@@ -132,7 +132,7 @@ export default function UniAdminDashboard() {
   , [students])
 
   return (
-    <Layout navItems={UNI_ADMIN_NAV} user={UNI_ADMIN_USER} title="University Admin" subtitle="Dashboard · Action Learning Cockpit">
+    <Layout navItems={UNI_ADMIN_NAV} user={sidebarUser} title="University Admin" subtitle="Dashboard · Action Learning Cockpit">
       <div className="db-page">
 
         {/* Header */}
@@ -165,38 +165,33 @@ export default function UniAdminDashboard() {
           </div>
         </div>
 
-        {/* Row: Enrollment trend + Student status donut */}
+        {/* Row: Students per cohort + Student status donut */}
         <div className="db-row-2-1">
 
-          {/* Area: enrollment trend */}
+          {/* Bar: students per cohort (real data) */}
           <div className="db-chart-card">
             <p className="db-chart-title">
-              Enrollment Trend <span className="db-chart-sub">last 6 months</span>
+              Students per Cohort <span className="db-chart-sub">top cohorts by size</span>
             </p>
-            <ResponsiveContainer width="100%" height={230}>
-              <AreaChart data={ENROLLMENT_TREND} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="gStu" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#6366f1" stopOpacity={0.22} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}    />
-                  </linearGradient>
-                  <linearGradient id="gAct" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#10b981" stopOpacity={0.22} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip />} />
-                <Area type="monotone" dataKey="students" name="Total"  stroke="#6366f1" strokeWidth={2.5} fill="url(#gStu)" dot={false} />
-                <Area type="monotone" dataKey="active"   name="Active" stroke="#10b981" strokeWidth={2.5} fill="url(#gAct)" dot={false} />
-              </AreaChart>
-            </ResponsiveContainer>
-            <div className="db-legend">
-              <div className="db-legend-item"><span className="db-legend-dot" style={{ background: '#6366f1' }} />Total enrolled</div>
-              <div className="db-legend-item"><span className="db-legend-dot" style={{ background: '#10b981' }} />Active students</div>
-            </div>
+            {loading ? (
+              <div className="db-no-data">Loading…</div>
+            ) : studentsPerCohort.length === 0 ? (
+              <div className="db-no-data">No cohorts yet</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={230}>
+                <BarChart data={studentsPerCohort} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="students" name="Students" radius={[6, 6, 0, 0]} maxBarSize={46}>
+                    {studentsPerCohort.map((_, i) => (
+                      <Cell key={i} fill={C[i % C.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
 
           {/* Donut: student status */}
@@ -298,8 +293,8 @@ export default function UniAdminDashboard() {
           </div>
         </div>
 
-        {/* Student leaderboard */}
-        {topStudents.length > 0 && (
+        {/* Active students list */}
+        {activeStudentList.length > 0 && (
           <div className="db-leaderboard">
             <div className="db-lb-header">
               <span className="db-lb-title">🎓 Active Students</span>
@@ -316,13 +311,9 @@ export default function UniAdminDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {topStudents.map((s, i) => (
+                {activeStudentList.map((s, i) => (
                   <tr key={s.id}>
-                    <td>
-                      <span className={`db-rank ${i === 0 ? 'db-rank-1' : i === 1 ? 'db-rank-2' : i === 2 ? 'db-rank-3' : 'db-rank-n'}`}>
-                        {i + 1}
-                      </span>
-                    </td>
+                    <td><span className="db-rank db-rank-n">{i + 1}</span></td>
                     <td className="db-name-cell">{s.firstName} {s.lastName}</td>
                     <td style={{ color: '#9ca3af', fontFamily: 'monospace', fontSize: 12 }}>{s.studentRef}</td>
                     <td style={{ color: '#6b7280' }}>{s.programmeName}</td>
