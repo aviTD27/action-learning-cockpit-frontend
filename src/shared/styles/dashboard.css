@@ -1,4 +1,4 @@
-/* ── Page shell ── */
+/*   Page shell   */
 .db-page {
   max-width: 1240px;
   margin: 0 auto;
@@ -9,7 +9,7 @@
 .db-title  { font-size: 1.45rem; font-weight: 800; color: #111827; margin: 0 0 .2rem; }
 .db-sub    { font-size: 13px; color: #6b7280; margin: 0; }
 
-/* ── KPI row ── */
+/*   KPI row   */
 .db-kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -72,7 +72,7 @@
 .db-kpi-cyan   { background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%); }
 .db-kpi-rose   { background: linear-gradient(135deg, #be123c 0%, #f43f5e 100%); }
 
-/* ── Chart rows ── */
+/*   Chart rows   */
 .db-row-2-1 {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -89,7 +89,7 @@
   margin-bottom: 1rem;
 }
 
-/* ── Chart card ── */
+/*   Chart card   */
 .db-chart-card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -117,7 +117,7 @@
   font-size: 13px;
 }
 
-/* ── Donut centre label ── */
+/*   Donut centre label   */
 .db-donut-wrap { position: relative; }
 .db-donut-centre {
   position: absolute;
@@ -131,7 +131,7 @@
 .db-donut-num   { font-size: 1.6rem; font-weight: 800; color: #1f2937; line-height: 1; }
 .db-donut-label { font-size: 10px; color: #9ca3af; margin-top: 2px; }
 
-/* ── Legend ── */
+/*   Legend   */
 .db-legend {
   display: flex;
   flex-wrap: wrap;
@@ -142,7 +142,7 @@
 .db-legend-item { display: flex; align-items: center; gap: .3rem; font-size: 11px; color: #4b5563; }
 .db-legend-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-/* ── Tooltip ── */
+/*   Tooltip   */
 .db-tooltip {
   background: #1f2937;
   border: none;
@@ -156,7 +156,7 @@
 .db-tooltip-row   { display: flex; align-items: center; gap: .4rem; margin: 1px 0; }
 .db-tooltip-dot   { width: 7px; height: 7px; border-radius: 50%; }
 
-/* ── Leaderboard ── */
+/*   Leaderboard   */
 .db-leaderboard {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -223,3 +223,19 @@
 .db-pill-amber  { background: #fef9c3; color: #a16207; }
 .db-pill-slate  { background: #f1f5f9; color: #475569; }
 .db-pill-blue   { background: #dbeafe; color: #1d4ed8; }
+
+/* Upcoming deadlines list (lecturer dashboard) */
+.db-deadlines      { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.db-deadline-row   {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #f1f3f7;
+  border-radius: 10px;
+  background: #fff;
+}
+.db-deadline-main   { display: flex; flex-direction: column; min-width: 0; }
+.db-deadline-title  { font-weight: 600; color: #1E3A5F; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.db-deadline-cohort { font-size: 11px; color: #9ca3af; margin-top: 2px; }
