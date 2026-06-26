@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  XAxis, YAxis, CartesianGrid, Tooltip,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
   BarChart, Bar,
 } from 'recharts'
 import Layout from '../../shared/layout/Layout'
 import { UNI_ADMIN_NAV } from '../nav'
-import { getCohorts, getLecturers, getProgrammes, getStudents } from '../api/uniAdmin'
-import type { StudentResponse, LecturerResponse, CohortResponse, ProgrammeResponse } from '../api/types'
+import {
+  getCohorts, getLecturers, getProgrammes, getStudents,
+  getTenantTrends, getGradeDistribution, getCohortBenchmark,
+} from '../api/uniAdmin'
+import type {
+  StudentResponse, LecturerResponse, CohortResponse, ProgrammeResponse,
+  TrendPoint, GradeDistribution, CohortBenchmark,
+} from '../api/types'
 import { useAuth } from '../../auth/AuthContext'
 import '../../shared/styles/dashboard.css'
 import '../styles/uniAdmin.css'
@@ -31,6 +37,13 @@ const STATUS_LABELS: Record<string, string> = {
   PROBATION: 'Probation', PAYMENT_PENDING: 'Pmt. Pending',
   SUSPENDED: 'Suspended', EXPELLED: 'Expelled',
   DROPPED_OUT: 'Dropped Out', COMPLETED: 'Completed',
+}
+
+const GRADE_COLORS: Record<string, string> = {
+  Distinction: '#6366f1',
+  Good:        '#10b981',
+  Pass:        '#f59e0b',
+  Fail:        '#ef4444',
 }
 
 const COHORT_STATUS_COLORS: Record<string, string> = {
@@ -62,6 +75,9 @@ export default function UniAdminDashboard() {
   const [lecturers,  setLecturers]  = useState<LecturerResponse[]>([])
   const [cohorts,    setCohorts]    = useState<CohortResponse[]>([])
   const [programmes, setProgrammes] = useState<ProgrammeResponse[]>([])
+  const [trends,          setTrends]          = useState<TrendPoint[]>([])
+  const [gradeDist,       setGradeDist]       = useState<GradeDistribution[]>([])
+  const [cohortBenchmark, setCohortBenchmark] = useState<CohortBenchmark[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -71,11 +87,17 @@ export default function UniAdminDashboard() {
       getLecturers(uid).catch(() => ({ data: [] as LecturerResponse[] })),
       getCohorts(uid).catch(() => ({ data: [] as CohortResponse[] })),
       getProgrammes(uid).catch(() => ({ data: [] as ProgrammeResponse[] })),
-    ]).then(([s, l, c, p]) => {
+      getTenantTrends(uid).catch(() => ({ data: [] as TrendPoint[] })),
+      getGradeDistribution(uid).catch(() => ({ data: [] as GradeDistribution[] })),
+      getCohortBenchmark(uid).catch(() => ({ data: [] as CohortBenchmark[] })),
+    ]).then(([s, l, c, p, t, g, cb]) => {
       setStudents(s.data)
       setLecturers(l.data)
       setCohorts(c.data)
       setProgrammes(p.data)
+      setTrends(t.data)
+      setGradeDist(g.data)
+      setCohortBenchmark(cb.data)
     }).finally(() => setLoading(false))
   }, [universityId])
 
@@ -123,13 +145,6 @@ export default function UniAdminDashboard() {
   const activeStudents   = students.filter(s => s.status === 'ACTIVE').length
   const activeLecturers  = lecturers.filter(l => l.status === 'ACTIVE').length
   const ongoingCohorts   = cohorts.filter(c => c.status === 'ONGOING').length
-
-  const activeStudentList = useMemo(() =>
-    [...students]
-      .filter(s => s.status === 'ACTIVE')
-      .sort((a, b) => a.lastName.localeCompare(b.lastName))
-      .slice(0, 5)
-  , [students])
 
   return (
     <Layout navItems={UNI_ADMIN_NAV} user={sidebarUser} title="University Admin" subtitle="Dashboard · Action Learning Cockpit">
@@ -293,40 +308,129 @@ export default function UniAdminDashboard() {
           </div>
         </div>
 
-        {/* Active students list */}
-        {activeStudentList.length > 0 && (
+        {/* Row: Submission trend + Grade distribution */}
+        <div className="db-row-2-1">
+
+          {/* Area: submission & grade trend */}
+          <div className="db-chart-card">
+            <p className="db-chart-title">
+              Submission &amp; Grade Trend <span className="db-chart-sub">last 6 months</span>
+            </p>
+            {loading ? (
+              <div className="db-no-data">Loading…</div>
+            ) : trends.length === 0 ? (
+              <div className="db-no-data">No submission data yet</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={230}>
+                <AreaChart data={trends} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gSub" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#6366f1" stopOpacity={0.22} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}    />
+                    </linearGradient>
+                    <linearGradient id="gScore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#10b981" stopOpacity={0.22} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}    />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Area type="monotone" dataKey="submissions" name="Submissions" stroke="#6366f1" strokeWidth={2.5} fill="url(#gSub)" dot={false} />
+                  <Area type="monotone" dataKey="avgScore"    name="Avg Score %" stroke="#10b981" strokeWidth={2.5} fill="url(#gScore)" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+            <div className="db-legend">
+              <div className="db-legend-item"><span className="db-legend-dot" style={{ background: '#6366f1' }} />Submissions</div>
+              <div className="db-legend-item"><span className="db-legend-dot" style={{ background: '#10b981' }} />Avg Score %</div>
+            </div>
+          </div>
+
+          {/* Donut: grade distribution */}
+          <div className="db-chart-card">
+            <p className="db-chart-title">Grade Distribution</p>
+            {loading ? (
+              <div className="db-no-data">Loading…</div>
+            ) : gradeDist.every(d => d.count === 0) ? (
+              <div className="db-no-data">No released grades yet</div>
+            ) : (
+              <>
+                <div className="db-donut-wrap">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie data={gradeDist} cx="50%" cy="50%"
+                        innerRadius={58} outerRadius={82} paddingAngle={3}
+                        dataKey="count" nameKey="band" startAngle={90} endAngle={-270}>
+                        {gradeDist.map(d => (
+                          <Cell key={d.band} fill={GRADE_COLORS[d.band] ?? '#94a3b8'} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<ChartTooltip />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="db-donut-centre">
+                    <span className="db-donut-num">{gradeDist.reduce((s, d) => s + d.count, 0)}</span>
+                    <span className="db-donut-label">grades</span>
+                  </div>
+                </div>
+                <div className="db-legend">
+                  {gradeDist.map(d => (
+                    <div key={d.band} className="db-legend-item">
+                      <span className="db-legend-dot" style={{ background: GRADE_COLORS[d.band] ?? '#94a3b8' }} />
+                      {d.band} ({d.count})
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Cohort benchmark leaderboard */}
+        {!loading && cohortBenchmark.length > 0 && (
           <div className="db-leaderboard">
             <div className="db-lb-header">
-              <span className="db-lb-title">🎓 Active Students</span>
-              <span className="db-lb-badge">{activeStudents} active out of {students.length}</span>
+              <span className="db-lb-title">Cohort Performance Benchmark</span>
+              <span className="db-lb-badge">{cohortBenchmark.length} cohorts ranked</span>
             </div>
             <table className="db-lb-table">
               <thead>
                 <tr>
                   <th style={{ width: 48 }}>#</th>
-                  <th>Student</th>
-                  <th>Ref</th>
+                  <th>Cohort</th>
                   <th>Programme</th>
-                  <th>Status</th>
+                  <th>Students</th>
+                  <th>Submissions</th>
+                  <th style={{ minWidth: 160 }}>Avg Score</th>
                 </tr>
               </thead>
               <tbody>
-                {activeStudentList.map((s, i) => (
-                  <tr key={s.id}>
-                    <td><span className="db-rank db-rank-n">{i + 1}</span></td>
-                    <td className="db-name-cell">{s.firstName} {s.lastName}</td>
-                    <td style={{ color: '#9ca3af', fontFamily: 'monospace', fontSize: 12 }}>{s.studentRef}</td>
-                    <td style={{ color: '#6b7280' }}>{s.programmeName}</td>
+                {cohortBenchmark.map((cb, i) => (
+                  <tr key={cb.cohortId}>
                     <td>
-                      <span
-                        className="db-pill"
-                        style={{
-                          background: `${STATUS_COLORS[s.status] ?? '#94a3b8'}22`,
-                          color: STATUS_COLORS[s.status] ?? '#94a3b8',
-                        }}
-                      >
-                        {STATUS_LABELS[s.status] ?? s.status}
+                      <span className={`db-rank ${i === 0 ? 'db-rank-1' : i === 1 ? 'db-rank-2' : i === 2 ? 'db-rank-3' : 'db-rank-n'}`}>
+                        {cb.rank}
                       </span>
+                    </td>
+                    <td className="db-name-cell">{cb.cohortName}</td>
+                    <td style={{ color: '#6b7280' }}>{cb.programmeName ?? '—'}</td>
+                    <td>{cb.students}</td>
+                    <td>{cb.submissions}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+                        <div className="db-progress" style={{ flex: 1 }}>
+                          <div className="db-progress-bar"
+                            style={{
+                              width: `${cb.avgScorePct}%`,
+                              background: `linear-gradient(90deg, ${C[i % C.length]}, ${C[(i + 1) % C.length]})`,
+                            }} />
+                        </div>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', minWidth: 40 }}>
+                          {cb.avgScorePct > 0 ? `${cb.avgScorePct}%` : 'N/A'}
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 ))}
