@@ -15,7 +15,7 @@ interface FormState {
 }
 
 export default function RegisterPage() {
-  const { isAuthenticated, role, login } = useAuth()
+  const { isAuthenticated, role } = useAuth()
   const navigate = useNavigate()
 
   const isAdminSession = isAuthenticated && role === 'ROLE_ADMIN'
