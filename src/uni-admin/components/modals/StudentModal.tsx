@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type {
   CohortResponse,
   CreateStudentRequest,
@@ -7,6 +7,7 @@ import type {
   StudentStatus,
 } from '../../api/types'
 import { STUDENT_STATUSES } from '../../api/types'
+import { useAuth } from '../../../auth/AuthContext'
 import '../../styles/uniAdmin.css'
 
 import { isAxiosError } from 'axios'
@@ -14,6 +15,10 @@ import { isAxiosError } from 'axios'
 function apiErrorMessage(err: unknown, fallback: string): string {
   if (isAxiosError(err) && err.response?.data?.message) return err.response.data.message
   return fallback
+}
+
+function normalizePart(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
 interface Props {
@@ -26,10 +31,16 @@ interface Props {
 }
 
 export default function StudentModal({ open, existing, programmes, cohorts, onClose, onSave }: Props) {
+  // The admin's email is firstname.lastname@university-domain (generated during registration approval).
+  // Extracting the @-suffix gives us the university domain without any extra API call.
+  const { email: adminEmail } = useAuth()
+  const domain = adminEmail?.includes('@')
+    ? adminEmail.slice(adminEmail.indexOf('@') + 1)
+    : ''
+
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [personalEmail, setPersonalEmail] = useState('')
   const [studentRef, setStudentRef] = useState('')
   const [programmeId, setProgrammeId] = useState<number | ''>('')
   const [cohortId, setCohortId] = useState<number | ''>('')
@@ -37,12 +48,21 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
+  const isEditing = !!existing
+
+  const platformEmailPreview = useMemo(() => {
+    if (isEditing) return existing?.email ?? ''
+    const first = normalizePart(firstName)
+    const last = normalizePart(lastName)
+    if (!first && !last) return ''
+    return `${first || 'firstname'}.${last || 'lastname'}@${domain || '...'}`
+  }, [isEditing, existing, firstName, lastName, domain])
+
   useEffect(() => {
     if (open) {
       setFirstName(existing?.firstName ?? '')
       setLastName(existing?.lastName ?? '')
-      setEmail(existing?.email ?? '')
-      setPassword('')
+      setPersonalEmail('')
       setStudentRef(existing?.studentRef ?? '')
       setProgrammeId(existing?.programmeId ?? '')
       setCohortId(existing?.cohortId ?? '')
@@ -59,23 +79,27 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
 
   const submit = async () => {
     if (!firstName.trim() || !lastName.trim()) { setError('First and last name are required'); return }
-    if (!/^\S+@\S+\.\S+$/.test(email)) { setError('A valid email is required'); return }
-    if (!existing && !password) { setError('Password is required'); return }
+    if (!isEditing && !/^\S+@\S+\.\S+$/.test(personalEmail)) {
+      setError('A valid personal email is required — login credentials will be sent there')
+      return
+    }
     if (!studentRef.trim()) { setError('Student reference is required'); return }
     if (programmeId === '') { setError('Programme is required'); return }
     if (cohortId === '') { setError('Cohort is required'); return }
     setSaving(true)
     try {
-      await onSave({
+      const payload: CreateStudentRequest = {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        email: email.trim(),
-        password,
         studentRef: studentRef.trim(),
-        programmeId,
+        programmeId: programmeId as number,
         status,
-        cohortId,
-      })
+        cohortId: cohortId as number,
+      }
+      if (!isEditing) {
+        payload.personalEmail = personalEmail.trim()
+      }
+      await onSave(payload)
       onClose()
     } catch (err) {
       setError(apiErrorMessage(err, 'Failed to save student'))
@@ -87,7 +111,7 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
   return (
     <div className="ua-modal-overlay" onClick={onClose}>
       <div className="ua-modal" onClick={e => e.stopPropagation()}>
-        <h2 className="ua-modal-title">{existing ? 'Edit Student' : 'Add Student'}</h2>
+        <h2 className="ua-modal-title">{isEditing ? 'Edit Student' : 'Add Student'}</h2>
 
         <div className="ua-two-col">
           <div className="ua-modal-field">
@@ -102,24 +126,48 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
           </div>
         </div>
 
+        {/* Platform email — auto-generated, always read-only */}
         <div className="ua-modal-field">
-          <label className="ua-modal-label">Email *</label>
-          <input className="ua-modal-input" type="email" value={email}
-            onChange={e => setEmail(e.target.value)} placeholder="name@student.edu" />
+          <label className="ua-modal-label">
+            Platform Login Email
+            {!isEditing && (
+              <span style={{ fontWeight: 400, color: '#9ca3af', marginLeft: 6 }}>
+                (auto-generated)
+              </span>
+            )}
+          </label>
+          <input
+            className="ua-modal-input"
+            value={platformEmailPreview}
+            readOnly
+            placeholder={isEditing ? '' : 'Enter name above to preview…'}
+            style={{ background: '#f9fafb', color: '#6b7280', cursor: 'default' }}
+          />
         </div>
 
-        <div className="ua-two-col">
+        {/* Personal email — only for new students */}
+        {!isEditing && (
           <div className="ua-modal-field">
-            <label className="ua-modal-label">Password *</label>
-            <input className="ua-modal-input" type="password" value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder={existing ? 'Leave blank to keep current' : ''} />
+            <label className="ua-modal-label">
+              Personal Email *
+              <span style={{ fontWeight: 400, color: '#9ca3af', marginLeft: 6 }}>
+                (login credentials will be sent here)
+              </span>
+            </label>
+            <input
+              className="ua-modal-input"
+              type="email"
+              value={personalEmail}
+              onChange={e => setPersonalEmail(e.target.value)}
+              placeholder="student@gmail.com"
+            />
           </div>
-          <div className="ua-modal-field">
-            <label className="ua-modal-label">Student Ref *</label>
-            <input className="ua-modal-input" value={studentRef}
-              onChange={e => setStudentRef(e.target.value)} placeholder="e.g. STU-2026-001" />
-          </div>
+        )}
+
+        <div className="ua-modal-field">
+          <label className="ua-modal-label">Student Ref *</label>
+          <input className="ua-modal-input" value={studentRef}
+            onChange={e => setStudentRef(e.target.value)} placeholder="e.g. STU-2026-001" />
         </div>
 
         <div className="ua-modal-field">

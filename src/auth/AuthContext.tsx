@@ -3,9 +3,9 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 interface DecodedToken {
   sub: string
   role: string
+  universityId?: number
   firstName?: string
   surname?: string
-  name?: string
   iat: number
   exp: number
 }
@@ -14,6 +14,9 @@ interface AuthContextValue {
   token: string | null
   role: string | null
   email: string | null
+  universityId: number | null
+  firstName: string | null
+  surname: string | null
   displayName: string | null
   isAuthenticated: boolean
   login: (token: string) => void
@@ -22,7 +25,6 @@ interface AuthContextValue {
 
 function buildDisplayName(decoded: DecodedToken): string {
   if (decoded.firstName && decoded.surname) return `${decoded.firstName} ${decoded.surname}`
-  if (decoded.name) return decoded.name
   return decoded.sub
 }
 
@@ -69,6 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       token,
       role: decoded?.role ?? null,
       email: decoded?.sub ?? null,
+      universityId: decoded?.universityId ?? null,
+      firstName: decoded?.firstName ?? null,
+      surname: decoded?.surname ?? null,
       displayName: decoded ? buildDisplayName(decoded) : null,
       isAuthenticated: !!token,
       login,

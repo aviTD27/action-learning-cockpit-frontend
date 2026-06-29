@@ -1,14 +1,18 @@
 import apiClient from '../../api/apiClient'
 import type {
+  CohortBenchmark,
   CohortResponse,
   CreateCohortRequest,
   CreateLecturerRequest,
   CreateProgrammeRequest,
   CreateStudentRequest,
   CreateUniversityRequest,
+  GradeDistribution,
   LecturerResponse,
   ProgrammeResponse,
   StudentResponse,
+  TenantSummary,
+  TrendPoint,
   UniversityResponse,
 } from './types'
 
@@ -40,3 +44,9 @@ export const getStudents = (universityId?: number) => api.get<StudentResponse[]>
 export const getStudentsByCohort = (cohortId: number) => api.get<StudentResponse[]>(`/students/cohort/${cohortId}`)
 export const createStudent = (data: CreateStudentRequest) => api.post<StudentResponse>('/students', data)
 export const updateStudent = (id: number, data: CreateStudentRequest) => api.put<StudentResponse>(`/students/${id}`, data)
+
+// Analytics
+export const getTenantSummary     = (universityId?: number) => api.get<TenantSummary>('/analytics/tenant/summary', { params: { universityId } })
+export const getTenantTrends      = (universityId?: number) => api.get<TrendPoint[]>('/analytics/tenant/trends', { params: { universityId } })
+export const getGradeDistribution = (universityId?: number) => api.get<GradeDistribution[]>('/analytics/tenant/grade-distribution', { params: { universityId } })
+export const getCohortBenchmark   = (universityId?: number) => api.get<CohortBenchmark[]>('/analytics/tenant/cohort-benchmark', { params: { universityId } })

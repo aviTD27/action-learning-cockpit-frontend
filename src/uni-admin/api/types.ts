@@ -30,6 +30,7 @@ export interface UniversityResponse {
   id: number
   name: string
   code: string
+  domain: string | null
 }
 
 export interface CreateUniversityRequest {
@@ -75,6 +76,8 @@ export interface StudentResponse {
   programmeName: string
   status: StudentStatus
   cohortId: number
+  cohortName: string | null
+  universityName: string | null
 }
 
 export interface CreateProgrammeRequest {
@@ -96,17 +99,53 @@ export interface CreateLecturerRequest {
   email: string
   lecturerRef: string
   programmeIds: number[]
-  password?: string
   status?: LecturerStatus
 }
 
 export interface CreateStudentRequest {
   firstName: string
   lastName: string
-  email: string
-  password: string
+  /** Only required when creating — platform email is auto-generated server-side. */
+  personalEmail?: string
   studentRef: string
   programmeId: number
   status: StudentStatus
   cohortId: number
+}
+
+//   Analytics (tenant-scoped)                          ─
+export interface TenantSummary {
+  totalStudents: number
+  activeStudents: number
+  totalLecturers: number
+  activeLecturers: number
+  totalProgrammes: number
+  totalCohorts: number
+  activeCohorts: number
+  totalSubmissions: number
+  releasedGrades: number
+  gradedThisMonth: number
+  avgScorePct: number
+}
+
+export interface TrendPoint {
+  month: string
+  submissions: number
+  avgScore: number
+}
+
+export interface GradeDistribution {
+  band: string
+  count: number
+}
+
+export interface CohortBenchmark {
+  cohortId: number
+  cohortName: string
+  programmeName: string | null
+  students: number
+  submissions: number
+  releasedGrades: number
+  avgScorePct: number
+  rank: number
 }

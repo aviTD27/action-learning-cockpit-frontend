@@ -1,9 +1,18 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { loginUser } from '../api/authService'
 import './auth.css'
+
+const ROLE_ROUTES: Record<string, string> = {
+  ROLE_SUPER_ADMIN:    '/super-admin',
+  ROLE_PLATFORM_ADMIN: '/super-admin',
+  ROLE_ADMIN:          '/uni-admin',
+  ROLE_UNI_ADMIN:      '/uni-admin',
+  ROLE_LECTURER:       '/lecturer',
+  ROLE_STUDENT:        '/student',
+}
 
 export default function LoginPage() {
   const { isAuthenticated, role, login } = useAuth()
@@ -15,10 +24,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   if (isAuthenticated) {
-    return <Navigate to={role === 'ROLE_ADMIN' ? '/uni-admin' : '/student'} replace />
+    return <Navigate to={ROLE_ROUTES[role ?? ''] ?? '/login'} replace />
   }
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -28,7 +37,7 @@ export default function LoginPage() {
       const { token } = res.data
       login(token)
       const payload = JSON.parse(atob(token.split('.')[1]))
-      navigate(payload.role === 'ROLE_ADMIN' ? '/uni-admin' : '/student', { replace: true })
+      navigate(ROLE_ROUTES[payload.role] ?? '/login', { replace: true })
     } catch (err: any) {
       const status = err.response?.status
       const msg = err.response?.data?.message
@@ -89,8 +98,8 @@ export default function LoginPage() {
         </form>
 
         <p className="auth-footer">
-          Don't have an account?{' '}
-          <Link to="/register">Create one</Link>
+          New university?{' '}
+          <Link to="/request-access">Request access</Link>
         </p>
       </div>
     </div>

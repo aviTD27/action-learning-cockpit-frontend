@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
-import { GraduationCap, Pencil, Plus } from 'lucide-react'
+import { GraduationCap, Pencil, Plus, Upload } from 'lucide-react'
 import { useStudents } from '../../hooks/useStudents'
 import { useCohorts } from '../../hooks/useCohorts'
 import { useProgrammes } from '../../hooks/useProgrammes'
 import { createStudent, updateStudent } from '../../api/uniAdmin'
 import type { CreateStudentRequest, StudentResponse } from '../../api/types'
 import StudentModal from '../modals/StudentModal'
+import ImportCSVModal from '../modals/ImportCSVModal'
 import StatusBadge from '../shared/StatusBadge'
 import '../../styles/uniAdmin.css'
 
@@ -15,6 +16,7 @@ export default function StudentTable() {
   const { programmes } = useProgrammes()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<StudentResponse | null>(null)
   const [cohortFilter, setCohortFilter] = useState<number | ''>('')
 
@@ -51,6 +53,9 @@ export default function StudentTable() {
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
+          <button className="ua-btn ua-btn-secondary" onClick={() => setImportOpen(true)}>
+            <Upload size={12} /> Import CSV
+          </button>
           <button className="ua-btn ua-btn-success" onClick={openCreate}>
             <Plus size={12} /> Add Student
           </button>
@@ -109,6 +114,15 @@ export default function StudentTable() {
         cohorts={cohorts}
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
+      />
+
+      <ImportCSVModal
+        open={importOpen}
+        mode="student"
+        programmes={programmes}
+        cohorts={cohorts}
+        onClose={() => setImportOpen(false)}
+        onImported={reload}
       />
     </div>
   )

@@ -11,7 +11,7 @@ import {
 import type { NavItem, SidebarUser } from '../shared/layout/Sidebar'
 
 export const UNI_ADMIN_NAV: NavItem[] = [
-  { label: 'Overview', icon: Home, path: '/uni-admin', end: true },
+  { label: 'Dashboard', icon: Home, path: '/uni-admin', end: true },
   { label: 'Programmes', icon: BookOpen, path: '/uni-admin/programmes' },
   { label: 'Cohorts', icon: Users, path: '/uni-admin/cohorts' },
   { label: 'Lecturers', icon: Presentation, path: '/uni-admin/lecturers' },

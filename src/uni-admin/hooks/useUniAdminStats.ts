@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getCohorts, getLecturers, getProgrammes, getStudents } from '../api/uniAdmin'
-import { CURRENT_UNIVERSITY_ID } from '../tenant'
+import { useAuth } from '../../auth/AuthContext'
 
 export interface UniAdminStats {
   totalProgrammes: number
@@ -10,21 +10,20 @@ export interface UniAdminStats {
   activeLecturers: number
   totalStudents: number
   activeStudents: number
-  checkpointPassRate: number
-  avgNlpScore: number
 }
 
 export function useUniAdminStats() {
+  const { universityId } = useAuth()
   const [stats, setStats] = useState<UniAdminStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     Promise.all([
-      getProgrammes(CURRENT_UNIVERSITY_ID),
-      getCohorts(CURRENT_UNIVERSITY_ID),
-      getLecturers(CURRENT_UNIVERSITY_ID),
-      getStudents(CURRENT_UNIVERSITY_ID),
+      getProgrammes(universityId ?? undefined),
+      getCohorts(universityId ?? undefined),
+      getLecturers(universityId ?? undefined),
+      getStudents(universityId ?? undefined),
     ])
       .then(([prog, coh, lec, stu]) => {
         setStats({
@@ -35,8 +34,6 @@ export function useUniAdminStats() {
           activeLecturers: lec.data.filter(l => l.status === 'ACTIVE').length,
           totalStudents: stu.data.length,
           activeStudents: stu.data.filter(s => s.status === 'ACTIVE').length,
-          checkpointPassRate: 87, // TODO: backend
-          avgNlpScore: 72,        // TODO: backend
         })
       })
       .catch(() => setError('Failed to load stats'))

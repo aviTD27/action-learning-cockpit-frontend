@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { GraduationCap, Landmark, LogOut, Monitor, Presentation } from 'lucide-react'
+import { GraduationCap, KeyRound, Landmark, LogOut, Monitor, Presentation } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
+import ChangePasswordModal from '../components/ChangePasswordModal'
 import '../styles/layout.css'
 
 export interface NavItem {
@@ -45,9 +47,11 @@ function formatRoleLabel(role: string | null): string {
 }
 
 export default function Sidebar({ items, user }: Props) {
-  const nav = items ?? ROLE_NAV
+  const nav = items ?? []
   const { logout, displayName, role: authRole } = useAuth()
+  const showSwitchRole = authRole === 'ROLE_SUPER_ADMIN' || authRole === 'ROLE_PLATFORM_ADMIN'
   const navigate = useNavigate()
+  const [showChangePw, setShowChangePw] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -91,7 +95,7 @@ export default function Sidebar({ items, user }: Props) {
       </nav>
 
       <div className="sidebar-footer">
-        {items && (
+        {showSwitchRole && (
           <>
             <p className="sidebar-footer-label">Switch role</p>
             {ROLE_NAV.map(r => (
@@ -102,10 +106,15 @@ export default function Sidebar({ items, user }: Props) {
             ))}
           </>
         )}
+        <button className="sidebar-change-pw" onClick={() => setShowChangePw(true)}>
+          <KeyRound size={14} /> Change password
+        </button>
         <button className="sidebar-logout" onClick={handleLogout}>
           <LogOut size={14} /> Log out
         </button>
       </div>
+
+      {showChangePw && <ChangePasswordModal onClose={() => setShowChangePw(false)} />}
     </aside>
   )
 }
