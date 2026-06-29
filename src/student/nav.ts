@@ -1,4 +1,4 @@
-import { Bell, BookOpen, GraduationCap, Home, Star, UserRound, Users } from 'lucide-react'
+import { Bell, BookOpen, Home, Star, UserRound, Users } from 'lucide-react'
 import type { NavItem } from '../shared/layout/Sidebar'
 
 export const STUDENT_NAV: NavItem[] = [
