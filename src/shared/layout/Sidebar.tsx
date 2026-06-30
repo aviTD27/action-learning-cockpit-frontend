@@ -11,6 +11,7 @@ export interface NavItem {
   icon: LucideIcon
   path: string
   end?: boolean
+  badge?: number
 }
 
 export interface SidebarUser {
@@ -89,7 +90,12 @@ export default function Sidebar({ items, user }: Props) {
             }
           >
             <item.icon size={14} />
-            {item.label}
+            <span className="nav-link-label">{item.label}</span>
+            {item.badge && item.badge > 0 && (
+              <span className="nav-link-badge">
+                {item.badge > 99 ? '99+' : item.badge}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

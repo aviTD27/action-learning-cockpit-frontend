@@ -42,3 +42,25 @@ export interface GradeItem {
 
 export const getMyGrades = () =>
   apiClient.get<GradeItem[]>('/grades/me').then(r => r.data)
+
+export interface NotificationItem {
+  id: number
+  submissionId: number | null
+  submissionTitle: string | null
+  type: string
+  message: string
+  read: boolean
+  createdAt: string
+}
+
+export const getMyNotifications = () =>
+  apiClient.get<NotificationItem[]>('/notifications/me').then(r => r.data)
+
+export const getUnreadCount = () =>
+  apiClient.get<number>('/notifications/me/unread-count').then(r => r.data)
+
+export const markNotificationRead = (id: number) =>
+  apiClient.patch<NotificationItem>(`/notifications/${id}/read`).then(r => r.data)
+
+export const markAllNotificationsRead = () =>
+  apiClient.patch('/notifications/me/read-all')

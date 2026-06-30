@@ -1,40 +1,45 @@
 import { Route } from 'react-router-dom'
-import Layout from '../shared/layout/Layout'
-import { STUDENT_NAV } from '../student/nav'
 import StudentDashboard from '../student/components/StudentDashboard'
+import StudentLayout from '../student/components/StudentLayout'
 import PlaceholderPage from '../student/pages/PlaceholderPage'
 import ProfilePage from '../student/pages/ProfilePage'
 import AssignmentsPage from '../student/pages/AssignmentsPage'
 import GradesPage from '../student/pages/GradesPage'
-
-function StudentPage({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <Layout navItems={STUDENT_NAV} title={title} subtitle="Action Learning Cockpit">
-      <PlaceholderPage title={title} subtitle={subtitle} />
-    </Layout>
-  )
-}
+import NotificationsPage from '../student/pages/NotificationsPage'
 
 export default function StudentRoutes() {
   return (
     <>
-      <Route path="/student"                element={<StudentDashboard />} />
-      <Route path="/student/assignments"    element={
-        <Layout navItems={STUDENT_NAV} title="Assignments" subtitle="Your coursework">
+      <Route path="/student" element={<StudentDashboard />} />
+
+      <Route path="/student/assignments" element={
+        <StudentLayout title="Assignments" subtitle="Your coursework">
           <AssignmentsPage />
-        </Layout>
+        </StudentLayout>
       } />
-      <Route path="/student/grades"         element={
-        <Layout navItems={STUDENT_NAV} title="Grades" subtitle="Released grades and feedback">
+
+      <Route path="/student/grades" element={
+        <StudentLayout title="Grades" subtitle="Released grades and feedback">
           <GradesPage />
-        </Layout>
+        </StudentLayout>
       } />
-      <Route path="/student/notifications"  element={<StudentPage title="Notifications" subtitle="Your notifications will appear here." />} />
-      <Route path="/student/cohort"         element={<StudentPage title="My Cohort"     subtitle="Your cohort and lecturer info will appear here." />} />
-      <Route path="/student/profile"        element={
-        <Layout navItems={STUDENT_NAV} title="Profile" subtitle="Your account">
+
+      <Route path="/student/notifications" element={
+        <StudentLayout title="Notifications" subtitle="Your in-app notifications">
+          <NotificationsPage />
+        </StudentLayout>
+      } />
+
+      <Route path="/student/cohort" element={
+        <StudentLayout title="My Cohort" subtitle="Action Learning Cockpit">
+          <PlaceholderPage title="My Cohort" subtitle="Your cohort and lecturer info will appear here." />
+        </StudentLayout>
+      } />
+
+      <Route path="/student/profile" element={
+        <StudentLayout title="Profile" subtitle="Your account">
           <ProfilePage />
-        </Layout>
+        </StudentLayout>
       } />
     </>
   )
