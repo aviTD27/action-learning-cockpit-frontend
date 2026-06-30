@@ -1,11 +1,11 @@
 import { Route } from 'react-router-dom'
 import StudentDashboard from '../student/components/StudentDashboard'
 import StudentLayout from '../student/components/StudentLayout'
-import PlaceholderPage from '../student/pages/PlaceholderPage'
 import ProfilePage from '../student/pages/ProfilePage'
 import AssignmentsPage from '../student/pages/AssignmentsPage'
 import GradesPage from '../student/pages/GradesPage'
 import NotificationsPage from '../student/pages/NotificationsPage'
+import MyCohortPage from '../student/pages/MyCohortPage'
 
 export default function StudentRoutes() {
   return (
@@ -31,8 +31,8 @@ export default function StudentRoutes() {
       } />
 
       <Route path="/student/cohort" element={
-        <StudentLayout title="My Cohort" subtitle="Action Learning Cockpit">
-          <PlaceholderPage title="My Cohort" subtitle="Your cohort and lecturer info will appear here." />
+        <StudentLayout title="My Cohort" subtitle="Your cohort and lecturers">
+          <MyCohortPage />
         </StudentLayout>
       } />
 

@@ -64,3 +64,16 @@ export const markNotificationRead = (id: number) =>
 
 export const markAllNotificationsRead = () =>
   apiClient.patch('/notifications/me/read-all')
+
+export interface CohortInfo {
+  cohortId: number
+  cohortName: string
+  programmeName: string
+  programmeCode: string
+  status: string
+  universityName: string | null
+  lecturerNames: string[]
+}
+
+export const getMyCohort = () =>
+  apiClient.get<CohortInfo>('/students/me/cohort').then(r => r.data)
