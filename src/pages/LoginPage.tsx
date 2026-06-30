@@ -8,7 +8,6 @@ import './auth.css'
 const ROLE_ROUTES: Record<string, string> = {
   ROLE_SUPER_ADMIN:    '/super-admin',
   ROLE_PLATFORM_ADMIN: '/super-admin',
-  ROLE_ADMIN:          '/uni-admin',
   ROLE_UNI_ADMIN:      '/uni-admin',
   ROLE_LECTURER:       '/lecturer',
   ROLE_STUDENT:        '/student',
