@@ -30,3 +30,15 @@ export interface AssignmentItem {
 
 export const getAssignmentsForCohort = (cohortId: number) =>
   apiClient.get<AssignmentItem[]>(`/submissions?cohortId=${cohortId}`).then(r => r.data)
+
+export interface GradeItem {
+  submissionId: number
+  submissionTitle: string
+  maxPoints: number
+  grade: number
+  feedback: string | null
+  gradedAt: string
+}
+
+export const getMyGrades = () =>
+  apiClient.get<GradeItem[]>('/grades/me').then(r => r.data)
