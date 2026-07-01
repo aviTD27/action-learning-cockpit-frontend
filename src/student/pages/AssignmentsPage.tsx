@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
-import { BookOpen, Calendar, ChevronLeft, ChevronRight, List } from 'lucide-react'
+import { ChangeEvent, useEffect, useRef, useState, useMemo } from 'react'
+import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
+import { uploadDocument, turnInDocument, getMyUploadStatus, type CheckResult, type ComplianceReport } from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/assignments.css'
+import '../styles/compliance.css'
 
 type FilterTab = 'all' | 'pending' | 'past-due'
 type ViewMode  = 'list' | 'calendar'
@@ -41,8 +43,96 @@ function submissionType(allowedFileTypes: string | null): string {
   return `File (${allowedFileTypes})`
 }
 
+/* ── Compliance report ── */
+function ComplianceCheckRow({ result }: { result: CheckResult }) {
+  if (result.skipped) {
+    return (
+      <div className="compliance-check skipped">
+        <span className="compliance-icon-wrap"><Minus size={14} /></span>
+        <div>
+          <span className="compliance-label">{result.label}:</span>
+          <span className="compliance-msg">{result.message}</span>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className={`compliance-check ${result.passed ? 'passed' : 'failed'}`}>
+      <span className="compliance-icon-wrap">
+        {result.passed ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+      </span>
+      <div>
+        <span className="compliance-label">{result.label}:</span>
+        <span className="compliance-msg">{result.message}</span>
+        {result.detail && <div className="compliance-detail">{result.detail}</div>}
+      </div>
+    </div>
+  )
+}
+
+function ComplianceReportPanel({ report }: { report: ComplianceReport }) {
+  return (
+    <div className={`compliance-panel ${report.overallPass ? 'pass' : 'fail'}`}>
+      <div className="compliance-banner">
+        {report.overallPass
+          ? <><CheckCircle2 size={15} /> Document passed all compliance checks</>
+          : <><XCircle size={15} /> Document failed one or more compliance checks</>}
+      </div>
+      <div className="compliance-checks">
+        <ComplianceCheckRow result={report.fileType} />
+        <ComplianceCheckRow result={report.naming} />
+        <ComplianceCheckRow result={report.wordCount} />
+        <ComplianceCheckRow result={report.headings} />
+      </div>
+    </div>
+  )
+}
+
 /* ── List view card ── */
 function AssignmentCard({ a }: { a: Assignment }) {
+  const fileInputRef                    = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading]       = useState(false)
+  const [report, setReport]             = useState<ComplianceReport | null>(null)
+  const [uploadError, setUploadError]   = useState<string | null>(null)
+  const [turningIn, setTurningIn]       = useState(false)
+  const [turnedIn, setTurnedIn]         = useState(false)
+
+  useEffect(() => {
+    getMyUploadStatus(a.id).then(status => {
+      if (status?.turnedIn) setTurnedIn(true)
+    })
+  }, [a.id])
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setUploadError(null)
+    setTurnedIn(false)
+    try {
+      const r = await uploadDocument(a.id, file)
+      setReport(r)
+    } catch {
+      setUploadError('Upload failed. Please check your connection and try again.')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleTurnIn = async () => {
+    if (!report?.uploadId) return
+    setTurningIn(true)
+    try {
+      await turnInDocument(report.uploadId)
+      setTurnedIn(true)
+    } catch {
+      setUploadError('Turn-in failed. Please try again.')
+    } finally {
+      setTurningIn(false)
+    }
+  }
+
   return (
     <div className="asgn-card">
       <div className="asgn-card-top">
@@ -61,6 +151,41 @@ function AssignmentCard({ a }: { a: Assignment }) {
         </span>
         <span className="asgn-card-points">{a.maxPoints} pts</span>
       </div>
+
+      <div className="asgn-upload-row">
+        <button
+          className="asgn-upload-btn"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+        >
+          <Upload size={13} />
+          {uploading ? 'Checking…' : 'Submit Document'}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.docx"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
+      </div>
+
+      {uploadError && <p className="asgn-upload-error">{uploadError}</p>}
+      {report && <ComplianceReportPanel report={report} />}
+      {report?.overallPass && !turnedIn && (
+        <button
+          className="asgn-turnin-btn"
+          onClick={handleTurnIn}
+          disabled={turningIn}
+        >
+          {turningIn ? 'Submitting…' : 'Turn In'}
+        </button>
+      )}
+      {turnedIn && (
+        <div className="asgn-turnedin-badge">
+          <CheckCircle2 size={14} /> Submitted successfully
+        </div>
+      )}
     </div>
   )
 }

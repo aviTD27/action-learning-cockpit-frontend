@@ -26,10 +26,59 @@ export interface AssignmentItem {
   allowedFileTypes: string | null
   lateAllowed: boolean
   lecturerId: number | null
+  minWordCount: number | null
+  maxWordCount: number | null
+  namingPattern: string | null
+  requiredHeadings: string | null
 }
 
 export const getAssignmentsForCohort = (cohortId: number) =>
   apiClient.get<AssignmentItem[]>(`/submissions?cohortId=${cohortId}`).then(r => r.data)
+
+export interface CheckResult {
+  label: string
+  passed: boolean
+  skipped: boolean
+  message: string
+  detail: string | null
+}
+
+export interface ComplianceReport {
+  uploadId: number | null
+  fileName: string
+  fileSizeBytes: number
+  overallPass: boolean
+  fileType: CheckResult
+  naming: CheckResult
+  wordCount: CheckResult
+  headings: CheckResult
+}
+
+export const turnInDocument = (uploadId: number): Promise<void> =>
+  apiClient.patch(`/submissions/uploads/${uploadId}/turn-in`).then(() => {})
+
+export interface MyUploadStatus {
+  uploadId: number
+  turnedIn: boolean
+  fileName: string | null
+  turnedInAt: string | null
+  compliancePassed: boolean
+}
+
+export const getMyUploadStatus = (submissionId: number): Promise<MyUploadStatus | null> =>
+  apiClient.get<MyUploadStatus>(`/submissions/${submissionId}/my-upload`)
+    .then(r => r.status === 204 ? null : r.data)
+    .catch(() => null)
+
+export const uploadDocument = (submissionId: number, file: File): Promise<ComplianceReport> => {
+  const form = new FormData()
+  form.append('file', file)
+  return apiClient.post<ComplianceReport>(
+    `/submissions/${submissionId}/upload`,
+    form,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  ).then(r => r.data)
+}
 
 export interface GradeItem {
   submissionId: number
