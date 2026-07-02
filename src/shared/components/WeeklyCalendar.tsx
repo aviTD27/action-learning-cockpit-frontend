@@ -1,57 +1,48 @@
 import type { TimetableEntry, DayOfWeek } from '../../uni-admin/api/types'
 import './weeklyCalendar.css'
 
-const DAYS: DayOfWeek[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+const DAYS: DayOfWeek[] = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY']
 const DAY_LABELS: Record<DayOfWeek, string> = {
   MONDAY: 'Mon', TUESDAY: 'Tue', WEDNESDAY: 'Wed',
   THURSDAY: 'Thu', FRIDAY: 'Fri', SATURDAY: 'Sat', SUNDAY: 'Sun',
 }
 
-const START_HOUR = 7
-const END_HOUR   = 21
-const TOTAL_HOURS = END_HOUR - START_HOUR
+const HOUR_START  = 7
+const HOUR_END    = 21
+const TOTAL_HOURS = HOUR_END - HOUR_START
+const ROW_H       = 56   // px per hour slot
 
-function toMinutes(time: string) {
-  const [h, m] = time.split(':').map(Number)
+function toMinutes(t: string) {
+  const [h, m] = t.split(':').map(Number)
   return h * 60 + m
 }
 
-function pad(n: number) {
-  return String(n).padStart(2, '0')
+function fmtTime(t: string) {
+  const [h, m] = t.split(':')
+  const hr  = Number(h)
+  const ampm = hr >= 12 ? 'PM' : 'AM'
+  return `${hr % 12 || 12}:${m} ${ampm}`
 }
 
-function formatTime(time: string) {
-  const [h, m] = time.split(':')
-  const hour = Number(h)
-  const ampm = hour >= 12 ? 'PM' : 'AM'
-  const h12  = hour % 12 || 12
-  return `${h12}:${m} ${ampm}`
+function topPx(startTime: string)  {
+  return ((toMinutes(startTime) - HOUR_START * 60) / 60) * ROW_H
 }
+function heightPx(startTime: string, endTime: string) {
+  return ((toMinutes(endTime) - toMinutes(startTime)) / 60) * ROW_H
+}
+
+const TOTAL_H_PX = TOTAL_HOURS * ROW_H
 
 interface Props {
-  entries: TimetableEntry[]
-  onAdd?:    () => void
-  onEdit?:   (entry: TimetableEntry) => void
-  onDelete?: (entry: TimetableEntry) => void
+  entries:   TimetableEntry[]
   canEdit?:  boolean
+  onAdd?:    () => void
+  onEdit?:   (e: TimetableEntry) => void
+  onDelete?: (e: TimetableEntry) => void
 }
 
-export default function WeeklyCalendar({ entries, onAdd, onEdit, onDelete, canEdit }: Props) {
-  const hourSlots = Array.from({ length: TOTAL_HOURS }, (_, i) => START_HOUR + i)
-
-  function getEntries(day: DayOfWeek) {
-    return entries.filter(e => e.dayOfWeek === day)
-  }
-
-  function topPct(startTime: string) {
-    const mins = toMinutes(startTime) - START_HOUR * 60
-    return (mins / (TOTAL_HOURS * 60)) * 100
-  }
-
-  function heightPct(startTime: string, endTime: string) {
-    const dur = toMinutes(endTime) - toMinutes(startTime)
-    return (dur / (TOTAL_HOURS * 60)) * 100
-  }
+export default function WeeklyCalendar({ entries, canEdit, onAdd, onEdit, onDelete }: Props) {
+  const hours = Array.from({ length: TOTAL_HOURS }, (_, i) => HOUR_START + i)
 
   return (
     <div className="wc-root">
@@ -60,81 +51,79 @@ export default function WeeklyCalendar({ entries, onAdd, onEdit, onDelete, canEd
       <div className="wc-toolbar">
         <h2 className="wc-heading">Weekly Timetable</h2>
         {canEdit && onAdd && (
-          <button className="ua-btn ua-btn-primary" onClick={onAdd}>
-            + Add Entry
-          </button>
+          <button className="ua-btn ua-btn-primary" onClick={onAdd}>+ Add Entry</button>
         )}
       </div>
 
-      {/* Grid */}
-      <div className="wc-scroll">
-        <div className="wc-grid">
+      {/* Calendar card */}
+      <div className="wc-card">
 
-          {/* Corner */}
-          <div className="wc-corner" />
-
-          {/* Day headers */}
-          {DAYS.map(day => (
-            <div key={day} className="wc-day-header">{DAY_LABELS[day]}</div>
+        {/* ── Sticky day header row ── */}
+        <div className="wc-header">
+          <div className="wc-gutter-cell" />
+          {DAYS.map(d => (
+            <div key={d} className="wc-day-hdr">{DAY_LABELS[d]}</div>
           ))}
+        </div>
 
-          {/* Hour labels */}
-          {hourSlots.map(h => (
-            <div key={h} className="wc-hour-label">
-              {pad(h)}:00
-            </div>
-          ))}
+        {/* ── Scrollable body ── */}
+        <div className="wc-body">
 
-          {/* Day columns */}
-          {DAYS.map(day => (
-            <div key={day} className="wc-col">
-              {/* Hour grid lines */}
-              {hourSlots.map(h => (
-                <div key={h} className="wc-cell" />
-              ))}
+          {/* Hour labels column */}
+          <div className="wc-gutter">
+            {hours.map(h => (
+              <div key={h} className="wc-time-label" style={{ height: ROW_H }}>
+                {String(h).padStart(2,'0')}:00
+              </div>
+            ))}
+          </div>
 
-              {/* Entries */}
-              {getEntries(day).map(entry => (
-                <div
-                  key={entry.id}
-                  className="wc-entry"
-                  style={{
-                    top:    `${topPct(entry.startTime)}%`,
-                    height: `${heightPct(entry.startTime, entry.endTime)}%`,
-                    background: entry.color || '#6366f1',
-                  }}
-                >
-                  <div className="wc-entry-title">{entry.title}</div>
-                  <div className="wc-entry-meta">{entry.room}</div>
-                  <div className="wc-entry-meta">
-                    {formatTime(entry.startTime)} – {formatTime(entry.endTime)}
-                  </div>
-                  {entry.lecturerName && (
-                    <div className="wc-entry-meta">{entry.lecturerName}</div>
-                  )}
+          {/* Day columns — one per day, in DAYS order */}
+          <div className="wc-days">
+            {DAYS.map(day => {
+              const dayEntries = entries.filter(e => e.dayOfWeek === day)
+              return (
+                <div key={day} className="wc-day-col" style={{ height: TOTAL_H_PX }}>
 
-                  {canEdit && (
-                    <div className="wc-entry-actions">
-                      <button
-                        className="wc-action-btn"
-                        onClick={e => { e.stopPropagation(); onEdit?.(entry) }}
-                        title="Edit"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        className="wc-action-btn wc-action-delete"
-                        onClick={e => { e.stopPropagation(); onDelete?.(entry) }}
-                        title="Delete"
-                      >
-                        ✕
-                      </button>
+                  {/* Hour grid lines */}
+                  {hours.map(h => (
+                    <div key={h} className="wc-grid-line" style={{ top: (h - HOUR_START) * ROW_H }} />
+                  ))}
+
+                  {/* Entry blocks */}
+                  {dayEntries.map(entry => (
+                    <div
+                      key={entry.id}
+                      className="wc-entry"
+                      style={{
+                        top:        topPx(entry.startTime),
+                        height:     Math.max(heightPx(entry.startTime, entry.endTime) - 4, 20),
+                        background: entry.color || '#6366f1',
+                      }}
+                    >
+                      <div className="wc-entry-title">{entry.title}</div>
+                      <div className="wc-entry-meta">{entry.room}</div>
+                      <div className="wc-entry-meta">
+                        {fmtTime(entry.startTime)} – {fmtTime(entry.endTime)}
+                      </div>
+                      {entry.lecturerName && (
+                        <div className="wc-entry-meta">{entry.lecturerName}</div>
+                      )}
+                      {canEdit && (
+                        <div className="wc-entry-actions">
+                          <button className="wc-act-btn"
+                            onClick={e => { e.stopPropagation(); onEdit?.(entry) }}>✎</button>
+                          <button className="wc-act-btn wc-act-del"
+                            onClick={e => { e.stopPropagation(); onDelete?.(entry) }}>✕</button>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-          ))}
+              )
+            })}
+          </div>
+
         </div>
       </div>
     </div>
