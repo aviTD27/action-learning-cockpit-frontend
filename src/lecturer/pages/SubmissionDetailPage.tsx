@@ -40,7 +40,10 @@ export default function SubmissionDetailPage() {
 
   const handleNotify = () => {
     notify(submissionId)
-    setNotice(`Notification sent — ${students.length} student${students.length === 1 ? '' : 's'} emailed and notified on the platform.`)
+    const pending = Math.max(students.length - submittedCount, 0)
+    setNotice(pending === 0
+      ? 'Everyone has submitted — no reminders were sent.'
+      : `Reminder sent to ${pending} student${pending === 1 ? '' : 's'} who haven't submitted yet.`)
   }
 
   const handleDownloadUpload = async (uploadId: number, fileName: string) => {
@@ -118,7 +121,7 @@ export default function SubmissionDetailPage() {
                 </button>
               )}
               <button className="ua-btn ua-btn-secondary" onClick={handleNotify}>
-                <Bell size={12} /> Notify Students
+                <Bell size={12} /> Remind Non-Submitters
               </button>
               {submission.status !== 'ARCHIVED' ? (
                 <button className="ua-btn ua-btn-secondary" onClick={() => archive(submissionId)}>
