@@ -25,9 +25,12 @@ export const createUniversity = (data: CreateUniversityRequest) => api.post<Univ
 
 // Programmes
 export const getProgrammes = (universityId?: number) => api.get<ProgrammeResponse[]>('/programmes', { params: { universityId } })
+export const getArchivedProgrammes = (universityId?: number) => api.get<ProgrammeResponse[]>('/programmes/archived', { params: { universityId } })
 export const getProgramme = (id: number) => api.get<ProgrammeResponse>(`/programmes/${id}`)
 export const createProgramme = (data: CreateProgrammeRequest) => api.post<ProgrammeResponse>('/programmes', data)
 export const updateProgramme = (id: number, data: CreateProgrammeRequest) => api.put<ProgrammeResponse>(`/programmes/${id}`, data)
+export const archiveProgramme = (id: number) => api.delete<void>(`/programmes/${id}`)
+export const unarchiveProgramme = (id: number) => api.post<ProgrammeResponse>(`/programmes/${id}/unarchive`)
 
 // Cohorts
 export const getCohorts = (universityId?: number) => api.get<CohortResponse[]>('/cohorts', { params: { universityId } })

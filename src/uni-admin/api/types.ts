@@ -12,6 +12,10 @@ export const LECTURER_STATUSES = ['ACTIVE', 'INACTIVE'] as const
 
 export type LecturerStatus = (typeof LECTURER_STATUSES)[number]
 
+export const PROGRAMME_STATUSES = ['ACTIVE', 'ARCHIVED'] as const
+
+export type ProgrammeStatus = (typeof PROGRAMME_STATUSES)[number]
+
 export const STUDENT_STATUSES = [
   'ACTIVE',
   'INACTIVE',
@@ -45,6 +49,7 @@ export interface ProgrammeResponse {
   description: string
   universityId: number | null
   universityName: string | null
+  status: ProgrammeStatus
 }
 
 export interface CohortResponse {
@@ -53,6 +58,8 @@ export interface CohortResponse {
   programmeId: number
   programmeName: string
   status: CohortStatus
+  lecturerIds: number[]
+  lecturerNames: string[]
 }
 
 export interface LecturerResponse {
@@ -61,6 +68,7 @@ export interface LecturerResponse {
   lastName: string
   email: string
   lecturerRef: string
+  phone?: string | null
   programmeIds: number[]
   programmeNames: string[]
   status: LecturerStatus
@@ -91,13 +99,15 @@ export interface CreateCohortRequest {
   name: string
   programmeId: number
   status?: CohortStatus
+  lecturerIds?: number[]
 }
 
 export interface CreateLecturerRequest {
   firstName: string
   lastName: string
-  email: string
+  email?: string
   lecturerRef: string
+  phone?: string
   programmeIds: number[]
   status?: LecturerStatus
 }
