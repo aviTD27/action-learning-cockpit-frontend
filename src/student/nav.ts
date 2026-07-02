@@ -1,4 +1,4 @@
-import { Bell, BookOpen, Home, Star, UserRound, Users } from 'lucide-react'
+import { Bell, BookOpen, CalendarDays, Home, Star, UserRound, Users } from 'lucide-react'
 import type { NavItem } from '../shared/layout/Sidebar'
 
 export function getStudentNav(unreadCount = 0): NavItem[] {
@@ -12,6 +12,7 @@ export function getStudentNav(unreadCount = 0): NavItem[] {
       path:  '/student/notifications',
       badge: unreadCount > 0 ? unreadCount : undefined,
     },
+    { label: 'Timetable',  icon: CalendarDays, path: '/student/timetable' },
     { label: 'My Cohort',  icon: Users,     path: '/student/cohort' },
     { label: 'Profile',    icon: UserRound, path: '/student/profile' },
   ]

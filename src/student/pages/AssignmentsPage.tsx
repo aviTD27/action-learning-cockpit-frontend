@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, type ChangeEvent } from 'react'
 import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
 import { uploadDocument, turnInDocument, getMyUploadStatus, type CheckResult, type ComplianceReport } from '../api/studentApi'

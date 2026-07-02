@@ -139,6 +139,36 @@ export interface GradeDistribution {
   count: number
 }
 
+// ── Timetable ─────────────────────────────────────────────────────────────────
+export type DayOfWeek = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+
+export interface TimetableEntry {
+  id: number
+  title: string
+  room: string
+  dayOfWeek: DayOfWeek
+  startTime: string
+  endTime: string
+  color: string
+  cohortId: number
+  cohortName: string
+  lecturerId: number | null
+  lecturerName: string | null
+  universityId: number
+  universityName: string
+}
+
+export interface CreateTimetableRequest {
+  title: string
+  room: string
+  dayOfWeek: DayOfWeek
+  startTime: string
+  endTime: string
+  color?: string
+  cohortId: number
+  lecturerId?: number | null
+}
+
 export interface CohortBenchmark {
   cohortId: number
   cohortName: string
