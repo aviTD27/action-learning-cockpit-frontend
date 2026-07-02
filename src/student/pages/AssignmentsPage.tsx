@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo, type ChangeEvent } from 'react'
-import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, Minus, Upload, XCircle } from 'lucide-react'
+import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, FileDown, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
-import { uploadDocument, turnInDocument, getMyUploadStatus, type CheckResult, type ComplianceReport } from '../api/studentApi'
+import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport } from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/assignments.css'
 import '../styles/compliance.css'
@@ -106,6 +106,20 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    // Reject oversized files before sending — avoids a dropped connection and shows a clear message.
+    const HARD_LIMIT = 50 * 1024 * 1024
+    const limit = a.maxFileSizeBytes && a.maxFileSizeBytes > 0
+      ? Math.min(a.maxFileSizeBytes, HARD_LIMIT)
+      : HARD_LIMIT
+    if (file.size > limit) {
+      setReport(null)
+      setUploadError(
+        `"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — too large. ` +
+        `The maximum allowed for this assignment is ${Math.round(limit / 1024 / 1024)} MB.`,
+      )
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
     setUploading(true)
     setUploadError(null)
     setTurnedIn(false)
@@ -144,6 +158,25 @@ function AssignmentCard({ a }: { a: Assignment }) {
       </div>
       {a.description && (
         <p className="asgn-card-desc">{a.description}</p>
+      )}
+      {a.hasTemplateFile && (
+        <button
+          className="ua-link-btn"
+          style={{ margin: '0 0 0.5rem', fontSize: '0.75rem' }}
+          onClick={async () => {
+            const res = await downloadAssignmentTemplate(a.id)
+            const url = URL.createObjectURL(res.data)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = a.templateFileName || 'template'
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+            URL.revokeObjectURL(url)
+          }}
+        >
+          <FileDown size={12} /> Download template{a.templateFileName ? `: ${a.templateFileName}` : ''}
+        </button>
       )}
       <div className="asgn-card-footer">
         <span style={{ color: urgencyColor(a.status, a.dueDate), fontSize: '0.75rem', fontWeight: 600 }}>
