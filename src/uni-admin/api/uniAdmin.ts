@@ -6,12 +6,14 @@ import type {
   CreateLecturerRequest,
   CreateProgrammeRequest,
   CreateStudentRequest,
+  CreateTimetableRequest,
   CreateUniversityRequest,
   GradeDistribution,
   LecturerResponse,
   ProgrammeResponse,
   StudentResponse,
   TenantSummary,
+  TimetableEntry,
   TrendPoint,
   UniversityResponse,
 } from './types'
@@ -50,3 +52,9 @@ export const getTenantSummary     = (universityId?: number) => api.get<TenantSum
 export const getTenantTrends      = (universityId?: number) => api.get<TrendPoint[]>('/analytics/tenant/trends', { params: { universityId } })
 export const getGradeDistribution = (universityId?: number) => api.get<GradeDistribution[]>('/analytics/tenant/grade-distribution', { params: { universityId } })
 export const getCohortBenchmark   = (universityId?: number) => api.get<CohortBenchmark[]>('/analytics/tenant/cohort-benchmark', { params: { universityId } })
+
+// Timetable
+export const getTimetable          = ()                                    => api.get<TimetableEntry[]>('/timetable')
+export const createTimetableEntry  = (data: CreateTimetableRequest)        => api.post<TimetableEntry>('/timetable', data)
+export const updateTimetableEntry  = (id: number, data: CreateTimetableRequest) => api.put<TimetableEntry>(`/timetable/${id}`, data)
+export const deleteTimetableEntry  = (id: number)                          => api.delete<void>(`/timetable/${id}`)
