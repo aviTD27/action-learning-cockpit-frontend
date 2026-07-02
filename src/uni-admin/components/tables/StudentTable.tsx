@@ -5,6 +5,7 @@ import { useCohorts } from '../../hooks/useCohorts'
 import { useProgrammes } from '../../hooks/useProgrammes'
 import { createStudent, updateStudent } from '../../api/uniAdmin'
 import type { CreateStudentRequest, StudentResponse } from '../../api/types'
+import { STUDENT_STATUSES } from '../../api/types'
 import StudentModal from '../modals/StudentModal'
 import ImportCSVModal from '../modals/ImportCSVModal'
 import StatusBadge from '../shared/StatusBadge'
@@ -19,15 +20,22 @@ export default function StudentTable() {
   const [importOpen, setImportOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<StudentResponse | null>(null)
   const [cohortFilter, setCohortFilter] = useState<number | ''>('')
+  const [programmeFilter, setProgrammeFilter] = useState<number | ''>('')
+  const [statusFilter, setStatusFilter] = useState<string>('')
 
   const cohortNames = useMemo(
     () => new Map(cohorts.map(c => [c.id, c.name])),
     [cohorts],
   )
 
-  const visible = cohortFilter === ''
-    ? students
-    : students.filter(s => s.cohortId === cohortFilter)
+  const visible = useMemo(
+    () => students.filter(s =>
+      (cohortFilter === ''    || s.cohortId === cohortFilter) &&
+      (programmeFilter === '' || s.programmeId === programmeFilter) &&
+      (statusFilter === ''    || s.status === statusFilter)
+    ),
+    [students, cohortFilter, programmeFilter, statusFilter],
+  )
 
   const openCreate = () => { setEditTarget(null); setModalOpen(true) }
   const openEdit = (student: StudentResponse) => { setEditTarget(student); setModalOpen(true) }
@@ -45,12 +53,32 @@ export default function StudentTable() {
         <div className="ua-header-actions">
           <select
             className="ua-modal-input ua-filter"
+            value={programmeFilter}
+            onChange={e => setProgrammeFilter(e.target.value === '' ? '' : Number(e.target.value))}
+          >
+            <option value="">All programmes</option>
+            {programmes.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+          <select
+            className="ua-modal-input ua-filter"
             value={cohortFilter}
             onChange={e => setCohortFilter(e.target.value === '' ? '' : Number(e.target.value))}
           >
             <option value="">All cohorts</option>
             {cohorts.map(c => (
               <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+          <select
+            className="ua-modal-input ua-filter"
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+          >
+            <option value="">All statuses</option>
+            {STUDENT_STATUSES.map(s => (
+              <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
             ))}
           </select>
           <button className="ua-btn ua-btn-secondary" onClick={() => setImportOpen(true)}>

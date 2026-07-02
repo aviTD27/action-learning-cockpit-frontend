@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getProgrammes } from '../api/uniAdmin'
+import { getProgrammes, getArchivedProgrammes } from '../api/uniAdmin'
 import { useAuth } from '../../auth/AuthContext'
 import type { ProgrammeResponse } from '../api/types'
 
@@ -12,8 +12,10 @@ export function useProgrammes() {
   const reload = useCallback(() => {
     setLoading(true)
     setError(null)
-    getProgrammes(universityId ?? undefined)
-      .then(res => setProgrammes(res.data))
+    const uni = universityId ?? undefined
+    // Load active + archived so status can be changed in either direction.
+    Promise.all([getProgrammes(uni), getArchivedProgrammes(uni)])
+      .then(([active, archived]) => setProgrammes([...active.data, ...archived.data]))
       .catch(() => setError('Failed to load programmes'))
       .finally(() => setLoading(false))
   }, [universityId])

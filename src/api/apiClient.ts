@@ -16,7 +16,9 @@ apiClient.interceptors.request.use(config => {
 apiClient.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 403) {
+    const url: string = error.config?.url ?? ''
+    const isAuthCall = url.includes('/auth/')
+    if (error.response?.status === 403 && !isAuthCall) {
       localStorage.removeItem('token')
       window.location.href = '/login'
     }

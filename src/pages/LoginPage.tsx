@@ -40,7 +40,9 @@ export default function LoginPage() {
     } catch (err: any) {
       const status = err.response?.status
       const msg = err.response?.data?.message
-      if (status === 401) {
+      if (status === 403) {
+        setError(msg ?? 'Your account has been deactivated. Please contact your administrator.')
+      } else if (status === 401) {
         setError('Invalid email or password.')
       } else {
         setError(msg ?? 'Something went wrong. Please try again.')

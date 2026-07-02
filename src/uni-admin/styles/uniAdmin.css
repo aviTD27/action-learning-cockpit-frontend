@@ -184,6 +184,13 @@
 
 .ua-modal-field  { margin-bottom: 1rem; }
 
+.ua-field-hint {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  line-height: 1.4;
+  margin: 4px 0 10px;
+}
+
 .ua-modal-label {
   display: block;
   font-size: 0.75rem;
@@ -299,6 +306,44 @@
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
 }
+
+.ua-status-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ua-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 160px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+}
+
+.ua-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+.ua-status-select {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+}
+
+.ua-status-select:disabled { opacity: 0.6; cursor: default; }
 
 /*  Status badges (backend enums)  */
 
