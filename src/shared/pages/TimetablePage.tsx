@@ -72,7 +72,7 @@ export default function TimetablePage({ canEdit, universityId }: Props) {
   if (loading) return <div style={{ padding: '2rem', color: '#9ca3af' }}>Loading timetable…</div>
 
   return (
-    <div style={{ padding: '1.5rem' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {error && (
         <div style={{ marginBottom: '1rem', padding: '.75rem 1rem', background: '#fee2e2', borderRadius: 8, color: '#dc2626', fontSize: 14 }}>
           {error}
