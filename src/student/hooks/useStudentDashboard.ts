@@ -52,7 +52,7 @@ export function useStudentDashboard() {
         const profile = await getMyProfile()
 
         const [assignments, grades] = await Promise.all([
-          profile.cohortId ? getAssignmentsForCohort(profile.cohortId) : Promise.resolve([]),
+          getAssignmentsForCohort(profile.cohortId),
           getMyGrades(),
         ])
 
