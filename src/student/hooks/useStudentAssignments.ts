@@ -22,7 +22,6 @@ export function useStudentAssignments() {
     async function load() {
       try {
         const profile = await getMyProfile()
-        if (!profile.cohortId) { setLoading(false); return }
         const items = await getAssignmentsForCohort(profile.cohortId)
         const mapped: Assignment[] = items
           .map(a => ({ ...a, status: computeStatus(a.dueDate) }))

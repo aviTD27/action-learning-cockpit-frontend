@@ -40,8 +40,10 @@ export interface AssignmentItem {
   hasTemplateFile: boolean
 }
 
-export const getAssignmentsForCohort = (cohortId: number) =>
-  apiClient.get<AssignmentItem[]>(`/submissions?cohortId=${cohortId}`).then(r => r.data)
+export const getAssignmentsForCohort = (cohortId: number | null) =>
+  apiClient.get<AssignmentItem[]>(
+    cohortId != null ? `/submissions?cohortId=${cohortId}` : '/submissions'
+  ).then(r => r.data)
 
 export const downloadAssignmentTemplate = (submissionId: number) =>
   apiClient.get<Blob>(`/submissions/${submissionId}/template`, { responseType: 'blob' })
