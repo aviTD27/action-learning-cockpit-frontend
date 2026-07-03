@@ -21,6 +21,7 @@ export interface AssignmentItem {
   id: number
   title: string
   description: string | null
+  instructions: string | null
   additionalNotes: string | null
   submissionType: 'FILE' | 'TEXT' | 'BOTH'
   dueDate: string
@@ -35,6 +36,7 @@ export interface AssignmentItem {
   namingPattern: string | null
   requiredHeadings: string | null
   templateFileName: string | null
+  hasTemplate: boolean
   hasTemplateFile: boolean
 }
 

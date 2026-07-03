@@ -8,6 +8,7 @@ export interface SubmissionResponse {
   id: number
   title: string
   description: string
+  instructions: string | null
   additionalNotes: string | null
   submissionType: SubmissionType
   status: SubmissionLifecycle
@@ -26,6 +27,7 @@ export interface SubmissionResponse {
   namingPattern: string | null
   requiredHeadings: string | null
   templateFileName: string | null
+  hasTemplate: boolean
   hasTemplateFile: boolean
   lastNotifiedAt: string | null
   createdAt: string
@@ -45,6 +47,7 @@ export interface SubmissionRulesRequest {
 export interface CreateSubmissionRequest {
   title: string
   description: string
+  instructions?: string
   additionalNotes?: string | null
   submissionType?: SubmissionType
   status?: SubmissionLifecycle
@@ -84,5 +87,24 @@ export interface StudentSubmissionResponse {
   submittedAt: string
   attemptNumber: number
   late: boolean
+  overallScore: number | null
+  scoreLevel: string | null
   reopened: boolean
+}
+
+export interface CriterionScore {
+  label: string
+  score: number
+  feedback: string
+  confidence: string
+  requiresReview: boolean
+}
+
+export interface ScoringReport {
+  overallScore: number
+  level: string
+  wordCount: number
+  embeddingsComputed: boolean
+  requiresHumanReview: boolean
+  criteria: CriterionScore[]
 }

@@ -144,6 +144,66 @@
 .ua-deadline-meta { display: flex; align-items: center; gap: 8px; }
 .ua-deadline-date { font-size: 11px; color: #6b7280; }
 
+/* AI Score chip in student table */
+.ua-score-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700;
+}
+.ua-score-chip-excellent { background: #dcfce7; color: #15803d; }
+.ua-score-chip-good      { background: #dbeafe; color: #1d4ed8; }
+.ua-score-chip-average   { background: #fef9c3; color: #a16207; }
+.ua-score-chip-poor      { background: #fee2e2; color: #b91c1c; }
+
+/* Score modal */
+.ua-score-modal { max-width: 540px; }
+.ua-score-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.ua-score-summary { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
+.ua-score-level {
+  padding: 3px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700;
+}
+.ua-score-excellent { background: #dcfce7; color: #15803d; }
+.ua-score-good      { background: #dbeafe; color: #1d4ed8; }
+.ua-score-average   { background: #fef9c3; color: #a16207; }
+.ua-score-poor      { background: #fee2e2; color: #b91c1c; }
+.ua-score-overall   { font-size: 1.5rem; font-weight: 800; color: #1E3A5F; }
+.ua-score-wc        { font-size: 11px; color: #9ca3af; }
+.ua-review-warning {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0.5rem 0.75rem; border-radius: 6px;
+  background: #fef9c3; color: #a16207; font-size: 0.78rem; margin-bottom: 0.75rem;
+}
+.ua-criteria-list { display: flex; flex-direction: column; gap: 1rem; }
+.ua-criterion { display: flex; flex-direction: column; gap: 4px; }
+.ua-criterion-top { display: flex; justify-content: space-between; align-items: center; }
+.ua-criterion-label { font-size: 0.82rem; font-weight: 700; color: #1f2937; }
+.ua-criterion-right { display: flex; align-items: center; gap: 6px; }
+.ua-criterion-pct { font-size: 0.82rem; font-weight: 700; color: #374151; min-width: 34px; text-align: right; }
+.ua-score-bar-track { height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden; }
+.ua-score-bar-fill  { height: 100%; border-radius: 9999px; transition: width 0.3s ease; }
+.ua-criterion-feedback { font-size: 0.75rem; color: #6b7280; margin: 0; line-height: 1.45; }
+.ua-conf-badge { padding: 1px 7px; border-radius: 9999px; font-size: 10px; font-weight: 700; }
+.ua-conf-low    { background: #fee2e2; color: #b91c1c; }
+.ua-conf-medium { background: #fef9c3; color: #a16207; }
+.ua-conf-high   { background: #dcfce7; color: #15803d; }
+
+/* Instructions panel */
+.ua-stat-row-block { flex-direction: column; align-items: flex-start; gap: 4px; }
+.ua-instructions-text {
+  font-size: 0.8125rem; color: #374151; line-height: 1.6; margin: 0;
+  white-space: pre-wrap; max-height: 160px; overflow-y: auto;
+  background: #f9fafb; border-radius: 6px; padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb; width: 100%; box-sizing: border-box;
+}
+
+/* Link-style button */
+.ua-link-btn {
+  background: none; border: none; cursor: pointer;
+  color: #1d4ed8; font-size: inherit; padding: 0;
+  display: inline-flex; align-items: center; gap: 4px;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.ua-link-btn:hover { color: #1E3A5F; }
+
 /* Submissions-by-cohort bars */
 .ua-bar-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
 .ua-bar-label { width: 110px; flex-shrink: 0; font-size: 11px; color: #4b5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

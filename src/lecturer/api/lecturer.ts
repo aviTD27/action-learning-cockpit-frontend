@@ -3,6 +3,7 @@ import type {
   CreateSubmissionRequest,
   GradeRequest,
   GradeResponse,
+  ScoringReport,
   StudentSubmissionResponse,
   SubmissionResponse,
 } from './types'
@@ -75,3 +76,20 @@ export const releaseGrades = (submissionId: number) =>
 
 export const getStudentSubmissions = (submissionId: number) =>
   api.get<StudentSubmissionResponse[]>(`/submissions/${submissionId}/student-submissions`)
+
+export const getSubmissionScore = (uploadId: number) =>
+  api.get<ScoringReport>(`/submissions/uploads/${uploadId}/score`)
+
+export const downloadStudentFile = (uploadId: number) =>
+  api.get<Blob>(`/submissions/uploads/${uploadId}/download`, { responseType: 'blob' })
+
+export const uploadTemplate = (submissionId: number, file: File) => {
+  const form = new FormData()
+  form.append('file', file)
+  return api.post<SubmissionResponse>(`/submissions/${submissionId}/template`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export const downloadTemplate = (submissionId: number) =>
+  api.get<Blob>(`/submissions/${submissionId}/template/download`, { responseType: 'blob' })

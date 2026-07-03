@@ -44,7 +44,7 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
     if (open) {
       setTitle(existing?.title ?? '')
       setDescription(existing?.description ?? '')
-      setAdditionalNotes(existing?.additionalNotes ?? '')
+      setAdditionalNotes(existing?.additionalNotes ?? existing?.instructions ?? '')
       setSubmissionType(existing?.submissionType ?? 'BOTH')
       setCohortId(existing?.cohortId ?? '')
       setCohortIds(existing?.cohortId ? [existing.cohortId] : [])
@@ -270,7 +270,7 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
               <label className="ua-modal-label">Template / Brief File</label>
               <input className="ua-modal-input" type="file"
                 onChange={e => setTemplateFile(e.target.files?.[0] ?? null)} />
-              {isEditing && existing?.hasTemplateFile && !templateFile && (
+              {isEditing && (existing?.hasTemplateFile || existing?.hasTemplate) && !templateFile && (
                 <p className="ua-field-hint">Current: {existing.templateFileName}</p>
               )}
             </div>

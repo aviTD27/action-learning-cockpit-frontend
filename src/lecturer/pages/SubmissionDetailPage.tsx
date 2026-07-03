@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Archive, ArrowLeft, Bell, CheckCheck, Download, FileArchive, FileDown, FileText, GraduationCap, Pencil, Send, Unlock } from 'lucide-react'
+import { Archive, ArrowLeft, Bell, Brain, CheckCheck, Download, FileArchive, FileDown, FileText, GraduationCap, Pencil, Send, Undo2, Unlock } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
 import { LECTURER_NAV, LECTURER_USER } from '../nav'
 import { useStudents } from '../../uni-admin/hooks/useStudents'
@@ -9,6 +9,7 @@ import { useGrades } from '../hooks/useGrades'
 import { useStudentSubmissions } from '../hooks/useStudentSubmissions'
 import { downloadUpload, downloadSubmissionsZip, downloadTemplate } from '../api/lecturer'
 import GradeModal from '../components/GradeModal'
+import ScoreModal from '../components/ScoreModal'
 import GradeBadge from '../components/GradeBadge'
 import { buildGradeCsv, downloadCsv, gradeCsvFilename } from '../lib/exportGrades'
 import type { StudentResponse } from '../../uni-admin/api/types'
@@ -32,10 +33,11 @@ export default function SubmissionDetailPage() {
   const submission = submissions.find(s => s.id === submissionId)
 
   const { students, loading } = useStudents(submission?.cohortId)
-  const { setGrade, releaseAll, gradeFor, draftCount } = useGrades(submissionId)
+  const { setGrade, releaseAll, unrelease, gradeFor, draftCount } = useGrades(submissionId)
   const { available: subsTracked, submissionFor, submittedCount, reload: reloadSubs } = useStudentSubmissions(submissionId)
 
   const [gradeTarget, setGradeTarget] = useState<StudentResponse | null>(null)
+  const [scoreTarget, setScoreTarget] = useState<{ name: string; uploadId: number } | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
   const handleNotify = () => {
@@ -139,10 +141,10 @@ export default function SubmissionDetailPage() {
               <span className="ua-detail-label">Description / Instructions</span>
               <span className="ua-detail-value">{submission.description || '—'}</span>
             </div>
-            {submission.additionalNotes && (
+            {(submission.additionalNotes || submission.instructions) && (
               <div className="ua-detail-item full">
                 <span className="ua-detail-label">Additional Notes</span>
-                <span className="ua-detail-value">{submission.additionalNotes}</span>
+                <span className="ua-detail-value">{submission.additionalNotes || submission.instructions}</span>
               </div>
             )}
             <div className="ua-detail-item">
@@ -166,7 +168,7 @@ export default function SubmissionDetailPage() {
             <div className="ua-detail-item">
               <span className="ua-detail-label">Template File</span>
               <span className="ua-detail-value">
-                {submission.hasTemplateFile ? (
+                {(submission.hasTemplateFile || submission.hasTemplate) ? (
                   <button className="ua-link-btn" onClick={handleDownloadTemplate}>
                     <FileDown size={12} /> {submission.templateFileName ?? 'Download template'}
                   </button>
@@ -259,6 +261,7 @@ export default function SubmissionDetailPage() {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Submission</th>
+                    <th>AI Score</th>
                     <th>Status</th>
                     <th>Grade</th>
                     <th>Feedback</th>
@@ -296,6 +299,18 @@ export default function SubmissionDetailPage() {
                           })()}
                         </td>
                         <td>
+                          {(() => {
+                            const sub = submissionFor(s.id)
+                            if (!sub || sub.overallScore == null) return <span className="col-muted">—</span>
+                            const pct = Math.round(sub.overallScore * 100)
+                            return (
+                              <span className={`ua-score-chip ua-score-chip-${sub.scoreLevel ?? 'average'}`}>
+                                {pct}% · {sub.scoreLevel}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                        <td>
                           <span className={`ua-badge ${!g ? 'ua-badge-not_started' : g.status === 'RELEASED' ? 'ua-badge-completed' : 'ua-badge-payment_pending'}`}>
                             <span className="ua-badge-dot" />
                             {!g ? 'Pending' : g.status === 'RELEASED' ? 'Released' : 'Draft'}
@@ -313,15 +328,25 @@ export default function SubmissionDetailPage() {
                         <td className="col-actions">
                           {(() => {
                             const sub = subsTracked ? submissionFor(s.id) : undefined
-                            return sub?.uploadId ? (
-                              <button
-                                className="ua-icon-btn"
-                                title={`Download ${sub.fileName}`}
-                                onClick={() => handleDownloadUpload(sub.uploadId!, sub.fileName)}
-                              >
-                                <FileDown size={13} />
-                              </button>
-                            ) : null
+                            if (!sub?.uploadId) return null
+                            return (
+                              <>
+                                <button
+                                  className="ua-icon-btn"
+                                  title={`Download ${sub.fileName}`}
+                                  onClick={() => handleDownloadUpload(sub.uploadId!, sub.fileName)}
+                                >
+                                  <FileDown size={13} />
+                                </button>
+                                <button
+                                  className="ua-icon-btn"
+                                  title="View AI score"
+                                  onClick={() => setScoreTarget({ name: `${s.firstName} ${s.lastName}`, uploadId: sub.uploadId! })}
+                                >
+                                  <Brain size={13} />
+                                </button>
+                              </>
+                            )
                           })()}
                           <button
                             className="ua-icon-btn"
@@ -337,6 +362,15 @@ export default function SubmissionDetailPage() {
                           >
                             <Pencil size={13} />
                           </button>
+                          {g?.status === 'RELEASED' && (
+                            <button
+                              className="ua-icon-btn"
+                              title="Un-release grade (move back to draft)"
+                              onClick={() => unrelease(s.id)}
+                            >
+                              <Undo2 size={13} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     )
@@ -358,6 +392,13 @@ export default function SubmissionDetailPage() {
         onSave={(grade, feedback) => {
           if (gradeTarget) setGrade(gradeTarget.id, grade, feedback)
         }}
+      />
+
+      <ScoreModal
+        open={scoreTarget !== null}
+        studentName={scoreTarget?.name ?? ''}
+        uploadId={scoreTarget?.uploadId ?? null}
+        onClose={() => setScoreTarget(null)}
       />
     </Layout>
   )

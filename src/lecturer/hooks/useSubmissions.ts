@@ -9,6 +9,7 @@ import {
   reopenSubmission,
   unarchiveSubmission,
   updateSubmission,
+  uploadTemplate,
 } from '../api/lecturer'
 import type { CreateSubmissionRequest, SubmissionResponse } from '../api/types'
 import type { CreateSubmissionData, Submission } from '../types'
@@ -18,6 +19,7 @@ function toSubmission(r: SubmissionResponse): Submission {
     id: r.id,
     title: r.title,
     description: r.description ?? '',
+    instructions: r.instructions ?? undefined,
     additionalNotes: r.additionalNotes ?? undefined,
     submissionType: r.submissionType ?? 'BOTH',
     status: r.status ?? 'PUBLISHED',
@@ -37,6 +39,7 @@ function toSubmission(r: SubmissionResponse): Submission {
       requiredHeadings: r.requiredHeadings ?? undefined,
     },
     templateFileName: r.templateFileName ?? undefined,
+    hasTemplate: r.hasTemplate,
     hasTemplateFile: r.hasTemplateFile,
     lastNotifiedAt: r.lastNotifiedAt ?? undefined,
     createdAt: r.createdAt,
@@ -47,6 +50,7 @@ function toRequest(data: CreateSubmissionData): CreateSubmissionRequest {
   return {
     title: data.title,
     description: data.description,
+    instructions: data.instructions,
     additionalNotes: data.additionalNotes,
     submissionType: data.submissionType,
     status: data.status,
@@ -105,10 +109,11 @@ export function useSubmissions() {
     }
   }, [reload])
 
-  const update = useCallback(async (id: number, data: CreateSubmissionData) => {
+  const update = useCallback(async (id: number, data: CreateSubmissionData, templateFile?: File | null) => {
     setError(null)
     try {
       await updateSubmission(id, toRequest(data))
+      if (templateFile) await uploadTemplate(id, templateFile)
       await reload()
     } catch (err) {
       setError(messageFrom(err, 'Could not update submission'))

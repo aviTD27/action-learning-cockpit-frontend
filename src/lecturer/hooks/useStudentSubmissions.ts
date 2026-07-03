@@ -13,6 +13,8 @@ function toStudentSubmission(r: StudentSubmissionResponse): StudentSubmission {
     submittedAt: r.submittedAt,
     attemptNumber: r.attemptNumber,
     late: r.late,
+    overallScore: r.overallScore ?? null,
+    scoreLevel: r.scoreLevel ?? null,
     reopened: r.reopened,
   }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo, type ChangeEvent } from 'react'
-import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, FileDown, List, Minus, Upload, XCircle } from 'lucide-react'
+import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Download, FileText, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
 import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport } from '../api/studentApi'
 import '../styles/student.css'
@@ -96,6 +96,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const [uploadError, setUploadError]   = useState<string | null>(null)
   const [turningIn, setTurningIn]       = useState(false)
   const [turnedIn, setTurnedIn]         = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
 
   useEffect(() => {
     getMyUploadStatus(a.id).then(status => {
@@ -106,7 +107,8 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    // Reject oversized files before sending — avoids a dropped connection and shows a clear message.
+
+    // Client-side size guard — avoids a dropped connection and shows a clear message.
     const HARD_LIMIT = 50 * 1024 * 1024
     const limit = a.maxFileSizeBytes && a.maxFileSizeBytes > 0
       ? Math.min(a.maxFileSizeBytes, HARD_LIMIT)
@@ -120,14 +122,16 @@ function AssignmentCard({ a }: { a: Assignment }) {
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
+
     setUploading(true)
     setUploadError(null)
     setTurnedIn(false)
     try {
       const r = await uploadDocument(a.id, file)
       setReport(r)
-    } catch {
-      setUploadError('Upload failed. Please check your connection and try again.')
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      setUploadError(msg ?? 'Upload failed. Please check your connection and try again.')
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -147,6 +151,22 @@ function AssignmentCard({ a }: { a: Assignment }) {
     }
   }
 
+  const handleDownloadTemplate = async () => {
+    const res = await downloadAssignmentTemplate(a.id)
+    const url = URL.createObjectURL(res.data)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = a.templateFileName || 'template'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  const hasInstructions = !!(a.instructions || a.additionalNotes)
+  const hasTemplate = !!(a.hasTemplateFile || a.hasTemplate)
+  const instructionsText = a.instructions || a.additionalNotes
+
   return (
     <div className="asgn-card">
       <div className="asgn-card-top">
@@ -159,25 +179,29 @@ function AssignmentCard({ a }: { a: Assignment }) {
       {a.description && (
         <p className="asgn-card-desc">{a.description}</p>
       )}
-      {a.hasTemplateFile && (
-        <button
-          className="ua-link-btn"
-          style={{ margin: '0 0 0.5rem', fontSize: '0.75rem' }}
-          onClick={async () => {
-            const res = await downloadAssignmentTemplate(a.id)
-            const url = URL.createObjectURL(res.data)
-            const link = document.createElement('a')
-            link.href = url
-            link.download = a.templateFileName || 'template'
-            document.body.appendChild(link)
-            link.click()
-            link.remove()
-            URL.revokeObjectURL(url)
-          }}
-        >
-          <FileDown size={12} /> Download template{a.templateFileName ? `: ${a.templateFileName}` : ''}
-        </button>
+
+      {(hasInstructions || hasTemplate) && (
+        <div className="asgn-info-row">
+          {hasInstructions && (
+            <button className="asgn-info-btn" onClick={() => setShowInstructions(v => !v)}>
+              <FileText size={12} />
+              {showInstructions ? 'Hide instructions' : 'View instructions'}
+            </button>
+          )}
+          {hasTemplate && (
+            <button className="asgn-info-btn" onClick={handleDownloadTemplate}>
+              <Download size={12} /> Download template
+            </button>
+          )}
+        </div>
       )}
+
+      {showInstructions && instructionsText && (
+        <div className="asgn-instructions">
+          <p>{instructionsText}</p>
+        </div>
+      )}
+
       <div className="asgn-card-footer">
         <span style={{ color: urgencyColor(a.status, a.dueDate), fontSize: '0.75rem', fontWeight: 600 }}>
           {formatDue(a.dueDate)}
@@ -185,27 +209,29 @@ function AssignmentCard({ a }: { a: Assignment }) {
         <span className="asgn-card-points">{a.maxPoints} pts</span>
       </div>
 
-      <div className="asgn-upload-row">
-        <button
-          className="asgn-upload-btn"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-        >
-          <Upload size={13} />
-          {uploading ? 'Checking…' : 'Submit Document'}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.docx"
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-        />
-      </div>
+      {!turnedIn && (
+        <div className="asgn-upload-row">
+          <button
+            className="asgn-upload-btn"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <Upload size={13} />
+            {uploading ? 'Checking…' : 'Upload File'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.docx"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+        </div>
+      )}
 
-      {uploadError && <p className="asgn-upload-error">{uploadError}</p>}
-      {report && <ComplianceReportPanel report={report} />}
-      {report?.overallPass && !turnedIn && (
+      {!turnedIn && uploadError && <p className="asgn-upload-error">{uploadError}</p>}
+      {!turnedIn && report && <ComplianceReportPanel report={report} />}
+      {!turnedIn && report?.overallPass && (
         <button
           className="asgn-turnin-btn"
           onClick={handleTurnIn}

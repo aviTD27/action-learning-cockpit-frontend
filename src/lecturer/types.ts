@@ -16,6 +16,7 @@ export interface Submission {
   id: number
   title: string
   description: string
+  instructions?: string
   additionalNotes?: string
   submissionType: SubmissionType
   status: SubmissionLifecycle
@@ -26,6 +27,7 @@ export interface Submission {
   maxPoints: number
   rules: SubmissionRules
   templateFileName?: string
+  hasTemplate?: boolean
   hasTemplateFile: boolean
   lastNotifiedAt?: string
   createdAt: string
@@ -34,6 +36,7 @@ export interface Submission {
 export interface CreateSubmissionData {
   title: string
   description: string
+  instructions?: string
   additionalNotes?: string
   submissionType: SubmissionType
   status?: SubmissionLifecycle
@@ -55,6 +58,8 @@ export interface StudentSubmission {
   submittedAt: string
   attemptNumber: number
   late: boolean
+  overallScore: number | null
+  scoreLevel: string | null
   reopened: boolean
 }
 
