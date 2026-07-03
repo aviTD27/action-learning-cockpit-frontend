@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Archive, ArrowLeft, Bell, Brain, CheckCheck, Download, FileArchive, FileDown, FileText, GraduationCap, Pencil, Send, Undo2, Unlock } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
-import { LECTURER_NAV, LECTURER_USER } from '../nav'
+import { LECTURER_NAV } from '../nav'
+import { useLecturerSidebarUser } from '../hooks/useLecturerSidebarUser'
 import { useStudents } from '../../uni-admin/hooks/useStudents'
 import { useSubmissions } from '../hooks/useSubmissions'
 import { useGrades } from '../hooks/useGrades'
@@ -29,6 +30,7 @@ function saveBlob(data: Blob, filename: string) {
 export default function SubmissionDetailPage() {
   const { id } = useParams()
   const submissionId = Number(id)
+  const sidebarUser = useLecturerSidebarUser()
   const { submissions, notify, publish, archive, unarchive, reopen } = useSubmissions()
   const submission = submissions.find(s => s.id === submissionId)
 
@@ -84,7 +86,7 @@ export default function SubmissionDetailPage() {
 
   if (!submission) {
     return (
-      <Layout navItems={LECTURER_NAV} user={LECTURER_USER} title="Submission" subtitle="Not found">
+      <Layout navItems={LECTURER_NAV} user={sidebarUser} title="Submission" subtitle="Not found">
         <div className="ua-page">
           <div className="ua-card">
             <p className="ua-table-empty">Submission not found.</p>
@@ -98,7 +100,7 @@ export default function SubmissionDetailPage() {
   const graded = students.filter(s => gradeFor(s.id)).length
 
   return (
-    <Layout navItems={LECTURER_NAV} user={LECTURER_USER} title={submission.title} subtitle={`${submission.cohortName} · due ${submission.dueDate}`}>
+    <Layout navItems={LECTURER_NAV} user={sidebarUser} title={submission.title} subtitle={`${submission.cohortName} · due ${submission.dueDate}`}>
       <div className="ua-page">
 
         <Link to="/lecturer/submissions" className="ua-link"><ArrowLeft size={12} /> Back to submissions</Link>
