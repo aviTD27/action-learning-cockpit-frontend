@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Award, BarChart2, ChevronDown, ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
 import { useStudentGrades } from '../hooks/useStudentGrades'
 import type { GradeItem } from '../api/studentApi'
+import { markGradeNotificationsRead } from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/grades.css'
 
@@ -144,6 +145,10 @@ function GradeRow({ grade }: { grade: GradeItem }) {
 /* ── Main page ── */
 export default function GradesPage() {
   const { grades, loading, error } = useStudentGrades()
+
+  useEffect(() => {
+    markGradeNotificationsRead().catch(() => {})
+  }, [])
 
   if (loading) return <p className="sd-table-empty">Loading grades…</p>
   if (error)   return <p className="sd-table-empty">{error}</p>

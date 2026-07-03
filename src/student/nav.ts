@@ -1,20 +1,25 @@
-import { Bell, BookOpen, CalendarDays, Home, Star, UserRound, Users } from 'lucide-react'
+import { BookOpen, CalendarDays, Home, Megaphone, Star, UserRound, Users } from 'lucide-react'
 import type { NavItem } from '../shared/layout/Sidebar'
 
-export function getStudentNav(unreadCount = 0): NavItem[] {
+export function getStudentNav(announcementUnread = 0, gradeUnread = 0): NavItem[] {
   return [
-    { label: 'Dashboard',     icon: Home,      path: '/student',               end: true },
-    { label: 'Assignments',   icon: BookOpen,  path: '/student/assignments' },
-    { label: 'Grades',        icon: Star,      path: '/student/grades' },
+    { label: 'Dashboard',   icon: Home,      path: '/student',            end: true },
+    { label: 'Assignments', icon: BookOpen,  path: '/student/assignments' },
     {
-      label: 'Notifications',
-      icon:  Bell,
-      path:  '/student/notifications',
-      badge: unreadCount > 0 ? unreadCount : undefined,
+      label: 'Grades',
+      icon:  Star,
+      path:  '/student/grades',
+      badge: gradeUnread > 0 ? gradeUnread : undefined,
     },
-    { label: 'Timetable',  icon: CalendarDays, path: '/student/timetable' },
-    { label: 'My Cohort',  icon: Users,     path: '/student/cohort' },
-    { label: 'Profile',    icon: UserRound, path: '/student/profile' },
+    {
+      label: 'Announcements',
+      icon:  Megaphone,
+      path:  '/student/announcements',
+      badge: announcementUnread > 0 ? announcementUnread : undefined,
+    },
+    { label: 'Timetable', icon: CalendarDays, path: '/student/timetable' },
+    { label: 'My Cohort', icon: Users,        path: '/student/cohort' },
+    { label: 'Profile',   icon: UserRound,    path: '/student/profile' },
   ]
 }
 

@@ -7,6 +7,8 @@ import NotifyStudentsPage from '../lecturer/pages/NotifyStudentsPage'
 import GradeReviewPage from '../lecturer/pages/GradeReviewPage'
 import LecturerProfilePage from '../lecturer/pages/LecturerProfilePage'
 import LecturerTimetablePage from '../lecturer/pages/TimetablePage'
+import LecturerAnnouncementsPage from '../lecturer/pages/AnnouncementsPage'
+import LecturerLayout from '../lecturer/components/LecturerLayout'
 
 export default function LecturerRoutes() {
   return (
@@ -19,6 +21,11 @@ export default function LecturerRoutes() {
       <Route path="/lecturer/notify" element={<NotifyStudentsPage />} />
       <Route path="/lecturer/grade-review" element={<GradeReviewPage />} />
       <Route path="/lecturer/profile" element={<LecturerProfilePage />} />
+      <Route path="/lecturer/announcements" element={
+        <LecturerLayout title="Announcements" subtitle="Send messages · View admin announcements">
+          <LecturerAnnouncementsPage />
+        </LecturerLayout>
+      } />
     </>
   )
 }

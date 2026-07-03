@@ -5,6 +5,7 @@ import ProfilePage from '../student/pages/ProfilePage'
 import AssignmentsPage from '../student/pages/AssignmentsPage'
 import GradesPage from '../student/pages/GradesPage'
 import NotificationsPage from '../student/pages/NotificationsPage'
+import StudentAnnouncementsPage from '../student/pages/AnnouncementsPage'
 import MyCohortPage from '../student/pages/MyCohortPage'
 import StudentTimetablePage from '../student/pages/TimetablePage'
 
@@ -28,6 +29,12 @@ export default function StudentRoutes() {
       <Route path="/student/notifications" element={
         <StudentLayout title="Notifications" subtitle="Your in-app notifications">
           <NotificationsPage />
+        </StudentLayout>
+      } />
+
+      <Route path="/student/announcements" element={
+        <StudentLayout title="Announcements" subtitle="Messages from lecturers and admin">
+          <StudentAnnouncementsPage />
         </StudentLayout>
       } />
 

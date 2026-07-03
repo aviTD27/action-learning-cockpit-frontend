@@ -128,6 +128,16 @@ export const markNotificationRead = (id: number) =>
 export const markAllNotificationsRead = () =>
   apiClient.patch('/notifications/me/read-all')
 
+export const getGradeReleaseUnreadCount = (): Promise<number> =>
+  getMyNotifications()
+    .then(items => items.filter(n => !n.read && n.type === 'GRADE_RELEASED').length)
+
+export const markGradeNotificationsRead = (): Promise<void> =>
+  getMyNotifications().then(items => {
+    const unread = items.filter(n => !n.read && n.type === 'GRADE_RELEASED')
+    return Promise.all(unread.map(n => markNotificationRead(n.id))).then(() => {})
+  })
+
 export interface CohortInfo {
   cohortId: number
   cohortName: string
