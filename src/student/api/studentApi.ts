@@ -40,6 +40,7 @@ export interface AssignmentItem {
   hasTemplateFile: boolean
 }
 
+// When cohortId is null (student not yet enrolled) falls back to university-wide published assignments
 export const getAssignmentsForCohort = (cohortId: number | null) =>
   apiClient.get<AssignmentItem[]>(
     cohortId != null ? `/submissions?cohortId=${cohortId}` : '/submissions'
