@@ -8,17 +8,18 @@ interface Props {
   open: boolean
   existing?: Submission | null
   onClose: () => void
-  onSave: (data: CreateSubmissionData) => void
+  onSave: (data: CreateSubmissionData, templateFile: File | null) => void
 }
 
 export default function SubmissionModal({ open, existing, onClose, onSave }: Props) {
   const { cohorts } = useCohorts()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [instructions, setInstructions] = useState('')
   const [cohortId, setCohortId] = useState<number | ''>('')
   const [dueDate, setDueDate] = useState('')
   const [maxPoints, setMaxPoints] = useState('20')
-  const [templateFileName, setTemplateFileName] = useState('')
+  const [templateFile, setTemplateFile] = useState<File | null>(null)
   // Submission rules
   const [allowedFileTypes, setAllowedFileTypes] = useState('')
   const [maxAttempts, setMaxAttempts] = useState('1')
@@ -33,10 +34,11 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
     if (open) {
       setTitle(existing?.title ?? '')
       setDescription(existing?.description ?? '')
+      setInstructions(existing?.instructions ?? '')
       setCohortId(existing?.cohortId ?? '')
       setDueDate(existing?.dueDate ?? '')
       setMaxPoints(existing ? String(existing.maxPoints) : '20')
-      setTemplateFileName(existing?.templateFileName ?? '')
+      setTemplateFile(null)
       setAllowedFileTypes(existing?.rules.allowedFileTypes ?? '')
       setMaxAttempts(existing ? String(existing.rules.maxAttempts) : '1')
       setLateAllowed(existing?.rules.lateAllowed ?? false)
@@ -58,6 +60,7 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
     onSave({
       title: title.trim(),
       description: description.trim(),
+      instructions: instructions.trim() || undefined,
       cohortId,
       cohortName: cohort?.name ?? '',
       dueDate,
@@ -67,8 +70,7 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
         maxAttempts: attempts,
         lateAllowed,
       },
-      templateFileName: templateFileName || undefined,
-    })
+    }, templateFile)
     onClose()
   }
 
@@ -86,9 +88,16 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
 
         <div className="ua-modal-field">
           <label className="ua-modal-label">Description</label>
-          <textarea className="ua-modal-input" rows={3} value={description}
+          <textarea className="ua-modal-input" rows={2} value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder="What students must submit" />
+            placeholder="Brief summary of what students must submit" />
+        </div>
+
+        <div className="ua-modal-field">
+          <label className="ua-modal-label">Instructions</label>
+          <textarea className="ua-modal-input" rows={4} value={instructions}
+            onChange={e => setInstructions(e.target.value)}
+            placeholder="Detailed instructions for students (steps, requirements, format, etc.)" />
         </div>
 
         <div className="ua-modal-field">
@@ -123,9 +132,13 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
 
         <div className="ua-modal-field">
           <label className="ua-modal-label">Template File</label>
-          {/* TODO (backend): Need to save file.*/}
+          {existing?.hasTemplate && !templateFile && (
+            <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0 0 4px' }}>
+              Current: {existing.templateFileName} — upload a new file to replace it
+            </p>
+          )}
           <input className="ua-modal-input" type="file"
-            onChange={e => setTemplateFileName(e.target.files?.[0]?.name ?? '')} />
+            onChange={e => setTemplateFile(e.target.files?.[0] ?? null)} />
         </div>
 
         <div className="ua-two-col">

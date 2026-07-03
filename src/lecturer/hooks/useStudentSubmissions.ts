@@ -11,6 +11,9 @@ function toStudentSubmission(r: StudentSubmissionResponse): StudentSubmission {
     submittedAt: r.submittedAt,
     attemptNumber: r.attemptNumber,
     late: r.late,
+    uploadId: r.uploadId ?? null,
+    overallScore: r.overallScore ?? null,
+    scoreLevel: r.scoreLevel ?? null,
   }
 }
 

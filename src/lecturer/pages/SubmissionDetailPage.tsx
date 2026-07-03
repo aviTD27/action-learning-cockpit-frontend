@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Bell, CheckCheck, Download, FileText, GraduationCap, Pencil } from 'lucide-react'
+import { ArrowLeft, Bell, Brain, CheckCheck, Download, FileDown, FileText, GraduationCap, Pencil } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
 import { LECTURER_NAV, LECTURER_USER } from '../nav'
+import { downloadStudentFile, downloadTemplate } from '../api/lecturer'
 import { useStudents } from '../../uni-admin/hooks/useStudents'
 import { useSubmissions } from '../hooks/useSubmissions'
 import { useGrades } from '../hooks/useGrades'
 import { useStudentSubmissions } from '../hooks/useStudentSubmissions'
 import GradeModal from '../components/GradeModal'
+import ScoreModal from '../components/ScoreModal'
 import GradeBadge from '../components/GradeBadge'
 import { buildGradeCsv, downloadCsv, gradeCsvFilename } from '../lib/exportGrades'
 import type { StudentResponse } from '../../uni-admin/api/types'
@@ -24,6 +26,7 @@ export default function SubmissionDetailPage() {
   const { available: subsTracked, submissionFor, submittedCount } = useStudentSubmissions(submissionId)
 
   const [gradeTarget, setGradeTarget] = useState<StudentResponse | null>(null)
+  const [scoreTarget, setScoreTarget] = useState<{ name: string; uploadId: number } | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
   const handleNotify = () => {
@@ -34,6 +37,23 @@ export default function SubmissionDetailPage() {
   const handleRelease = () => {
     releaseAll()
     setNotice('All draft grades released — students will see them once the student portal exists.')
+  }
+
+  const handleDownloadStudentFile = async (uploadId: number, fileName: string) => {
+    const res = await downloadStudentFile(uploadId)
+    const url = URL.createObjectURL(res.data)
+    const a = document.createElement('a')
+    a.href = url; a.download = fileName; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleDownloadTemplate = async () => {
+    if (!submission) return
+    const res = await downloadTemplate(submission.id)
+    const url = URL.createObjectURL(res.data)
+    const a = document.createElement('a')
+    a.href = url; a.download = submission.templateFileName ?? 'template'; a.click()
+    URL.revokeObjectURL(url)
   }
 
   const handleExport = () => {
@@ -95,8 +115,20 @@ export default function SubmissionDetailPage() {
             </div>
             <div className="ua-stat-row">
               <span className="ua-stat-label">Template File</span>
-              <span className="ua-stat-value">{submission.templateFileName ?? '—'}</span>
+              <span className="ua-stat-value">
+                {submission.hasTemplate ? (
+                  <button className="ua-link-btn" onClick={handleDownloadTemplate}>
+                    <FileDown size={12} /> {submission.templateFileName}
+                  </button>
+                ) : (submission.templateFileName ?? '—')}
+              </span>
             </div>
+            {submission.instructions && (
+              <div className="ua-stat-row ua-stat-row-block">
+                <span className="ua-stat-label">Instructions</span>
+                <p className="ua-instructions-text">{submission.instructions}</p>
+              </div>
+            )}
             <div className="ua-stat-row">
               <span className="ua-stat-label">Allowed File Types</span>
               <span className="ua-stat-value">{submission.rules.allowedFileTypes || 'Any'}</span>
@@ -155,6 +187,7 @@ export default function SubmissionDetailPage() {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Submission</th>
+                    <th>AI Score</th>
                     <th>Status</th>
                     <th>Grade</th>
                     <th>Feedback</th>
@@ -192,6 +225,18 @@ export default function SubmissionDetailPage() {
                           })()}
                         </td>
                         <td>
+                          {(() => {
+                            const sub = submissionFor(s.id)
+                            if (!sub || sub.overallScore == null) return <span className="col-muted">—</span>
+                            const pct = Math.round(sub.overallScore * 100)
+                            return (
+                              <span className={`ua-score-chip ua-score-chip-${sub.scoreLevel ?? 'average'}`}>
+                                {pct}% · {sub.scoreLevel}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                        <td>
                           <span className={`ua-badge ${!g ? 'ua-badge-not_started' : g.status === 'RELEASED' ? 'ua-badge-completed' : 'ua-badge-payment_pending'}`}>
                             <span className="ua-badge-dot" />
                             {!g ? 'Pending' : g.status === 'RELEASED' ? 'Released' : 'Draft'}
@@ -207,6 +252,28 @@ export default function SubmissionDetailPage() {
                         </td>
                         <td className="col-muted">{g?.feedback || '—'}</td>
                         <td className="col-actions">
+                          {(() => {
+                            const sub = submissionFor(s.id)
+                            if (!sub?.uploadId) return null
+                            return (
+                              <>
+                                <button
+                                  className="ua-icon-btn"
+                                  title="Download submission"
+                                  onClick={() => handleDownloadStudentFile(sub.uploadId!, sub.fileName)}
+                                >
+                                  <Download size={13} />
+                                </button>
+                                <button
+                                  className="ua-icon-btn"
+                                  title="View AI score"
+                                  onClick={() => setScoreTarget({ name: `${s.firstName} ${s.lastName}`, uploadId: sub.uploadId! })}
+                                >
+                                  <Brain size={13} />
+                                </button>
+                              </>
+                            )
+                          })()}
                           <button
                             className="ua-icon-btn"
                             title={g ? 'Edit grade' : 'Grade student'}
@@ -235,6 +302,13 @@ export default function SubmissionDetailPage() {
         onSave={(grade, feedback) => {
           if (gradeTarget) setGrade(gradeTarget.id, grade, feedback)
         }}
+      />
+
+      <ScoreModal
+        open={scoreTarget !== null}
+        studentName={scoreTarget?.name ?? ''}
+        uploadId={scoreTarget?.uploadId ?? null}
+        onClose={() => setScoreTarget(null)}
       />
     </Layout>
   )

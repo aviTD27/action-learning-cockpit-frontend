@@ -5,17 +5,19 @@ export interface SubmissionResponse {
   id: number
   title: string
   description: string
+  instructions: string | null
   cohortId: number
   cohortName: string
   lecturerId: number | null
-  dueDate: string 
+  dueDate: string
   maxPoints: number
   allowedFileTypes: string
   maxAttempts: number
   lateAllowed: boolean
   templateFileName: string | null
-  lastNotifiedAt: string | null 
-  createdAt: string 
+  hasTemplate: boolean
+  lastNotifiedAt: string | null
+  createdAt: string
 }
 
 export interface SubmissionRulesRequest {
@@ -27,6 +29,7 @@ export interface SubmissionRulesRequest {
 export interface CreateSubmissionRequest {
   title: string
   description: string
+  instructions?: string
   cohortId: number
   lecturerId?: number
   dueDate: string
@@ -58,4 +61,24 @@ export interface StudentSubmissionResponse {
   submittedAt: string
   attemptNumber: number
   late: boolean
+  uploadId: number | null
+  overallScore: number | null
+  scoreLevel: string | null
+}
+
+export interface CriterionScore {
+  label: string
+  score: number
+  feedback: string
+  confidence: string
+  requiresReview: boolean
+}
+
+export interface ScoringReport {
+  overallScore: number
+  level: string
+  wordCount: number
+  embeddingsComputed: boolean
+  requiresHumanReview: boolean
+  criteria: CriterionScore[]
 }

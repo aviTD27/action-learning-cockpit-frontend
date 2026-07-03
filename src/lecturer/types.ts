@@ -8,12 +8,14 @@ export interface Submission {
   id: number
   title: string
   description: string
+  instructions?: string
   cohortId: number
   cohortName: string
   dueDate: string
   maxPoints: number
   rules: SubmissionRules
   templateFileName?: string
+  hasTemplate?: boolean
   lastNotifiedAt?: string
   createdAt: string
 }
@@ -21,6 +23,7 @@ export interface Submission {
 export interface CreateSubmissionData {
   title: string
   description: string
+  instructions?: string
   cohortId: number
   cohortName: string
   dueDate: string
@@ -35,6 +38,9 @@ export interface StudentSubmission {
   submittedAt: string
   attemptNumber: number
   late: boolean
+  uploadId: number | null
+  overallScore: number | null
+  scoreLevel: string | null
 }
 
 export type GradeStatus = 'DRAFT' | 'RELEASED'

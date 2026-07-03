@@ -5,16 +5,17 @@ import {
   getSubmissions,
   notifySubmission,
   updateSubmission,
+  uploadTemplate,
 } from '../api/lecturer'
 import type { CreateSubmissionRequest, SubmissionResponse } from '../api/types'
 import type { CreateSubmissionData, Submission } from '../types'
 
-// TODO: Backend..
 function toSubmission(r: SubmissionResponse): Submission {
   return {
     id: r.id,
     title: r.title,
     description: r.description ?? '',
+    instructions: r.instructions ?? undefined,
     cohortId: r.cohortId,
     cohortName: r.cohortName,
     dueDate: r.dueDate,
@@ -25,6 +26,7 @@ function toSubmission(r: SubmissionResponse): Submission {
       lateAllowed: r.lateAllowed,
     },
     templateFileName: r.templateFileName ?? undefined,
+    hasTemplate: r.hasTemplate,
     lastNotifiedAt: r.lastNotifiedAt ?? undefined,
     createdAt: r.createdAt,
   }
@@ -34,6 +36,7 @@ function toRequest(data: CreateSubmissionData): CreateSubmissionRequest {
   return {
     title: data.title,
     description: data.description,
+    instructions: data.instructions,
     cohortId: data.cohortId,
     dueDate: data.dueDate,
     maxPoints: data.maxPoints,
@@ -70,20 +73,22 @@ export function useSubmissions() {
 
   useEffect(() => { reload() }, [reload])
 
-  const create = useCallback(async (data: CreateSubmissionData) => {
+  const create = useCallback(async (data: CreateSubmissionData, templateFile?: File | null) => {
     setError(null)
     try {
-      await createSubmission(toRequest(data))
+      const res = await createSubmission(toRequest(data))
+      if (templateFile) await uploadTemplate(res.data.id, templateFile)
       await reload()
     } catch (err) {
       setError(messageFrom(err, 'Could not create submission'))
     }
   }, [reload])
 
-  const update = useCallback(async (id: number, data: CreateSubmissionData) => {
+  const update = useCallback(async (id: number, data: CreateSubmissionData, templateFile?: File | null) => {
     setError(null)
     try {
       await updateSubmission(id, toRequest(data))
+      if (templateFile) await uploadTemplate(id, templateFile)
       await reload()
     } catch (err) {
       setError(messageFrom(err, 'Could not update submission'))

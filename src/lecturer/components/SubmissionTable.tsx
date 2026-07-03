@@ -100,9 +100,9 @@ export default function SubmissionTable() {
         open={modalOpen}
         existing={editTarget}
         onClose={() => setModalOpen(false)}
-        onSave={data => {
-          if (editTarget) update(editTarget.id, data)
-          else create(data)
+        onSave={(data, templateFile) => {
+          if (editTarget) update(editTarget.id, data, templateFile)
+          else create(data, templateFile)
         }}
       />
 

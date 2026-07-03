@@ -21,6 +21,7 @@ export interface AssignmentItem {
   id: number
   title: string
   description: string | null
+  instructions: string | null
   dueDate: string
   maxPoints: number
   allowedFileTypes: string | null
@@ -30,10 +31,16 @@ export interface AssignmentItem {
   maxWordCount: number | null
   namingPattern: string | null
   requiredHeadings: string | null
+  templateFileName: string | null
+  hasTemplate: boolean
 }
 
 export const getAssignmentsForCohort = (cohortId: number) =>
   apiClient.get<AssignmentItem[]>(`/submissions?cohortId=${cohortId}`).then(r => r.data)
+
+export const downloadAssignmentTemplate = (submissionId: number): Promise<Blob> =>
+  apiClient.get<Blob>(`/submissions/${submissionId}/template/download`, { responseType: 'blob' })
+    .then(r => r.data)
 
 export interface CheckResult {
   label: string

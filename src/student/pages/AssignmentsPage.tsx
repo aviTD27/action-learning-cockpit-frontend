@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState, useMemo } from 'react'
-import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, Minus, Upload, XCircle } from 'lucide-react'
+import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Download, FileText, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
-import { uploadDocument, turnInDocument, getMyUploadStatus, type CheckResult, type ComplianceReport } from '../api/studentApi'
+import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport } from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/assignments.css'
 import '../styles/compliance.css'
@@ -96,6 +96,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const [uploadError, setUploadError]   = useState<string | null>(null)
   const [turningIn, setTurningIn]       = useState(false)
   const [turnedIn, setTurnedIn]         = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
 
   useEffect(() => {
     getMyUploadStatus(a.id).then(status => {
@@ -112,8 +113,9 @@ function AssignmentCard({ a }: { a: Assignment }) {
     try {
       const r = await uploadDocument(a.id, file)
       setReport(r)
-    } catch {
-      setUploadError('Upload failed. Please check your connection and try again.')
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      setUploadError(msg ?? 'Upload failed. Please check your connection and try again.')
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -133,6 +135,14 @@ function AssignmentCard({ a }: { a: Assignment }) {
     }
   }
 
+  const handleDownloadTemplate = async () => {
+    const blob = await downloadAssignmentTemplate(a.id)
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url; link.download = a.templateFileName ?? 'template'; link.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="asgn-card">
       <div className="asgn-card-top">
@@ -145,6 +155,29 @@ function AssignmentCard({ a }: { a: Assignment }) {
       {a.description && (
         <p className="asgn-card-desc">{a.description}</p>
       )}
+
+      {(a.instructions || a.hasTemplate) && (
+        <div className="asgn-info-row">
+          {a.instructions && (
+            <button className="asgn-info-btn" onClick={() => setShowInstructions(v => !v)}>
+              <FileText size={12} />
+              {showInstructions ? 'Hide instructions' : 'View instructions'}
+            </button>
+          )}
+          {a.hasTemplate && (
+            <button className="asgn-info-btn" onClick={handleDownloadTemplate}>
+              <Download size={12} /> Download template
+            </button>
+          )}
+        </div>
+      )}
+
+      {showInstructions && a.instructions && (
+        <div className="asgn-instructions">
+          <p>{a.instructions}</p>
+        </div>
+      )}
+
       <div className="asgn-card-footer">
         <span style={{ color: urgencyColor(a.status, a.dueDate), fontSize: '0.75rem', fontWeight: 600 }}>
           {formatDue(a.dueDate)}
@@ -152,27 +185,29 @@ function AssignmentCard({ a }: { a: Assignment }) {
         <span className="asgn-card-points">{a.maxPoints} pts</span>
       </div>
 
-      <div className="asgn-upload-row">
-        <button
-          className="asgn-upload-btn"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-        >
-          <Upload size={13} />
-          {uploading ? 'Checking…' : 'Submit Document'}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.docx"
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-        />
-      </div>
+      {!turnedIn && (
+        <div className="asgn-upload-row">
+          <button
+            className="asgn-upload-btn"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <Upload size={13} />
+            {uploading ? 'Checking…' : 'Upload File'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.docx"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+        </div>
+      )}
 
-      {uploadError && <p className="asgn-upload-error">{uploadError}</p>}
-      {report && <ComplianceReportPanel report={report} />}
-      {report?.overallPass && !turnedIn && (
+      {!turnedIn && uploadError && <p className="asgn-upload-error">{uploadError}</p>}
+      {!turnedIn && report && <ComplianceReportPanel report={report} />}
+      {!turnedIn && report?.overallPass && (
         <button
           className="asgn-turnin-btn"
           onClick={handleTurnIn}
