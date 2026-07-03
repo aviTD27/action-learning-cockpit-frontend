@@ -3,6 +3,7 @@ import type {
   CreateSubmissionRequest,
   GradeRequest,
   GradeResponse,
+  LecturerOverview,
   ScoringReport,
   StudentSubmissionResponse,
   SubmissionResponse,
@@ -76,6 +77,10 @@ export const releaseGrades = (submissionId: number) =>
 
 export const getStudentSubmissions = (submissionId: number) =>
   api.get<StudentSubmissionResponse[]>(`/submissions/${submissionId}/student-submissions`)
+
+// Lecturer dashboard overview
+export const getLecturerOverview = () =>
+  api.get<LecturerOverview>('/analytics/lecturer/overview')
 
 export const getSubmissionScore = (uploadId: number) =>
   api.get<ScoringReport>(`/submissions/uploads/${uploadId}/score`)
