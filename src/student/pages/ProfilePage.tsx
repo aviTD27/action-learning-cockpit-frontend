@@ -1,7 +1,5 @@
-import { useState } from 'react'
-import { GraduationCap, KeyRound, Landmark, UserRound, Users } from 'lucide-react'
+import { GraduationCap, Landmark, UserRound, Users } from 'lucide-react'
 import { useStudentProfile } from '../hooks/useStudentProfile'
-import { changePassword } from '../../api/authService'
 import '../styles/student.css'
 
 function initials(first: string, last: string) {
@@ -22,39 +20,6 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function ProfilePage() {
   const { profile, loading, error } = useStudentProfile()
-
-  const [current, setCurrent]   = useState('')
-  const [next, setNext]         = useState('')
-  const [confirm, setConfirm]   = useState('')
-  const [pwError, setPwError]   = useState<string | null>(null)
-  const [pwSuccess, setPwSuccess] = useState(false)
-  const [saving, setSaving]     = useState(false)
-
-  const validatePw = (): string | null => {
-    if (!current || !next || !confirm) return 'All fields are required.'
-    if (next.length < 8)              return 'New password must be at least 8 characters.'
-    if (!/[A-Z]/.test(next))          return 'Must include an uppercase letter.'
-    if (!/[0-9]/.test(next))          return 'Must include a number.'
-    if (!/[^A-Za-z0-9]/.test(next))   return 'Must include a special character.'
-    if (next !== confirm)             return 'New passwords do not match.'
-    return null
-  }
-
-  const handleChangePw = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const msg = validatePw()
-    if (msg) { setPwError(msg); return }
-    setSaving(true); setPwError(null); setPwSuccess(false)
-    try {
-      await changePassword(current, next)
-      setPwSuccess(true)
-      setCurrent(''); setNext(''); setConfirm('')
-    } catch (err: any) {
-      setPwError(err.response?.data?.message ?? 'Current password is incorrect.')
-    } finally {
-      setSaving(false)
-    }
-  }
 
   if (loading) return <p className="sd-table-empty">Loading profile…</p>
   if (error || !profile) return <p className="sd-table-empty">{error ?? 'Profile not found.'}</p>
@@ -138,58 +103,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-      </div>
-
-      {/* Change password */}
-      <div className="sd-card">
-        <div className="sd-card-header">
-          <p className="sd-card-title"><KeyRound size={14} /> Change Password</p>
-        </div>
-        <div style={{ padding: '1rem', maxWidth: '420px' }}>
-          {pwSuccess && (
-            <p style={{ color: '#16a34a', fontSize: '0.8125rem', marginBottom: '0.75rem' }}>
-              Password updated successfully.
-            </p>
-          )}
-          <form onSubmit={handleChangePw} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {[
-              { label: 'Current password', value: current, onChange: setCurrent, auto: 'current-password' },
-              { label: 'New password',     value: next,    onChange: setNext,    auto: 'new-password'     },
-              { label: 'Confirm new password', value: confirm, onChange: setConfirm, auto: 'new-password' },
-            ].map(f => (
-              <div key={f.label}>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                  {f.label}
-                </label>
-                <input
-                  type="password"
-                  value={f.value}
-                  onChange={e => f.onChange(e.target.value)}
-                  autoComplete={f.auto}
-                  style={{
-                    width: '100%', border: '1px solid #d1d5db', borderRadius: '0.375rem',
-                    padding: '0.375rem 0.75rem', fontSize: '0.875rem', fontFamily: 'inherit',
-                    outline: 'none', boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-            ))}
-            <p style={{ fontSize: '10px', color: '#9ca3af', margin: 0 }}>
-              Min 8 chars · 1 uppercase · 1 number · 1 special character
-            </p>
-            {pwError && <p style={{ color: '#dc2626', fontSize: '0.75rem', margin: 0 }}>{pwError}</p>}
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button
-                type="submit"
-                disabled={saving}
-                className="ua-btn ua-btn-primary"
-                style={{ fontSize: '0.8125rem', padding: '0.4rem 1rem' }}
-              >
-                {saving ? 'Saving…' : 'Update Password'}
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
 
     </div>
