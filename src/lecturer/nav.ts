@@ -1,13 +1,12 @@
-import { CalendarDays, CheckCheck, ClipboardList, Home, Megaphone, ScrollText, UserRound } from 'lucide-react'
+import { CalendarDays, CheckCheck, ClipboardList, Home, Megaphone, UserRound } from 'lucide-react'
 import type { NavItem, SidebarUser } from '../shared/layout/Sidebar'
 
 export function getLecturerNav(announcementUnread = 0): NavItem[] {
   return [
-    { label: 'Dashboard',        icon: Home,          path: '/lecturer',              end: true },
-    { label: 'Timetable',        icon: CalendarDays,  path: '/lecturer/timetable' },
-    { label: 'Submissions',      icon: ClipboardList, path: '/lecturer/submissions' },
-    { label: 'Submission Rules', icon: ScrollText,    path: '/lecturer/rules' },
-    { label: 'Grade Review',     icon: CheckCheck,    path: '/lecturer/grade-review' },
+    { label: 'Dashboard',   icon: Home,          path: '/lecturer',              end: true },
+    { label: 'Timetable',   icon: CalendarDays,  path: '/lecturer/timetable' },
+    { label: 'Submissions', icon: ClipboardList, path: '/lecturer/submissions' },
+    { label: 'Grade Review', icon: CheckCheck,   path: '/lecturer/grade-review' },
     {
       label: 'Announcements',
       icon:  Megaphone,

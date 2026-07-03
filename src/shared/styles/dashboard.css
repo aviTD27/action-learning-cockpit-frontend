@@ -12,10 +12,52 @@
 /*   KPI row   */
 .db-kpi-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
+
+/* Empty-state onboarding */
+.db-onboard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.db-onboard-title { margin: 0; font-size: 1.05rem; font-weight: 700; color: #1E3A5F; }
+.db-onboard-sub { margin: 0.25rem 0 1.1rem; font-size: 0.85rem; color: #6b7280; }
+.db-onboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+}
+.db-onboard-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.db-onboard-card:hover {
+  border-color: #2E5F9E;
+  box-shadow: 0 6px 18px rgba(30,58,95,0.10);
+  transform: translateY(-2px);
+}
+.db-onboard-num {
+  position: absolute; top: 0.75rem; right: 0.85rem;
+  width: 1.4rem; height: 1.4rem; border-radius: 9999px;
+  background: #1E3A5F; color: #fff; font-size: 0.72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.db-onboard-icon { color: #2E5F9E; }
+.db-onboard-card-title { font-size: 0.9rem; font-weight: 700; color: #1E3A5F; }
+.db-onboard-card-text { font-size: 0.76rem; color: #6b7280; line-height: 1.4; }
 
 .db-kpi {
   border-radius: 16px;
