@@ -1,5 +1,6 @@
 import apiClient from '../../api/apiClient'
 import type {
+  AtRiskStudent,
   CohortBenchmark,
   CohortResponse,
   CreateCohortRequest,
@@ -9,7 +10,9 @@ import type {
   CreateTimetableRequest,
   CreateUniversityRequest,
   GradeDistribution,
+  GradingBacklog,
   LecturerResponse,
+  LecturerWorkload,
   ProgrammeResponse,
   StudentResponse,
   TenantSummary,
@@ -55,6 +58,9 @@ export const getTenantSummary     = (universityId?: number) => api.get<TenantSum
 export const getTenantTrends      = (universityId?: number) => api.get<TrendPoint[]>('/analytics/tenant/trends', { params: { universityId } })
 export const getGradeDistribution = (universityId?: number) => api.get<GradeDistribution[]>('/analytics/tenant/grade-distribution', { params: { universityId } })
 export const getCohortBenchmark   = (universityId?: number) => api.get<CohortBenchmark[]>('/analytics/tenant/cohort-benchmark', { params: { universityId } })
+export const getGradingBacklog    = (universityId?: number) => api.get<GradingBacklog>('/analytics/tenant/grading-backlog', { params: { universityId } })
+export const getAtRiskStudents    = (universityId?: number) => api.get<AtRiskStudent[]>('/analytics/tenant/at-risk', { params: { universityId } })
+export const getLecturerWorkload  = (universityId?: number) => api.get<LecturerWorkload[]>('/analytics/tenant/lecturer-workload', { params: { universityId } })
 
 // Timetable
 export const getTimetable          = ()                                    => api.get<TimetableEntry[]>('/timetable')

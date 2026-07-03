@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { AlertTriangle, BookOpen, Download, GraduationCap, Presentation, Users } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
@@ -9,10 +11,12 @@ import { UNI_ADMIN_NAV } from '../nav'
 import {
   getCohorts, getLecturers, getProgrammes, getStudents,
   getTenantTrends, getGradeDistribution, getCohortBenchmark,
+  getGradingBacklog, getAtRiskStudents, getLecturerWorkload,
 } from '../api/uniAdmin'
 import type {
   StudentResponse, LecturerResponse, CohortResponse, ProgrammeResponse,
   TrendPoint, GradeDistribution, CohortBenchmark,
+  GradingBacklog, AtRiskStudent, LecturerWorkload,
 } from '../api/types'
 import { useAuth } from '../../auth/AuthContext'
 import '../../shared/styles/dashboard.css'
@@ -54,6 +58,11 @@ const COHORT_STATUS_COLORS: Record<string, string> = {
   ARCHIVED:    '#d1d5db',
 }
 
+function csvCell(v: string | number | null | undefined): string {
+  const s = String(v ?? '')
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
@@ -78,6 +87,9 @@ export default function UniAdminDashboard() {
   const [trends,          setTrends]          = useState<TrendPoint[]>([])
   const [gradeDist,       setGradeDist]       = useState<GradeDistribution[]>([])
   const [cohortBenchmark, setCohortBenchmark] = useState<CohortBenchmark[]>([])
+  const [backlog,         setBacklog]         = useState<GradingBacklog | null>(null)
+  const [atRisk,          setAtRisk]          = useState<AtRiskStudent[]>([])
+  const [workload,        setWorkload]        = useState<LecturerWorkload[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -90,7 +102,10 @@ export default function UniAdminDashboard() {
       getTenantTrends(uid).catch(() => ({ data: [] as TrendPoint[] })),
       getGradeDistribution(uid).catch(() => ({ data: [] as GradeDistribution[] })),
       getCohortBenchmark(uid).catch(() => ({ data: [] as CohortBenchmark[] })),
-    ]).then(([s, l, c, p, t, g, cb]) => {
+      getGradingBacklog(uid).catch(() => ({ data: null as GradingBacklog | null })),
+      getAtRiskStudents(uid).catch(() => ({ data: [] as AtRiskStudent[] })),
+      getLecturerWorkload(uid).catch(() => ({ data: [] as LecturerWorkload[] })),
+    ]).then(([s, l, c, p, t, g, cb, gb, ar, lw]) => {
       setStudents(s.data)
       setLecturers(l.data)
       setCohorts(c.data)
@@ -98,6 +113,9 @@ export default function UniAdminDashboard() {
       setTrends(t.data)
       setGradeDist(g.data)
       setCohortBenchmark(cb.data)
+      setBacklog(gb.data)
+      setAtRisk(ar.data)
+      setWorkload(lw.data)
     }).finally(() => setLoading(false))
   }, [universityId])
 
@@ -146,39 +164,112 @@ export default function UniAdminDashboard() {
   const activeLecturers  = lecturers.filter(l => l.status === 'ACTIVE').length
   const ongoingCohorts   = cohorts.filter(c => c.status === 'ONGOING').length
 
+  const isEmpty = !loading && programmes.length === 0 && cohorts.length === 0 && students.length === 0
+
+  const exportReport = () => {
+    const rows: string[] = []
+    rows.push('University Dashboard Report')
+    rows.push(`Institution,${csvCell(institution)}`)
+    rows.push(`Generated,${csvCell(new Date().toLocaleString())}`)
+    rows.push('')
+    rows.push('Metric,Value')
+    rows.push(`Total Students,${students.length}`)
+    rows.push(`Active Students,${activeStudents}`)
+    rows.push(`Lecturers,${lecturers.length}`)
+    rows.push(`Active Lecturers,${activeLecturers}`)
+    rows.push(`Cohorts,${cohorts.length}`)
+    rows.push(`Ongoing Cohorts,${ongoingCohorts}`)
+    rows.push(`Programmes,${programmes.length}`)
+    rows.push(`Grades Awaiting Release,${backlog?.awaitingGrades ?? 0}`)
+    rows.push('')
+    rows.push('Cohort Performance Benchmark')
+    rows.push('Rank,Cohort,Programme,Students,Submissions,Avg Score %')
+    cohortBenchmark.forEach(cb => {
+      rows.push([cb.rank, csvCell(cb.cohortName), csvCell(cb.programmeName ?? ''), cb.students, cb.submissions, cb.avgScorePct].join(','))
+    })
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `dashboard-report-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url)
+  }
+
+  const ONBOARDING = [
+    { n: 1, title: 'Create a Programme', text: 'Define a degree or curriculum for your institution.', to: '/uni-admin/programmes', icon: BookOpen },
+    { n: 2, title: 'Create a Cohort', text: 'Add an intake under a programme and assign lecturers.', to: '/uni-admin/cohorts', icon: Users },
+    { n: 3, title: 'Add Lecturers', text: 'Invite lecturers — they receive login credentials by email.', to: '/uni-admin/lecturers', icon: Presentation },
+    { n: 4, title: 'Add Students', text: 'Enrol students into a cohort to get them started.', to: '/uni-admin/students', icon: GraduationCap },
+  ]
+
   return (
     <Layout navItems={UNI_ADMIN_NAV} user={sidebarUser} title="University Admin" subtitle="Dashboard · Action Learning Cockpit">
       <div className="db-page">
 
         {/* Header */}
-        <div className="db-header">
-          <h1 className="db-title">University Dashboard</h1>
-          <p className="db-sub">Live metrics for your institution — students, cohorts, lecturers, and programmes.</p>
+        <div className="db-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+          <div>
+            <h1 className="db-title">University Dashboard</h1>
+            <p className="db-sub">Live metrics for your institution — students, cohorts, lecturers, and programmes.</p>
+          </div>
+          <button
+            className="ua-btn ua-btn-secondary"
+            onClick={exportReport}
+            disabled={loading || isEmpty}
+            title="Download the KPIs and cohort benchmark as CSV"
+          >
+            <Download size={13} /> Export Report
+          </button>
         </div>
 
-        {/* KPI Row */}
+        {/* KPI Row — each tile links to its tab */}
         <div className="db-kpi-row">
-          <div className="db-kpi db-kpi-blue">
+          <Link to="/uni-admin/students" className="db-kpi db-kpi-blue" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="db-kpi-label">Total Students</div>
             <div className="db-kpi-value">{loading ? '—' : students.length}</div>
             <div className="db-kpi-note">{loading ? '' : `${activeStudents} active`}</div>
-          </div>
-          <div className="db-kpi db-kpi-indigo">
+          </Link>
+          <Link to="/uni-admin/lecturers" className="db-kpi db-kpi-indigo" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="db-kpi-label">Lecturers</div>
             <div className="db-kpi-value">{loading ? '—' : lecturers.length}</div>
             <div className="db-kpi-note">{loading ? '' : `${activeLecturers} active`}</div>
-          </div>
-          <div className="db-kpi db-kpi-green">
+          </Link>
+          <Link to="/uni-admin/cohorts" className="db-kpi db-kpi-green" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="db-kpi-label">Cohorts</div>
             <div className="db-kpi-value">{loading ? '—' : cohorts.length}</div>
             <div className="db-kpi-note">{loading ? '' : `${ongoingCohorts} ongoing`}</div>
-          </div>
-          <div className="db-kpi db-kpi-cyan">
+          </Link>
+          <Link to="/uni-admin/programmes" className="db-kpi db-kpi-cyan" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="db-kpi-label">Programmes</div>
             <div className="db-kpi-value">{loading ? '—' : programmes.length}</div>
             <div className="db-kpi-note">Active curricula</div>
+          </Link>
+          <div className="db-kpi db-kpi-amber">
+            <div className="db-kpi-label">Awaiting Grades</div>
+            <div className="db-kpi-value">{loading ? '—' : (backlog?.awaitingGrades ?? 0)}</div>
+            <div className="db-kpi-note">{loading ? '' : `${backlog?.turnedIn ?? 0} submitted`}</div>
           </div>
         </div>
+
+        {/* Empty-state onboarding — brand-new university */}
+        {isEmpty && (
+          <div className="db-onboard">
+            <h2 className="db-onboard-title">Welcome! Let's set up your institution</h2>
+            <p className="db-onboard-sub">Follow these steps to get your Action Learning Cockpit running.</p>
+            <div className="db-onboard-grid">
+              {ONBOARDING.map(step => (
+                <Link key={step.n} to={step.to} className="db-onboard-card">
+                  <span className="db-onboard-num">{step.n}</span>
+                  <step.icon size={20} className="db-onboard-icon" />
+                  <span className="db-onboard-card-title">{step.title}</span>
+                  <span className="db-onboard-card-text">{step.text}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!isEmpty && (<>
 
         {/* Row: Students per cohort + Student status donut */}
         <div className="db-row-2-1">
@@ -438,6 +529,79 @@ export default function UniAdminDashboard() {
             </table>
           </div>
         )}
+
+        {/* At-risk students + Lecturer workload */}
+        <div className="db-row-equal">
+
+          {/* At-risk students */}
+          <div className="db-chart-card">
+            <p className="db-chart-title">
+              <AlertTriangle size={14} style={{ verticalAlign: '-2px', color: '#ef4444', marginRight: 4 }} />
+              Students at Risk <span className="db-chart-sub">low average or missed submissions</span>
+            </p>
+            {loading ? (
+              <div className="db-no-data">Loading…</div>
+            ) : atRisk.length === 0 ? (
+              <div className="db-no-data">No at-risk students 🎉</div>
+            ) : (
+              <div className="ua-table-wrap" style={{ maxHeight: 260, overflowY: 'auto' }}>
+                <table className="ua-table">
+                  <thead>
+                    <tr><th>Student</th><th>Cohort</th><th>Avg</th><th>Missed</th><th>Reason</th></tr>
+                  </thead>
+                  <tbody>
+                    {atRisk.map(s => (
+                      <tr key={s.studentId}>
+                        <td className="col-name">{s.studentName}<div className="col-muted" style={{ fontSize: 11 }}>{s.studentRef}</div></td>
+                        <td className="col-muted">{s.cohortName ?? '—'}</td>
+                        <td>{s.avgScorePct != null ? `${s.avgScorePct}%` : '—'}</td>
+                        <td>{s.missedSubmissions}</td>
+                        <td className="col-muted" style={{ fontSize: 11 }}>{s.reason}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Lecturer workload */}
+          <div className="db-chart-card">
+            <p className="db-chart-title">
+              <Presentation size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />
+              Lecturer Workload <span className="db-chart-sub">assignments · cohorts · grading backlog</span>
+            </p>
+            {loading ? (
+              <div className="db-no-data">Loading…</div>
+            ) : workload.length === 0 ? (
+              <div className="db-no-data">No lecturers yet</div>
+            ) : (
+              <div className="ua-table-wrap" style={{ maxHeight: 260, overflowY: 'auto' }}>
+                <table className="ua-table">
+                  <thead>
+                    <tr><th>Lecturer</th><th>Assignments</th><th>Cohorts</th><th>Backlog</th></tr>
+                  </thead>
+                  <tbody>
+                    {workload.map(l => (
+                      <tr key={l.lecturerId}>
+                        <td className="col-name">{l.lecturerName}</td>
+                        <td>{l.assignments}</td>
+                        <td>{l.cohorts}</td>
+                        <td>
+                          {l.gradingBacklog > 0
+                            ? <span className="ua-badge ua-badge-payment_pending">{l.gradingBacklog} to grade</span>
+                            : <span className="col-muted">0</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
+        </>)}
 
       </div>
     </Layout>
