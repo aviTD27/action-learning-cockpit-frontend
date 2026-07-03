@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Archive, ArrowLeft, Bell, Brain, CheckCheck, Download, FileArchive, FileDown, FileText, GraduationCap, Pencil, Send, Undo2, Unlock } from 'lucide-react'
+import { Archive, ArrowLeft, Bell, Brain, CheckCheck, Download, FileArchive, FileDown, FileText, GraduationCap, Pencil, Send, Unlock } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
 import { LECTURER_NAV } from '../nav'
 import { useLecturerSidebarUser } from '../hooks/useLecturerSidebarUser'
@@ -35,7 +35,7 @@ export default function SubmissionDetailPage() {
   const submission = submissions.find(s => s.id === submissionId)
 
   const { students, loading } = useStudents(submission?.cohortId)
-  const { setGrade, releaseAll, unrelease, gradeFor, draftCount } = useGrades(submissionId)
+  const { setGrade, releaseAll, gradeFor, draftCount } = useGrades(submissionId)
   const { available: subsTracked, submissionFor, submittedCount, reload: reloadSubs } = useStudentSubmissions(submissionId)
 
   const [gradeTarget, setGradeTarget] = useState<StudentResponse | null>(null)
@@ -364,15 +364,6 @@ export default function SubmissionDetailPage() {
                           >
                             <Pencil size={13} />
                           </button>
-                          {g?.status === 'RELEASED' && (
-                            <button
-                              className="ua-icon-btn"
-                              title="Un-release grade (move back to draft)"
-                              onClick={() => unrelease(s.id)}
-                            >
-                              <Undo2 size={13} />
-                            </button>
-                          )}
                         </td>
                       </tr>
                     )

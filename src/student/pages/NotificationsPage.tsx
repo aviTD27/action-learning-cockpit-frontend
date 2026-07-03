@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertCircle, Bell, BookOpen, Check, CheckCheck, Clock } from 'lucide-react'
+import { AlertCircle, Bell, BookOpen, Check, CheckCheck, Clock, Star } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useStudentNotifications } from '../hooks/useStudentNotifications'
 import type { NotificationItem } from '../api/studentApi'
@@ -24,6 +24,8 @@ type TypeConfig = { icon: LucideIcon; color: string; bg: string }
 
 function typeConfig(type: string): TypeConfig {
   switch (type) {
+    case 'GRADE_RELEASED':
+      return { icon: Star, color: '#b45309', bg: '#fef3c7' }
     case 'NEW_SUBMISSION':
       return { icon: BookOpen, color: '#1d4ed8', bg: '#dbeafe' }
     case 'MANUAL':
