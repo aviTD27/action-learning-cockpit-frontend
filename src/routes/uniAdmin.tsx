@@ -7,6 +7,7 @@ import StudentsPage from '../uni-admin/pages/StudentsPage'
 import CompliancePage from '../uni-admin/pages/CompliancePage'
 import AnalyticsPage from '../uni-admin/pages/AnalyticsPage'
 import ProfilePage from '../uni-admin/pages/ProfilePage'
+import TimetablePage from '../uni-admin/pages/TimetablePage'
 
 export default function UniAdminRoutes() {
   return (
@@ -16,6 +17,7 @@ export default function UniAdminRoutes() {
       <Route path="/uni-admin/cohorts" element={<CohortsPage />} />
       <Route path="/uni-admin/lecturers" element={<LecturersPage />} />
       <Route path="/uni-admin/students" element={<StudentsPage />} />
+      <Route path="/uni-admin/timetable" element={<TimetablePage />} />
       <Route path="/uni-admin/compliance" element={<CompliancePage />} />
       <Route path="/uni-admin/analytics" element={<AnalyticsPage />} />
       <Route path="/uni-admin/profile" element={<ProfilePage />} />

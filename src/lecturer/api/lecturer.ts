@@ -30,6 +30,37 @@ export const deleteSubmission = (id: number) =>
 export const notifySubmission = (id: number) =>
   api.patch<SubmissionResponse>(`/submissions/${id}/notify`)
 
+export const publishSubmission = (id: number) =>
+  api.patch<SubmissionResponse>(`/submissions/${id}/publish`)
+
+export const archiveSubmission = (id: number) =>
+  api.patch<SubmissionResponse>(`/submissions/${id}/archive`)
+
+export const unarchiveSubmission = (id: number) =>
+  api.patch<SubmissionResponse>(`/submissions/${id}/unarchive`)
+
+export const reopenSubmission = (id: number, studentId: number) =>
+  api.patch<SubmissionResponse>(`/submissions/${id}/reopen/${studentId}`)
+
+// Template file (row 68)
+export const uploadTemplate = (id: number, file: File) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return api.post<void>(`/submissions/${id}/template`, fd, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export const downloadTemplate = (id: number) =>
+  api.get<Blob>(`/submissions/${id}/template`, { responseType: 'blob' })
+
+// Lecturer downloads (rows 75/76)
+export const downloadUpload = (uploadId: number) =>
+  api.get<Blob>(`/submissions/uploads/${uploadId}/download`, { responseType: 'blob' })
+
+export const downloadSubmissionsZip = (id: number) =>
+  api.get<Blob>(`/submissions/${id}/download-zip`, { responseType: 'blob' })
+
 //  Grades
 
 export const getGrades = (submissionId: number) =>

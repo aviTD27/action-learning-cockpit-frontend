@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, type ChangeEvent } from 'react'
 import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Download, FileText, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
 import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport } from '../api/studentApi'
@@ -107,6 +107,22 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Client-side size guard — avoids a dropped connection and shows a clear message.
+    const HARD_LIMIT = 50 * 1024 * 1024
+    const limit = a.maxFileSizeBytes && a.maxFileSizeBytes > 0
+      ? Math.min(a.maxFileSizeBytes, HARD_LIMIT)
+      : HARD_LIMIT
+    if (file.size > limit) {
+      setReport(null)
+      setUploadError(
+        `"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — too large. ` +
+        `The maximum allowed for this assignment is ${Math.round(limit / 1024 / 1024)} MB.`,
+      )
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
+
     setUploading(true)
     setUploadError(null)
     setTurnedIn(false)
@@ -136,12 +152,20 @@ function AssignmentCard({ a }: { a: Assignment }) {
   }
 
   const handleDownloadTemplate = async () => {
-    const blob = await downloadAssignmentTemplate(a.id)
-    const url = URL.createObjectURL(blob)
+    const res = await downloadAssignmentTemplate(a.id)
+    const url = URL.createObjectURL(res.data)
     const link = document.createElement('a')
-    link.href = url; link.download = a.templateFileName ?? 'template'; link.click()
+    link.href = url
+    link.download = a.templateFileName || 'template'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
     URL.revokeObjectURL(url)
   }
+
+  const hasInstructions = !!(a.instructions || a.additionalNotes)
+  const hasTemplate = !!(a.hasTemplateFile || a.hasTemplate)
+  const instructionsText = a.instructions || a.additionalNotes
 
   return (
     <div className="asgn-card">
@@ -156,15 +180,15 @@ function AssignmentCard({ a }: { a: Assignment }) {
         <p className="asgn-card-desc">{a.description}</p>
       )}
 
-      {(a.instructions || a.hasTemplate) && (
+      {(hasInstructions || hasTemplate) && (
         <div className="asgn-info-row">
-          {a.instructions && (
+          {hasInstructions && (
             <button className="asgn-info-btn" onClick={() => setShowInstructions(v => !v)}>
               <FileText size={12} />
               {showInstructions ? 'Hide instructions' : 'View instructions'}
             </button>
           )}
-          {a.hasTemplate && (
+          {hasTemplate && (
             <button className="asgn-info-btn" onClick={handleDownloadTemplate}>
               <Download size={12} /> Download template
             </button>
@@ -172,9 +196,9 @@ function AssignmentCard({ a }: { a: Assignment }) {
         </div>
       )}
 
-      {showInstructions && a.instructions && (
+      {showInstructions && instructionsText && (
         <div className="asgn-instructions">
-          <p>{a.instructions}</p>
+          <p>{instructionsText}</p>
         </div>
       )}
 

@@ -22,25 +22,29 @@ export interface AssignmentItem {
   title: string
   description: string | null
   instructions: string | null
+  additionalNotes: string | null
+  submissionType: 'FILE' | 'TEXT' | 'BOTH'
   dueDate: string
+  dueTime: string | null
   maxPoints: number
   allowedFileTypes: string | null
   lateAllowed: boolean
   lecturerId: number | null
   minWordCount: number | null
   maxWordCount: number | null
+  maxFileSizeBytes: number | null
   namingPattern: string | null
   requiredHeadings: string | null
   templateFileName: string | null
   hasTemplate: boolean
+  hasTemplateFile: boolean
 }
 
 export const getAssignmentsForCohort = (cohortId: number) =>
   apiClient.get<AssignmentItem[]>(`/submissions?cohortId=${cohortId}`).then(r => r.data)
 
-export const downloadAssignmentTemplate = (submissionId: number): Promise<Blob> =>
-  apiClient.get<Blob>(`/submissions/${submissionId}/template/download`, { responseType: 'blob' })
-    .then(r => r.data)
+export const downloadAssignmentTemplate = (submissionId: number) =>
+  apiClient.get<Blob>(`/submissions/${submissionId}/template`, { responseType: 'blob' })
 
 export interface CheckResult {
   label: string

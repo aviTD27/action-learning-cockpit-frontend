@@ -7,6 +7,71 @@
 /*  Student submission status  */
 .ua-badge-submitted    { background:#dcfce7; color:#15803d; }
 .ua-badge-missing      { background:#f3f4f6; color:#6b7280; }
+.ua-badge-late         { background:#ffedd5; color:#c2410c; }
+
+.ua-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #1d4ed8;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/*  Assignment detail — horizontal two-column layout  */
+.ua-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem 1.75rem;
+  padding: 1rem 1.25rem;
+}
+
+@media (min-width: 1100px) {
+  .ua-detail-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.ua-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #f3f4f6;
+  min-width: 0;
+}
+
+.ua-detail-item.full {
+  grid-column: 1 / -1;
+}
+
+.ua-detail-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.ua-detail-value {
+  font-size: 0.8125rem;
+  color: #1E3A5F;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.ua-detail-value.green { color: #15803d; }
+.ua-detail-value.red   { color: #b91c1c; }
+
+@media (max-width: 720px) {
+  .ua-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 460px) {
+  .ua-detail-grid { grid-template-columns: 1fr; }
+}
 
 /*  Grade modal / table helpers  */
 .ua-grade-preview {

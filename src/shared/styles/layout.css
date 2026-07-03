@@ -219,7 +219,8 @@
 
 .layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: #F5F7FA;
 }
 

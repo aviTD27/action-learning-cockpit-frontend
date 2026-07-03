@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Bell, Brain, CheckCheck, Download, FileDown, FileText, GraduationCap, Pencil } from 'lucide-react'
+import { Archive, ArrowLeft, Bell, Brain, CheckCheck, Download, FileArchive, FileDown, FileText, GraduationCap, Pencil, Send, Undo2, Unlock } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
 import { LECTURER_NAV, LECTURER_USER } from '../nav'
-import { downloadStudentFile, downloadTemplate } from '../api/lecturer'
 import { useStudents } from '../../uni-admin/hooks/useStudents'
 import { useSubmissions } from '../hooks/useSubmissions'
 import { useGrades } from '../hooks/useGrades'
 import { useStudentSubmissions } from '../hooks/useStudentSubmissions'
+import { downloadUpload, downloadSubmissionsZip, downloadTemplate } from '../api/lecturer'
 import GradeModal from '../components/GradeModal'
 import ScoreModal from '../components/ScoreModal'
 import GradeBadge from '../components/GradeBadge'
@@ -15,15 +15,26 @@ import { buildGradeCsv, downloadCsv, gradeCsvFilename } from '../lib/exportGrade
 import type { StudentResponse } from '../../uni-admin/api/types'
 import '../styles/lecturer.css'
 
+function saveBlob(data: Blob, filename: string) {
+  const url = URL.createObjectURL(data)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
 export default function SubmissionDetailPage() {
   const { id } = useParams()
   const submissionId = Number(id)
-  const { submissions, notify } = useSubmissions()
+  const { submissions, notify, publish, archive, unarchive, reopen } = useSubmissions()
   const submission = submissions.find(s => s.id === submissionId)
 
   const { students, loading } = useStudents(submission?.cohortId)
-  const { setGrade, releaseAll, gradeFor, draftCount } = useGrades(submissionId)
-  const { available: subsTracked, submissionFor, submittedCount } = useStudentSubmissions(submissionId)
+  const { setGrade, releaseAll, unrelease, gradeFor, draftCount } = useGrades(submissionId)
+  const { available: subsTracked, submissionFor, submittedCount, reload: reloadSubs } = useStudentSubmissions(submissionId)
 
   const [gradeTarget, setGradeTarget] = useState<StudentResponse | null>(null)
   const [scoreTarget, setScoreTarget] = useState<{ name: string; uploadId: number } | null>(null)
@@ -31,29 +42,38 @@ export default function SubmissionDetailPage() {
 
   const handleNotify = () => {
     notify(submissionId)
-    setNotice(`Notification sent ${students.length} student${students.length === 1 ? '' : 's'} emailed and notified on the platform.`)
+    const pending = Math.max(students.length - submittedCount, 0)
+    setNotice(pending === 0
+      ? 'Everyone has submitted — no reminders were sent.'
+      : `Reminder sent to ${pending} student${pending === 1 ? '' : 's'} who haven't submitted yet.`)
+  }
+
+  const handleDownloadUpload = async (uploadId: number, fileName: string) => {
+    const res = await downloadUpload(uploadId)
+    saveBlob(res.data, fileName || `submission-${uploadId}`)
+  }
+
+  const handleDownloadZip = async () => {
+    if (!submission) return
+    const res = await downloadSubmissionsZip(submissionId)
+    saveBlob(res.data, `submissions-${submission.title.replace(/\s+/g, '_')}.zip`)
+  }
+
+  const handleDownloadTemplate = async () => {
+    if (!submission) return
+    const res = await downloadTemplate(submissionId)
+    saveBlob(res.data, submission.templateFileName || 'template')
+  }
+
+  const handleReopen = async (studentId: number, name: string) => {
+    await reopen(submissionId, studentId)
+    await reloadSubs()
+    setNotice(`Re-opened "${submission?.title}" for ${name} — they can submit a late exception.`)
   }
 
   const handleRelease = () => {
     releaseAll()
     setNotice('All draft grades released — students will see them once the student portal exists.')
-  }
-
-  const handleDownloadStudentFile = async (uploadId: number, fileName: string) => {
-    const res = await downloadStudentFile(uploadId)
-    const url = URL.createObjectURL(res.data)
-    const a = document.createElement('a')
-    a.href = url; a.download = fileName; a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  const handleDownloadTemplate = async () => {
-    if (!submission) return
-    const res = await downloadTemplate(submission.id)
-    const url = URL.createObjectURL(res.data)
-    const a = document.createElement('a')
-    a.href = url; a.download = submission.templateFileName ?? 'template'; a.click()
-    URL.revokeObjectURL(url)
   }
 
   const handleExport = () => {
@@ -91,61 +111,107 @@ export default function SubmissionDetailPage() {
 
         <div className="ua-card">
           <div className="ua-card-header">
-            <p className="ua-card-title"><FileText size={14} /> {submission.title}</p>
-            <button className="ua-btn ua-btn-secondary" onClick={handleNotify}>
-              <Bell size={12} /> Notify Students
-            </button>
-          </div>
-          <div className="ua-panel-body">
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Description</span>
-              <span className="ua-stat-value">{submission.description || '—'}</span>
-            </div>
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Cohort</span>
-              <span className="ua-stat-value">{submission.cohortName}</span>
-            </div>
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Due Date</span>
-              <span className="ua-stat-value">{submission.dueDate}</span>
-            </div>
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Max Points</span>
-              <span className="ua-stat-value">{submission.maxPoints}</span>
-            </div>
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Template File</span>
-              <span className="ua-stat-value">
-                {submission.hasTemplate ? (
-                  <button className="ua-link-btn" onClick={handleDownloadTemplate}>
-                    <FileDown size={12} /> {submission.templateFileName}
-                  </button>
-                ) : (submission.templateFileName ?? '—')}
+            <p className="ua-card-title"><FileText size={14} /> {submission.title}
+              <span className={`ua-badge ${submission.status === 'PUBLISHED' ? 'ua-badge-active' : submission.status === 'ARCHIVED' ? 'ua-badge-archived' : 'ua-badge-not_started'}`} style={{ marginLeft: 8 }}>
+                <span className="ua-badge-dot" />{submission.status.charAt(0) + submission.status.slice(1).toLowerCase()}
               </span>
+            </p>
+            <div className="ua-header-actions">
+              {submission.status === 'DRAFT' && (
+                <button className="ua-btn ua-btn-primary" onClick={() => publish(submissionId)}>
+                  <Send size={12} /> Publish
+                </button>
+              )}
+              <button className="ua-btn ua-btn-secondary" onClick={handleNotify}>
+                <Bell size={12} /> Remind Non-Submitters
+              </button>
+              {submission.status !== 'ARCHIVED' ? (
+                <button className="ua-btn ua-btn-secondary" onClick={() => archive(submissionId)}>
+                  <Archive size={12} /> Archive
+                </button>
+              ) : (
+                <button className="ua-btn ua-btn-secondary" onClick={() => unarchive(submissionId)}>
+                  <Archive size={12} /> Unarchive
+                </button>
+              )}
             </div>
-            {submission.instructions && (
-              <div className="ua-stat-row ua-stat-row-block">
-                <span className="ua-stat-label">Instructions</span>
-                <p className="ua-instructions-text">{submission.instructions}</p>
+          </div>
+          <div className="ua-detail-grid">
+            <div className="ua-detail-item full">
+              <span className="ua-detail-label">Description / Instructions</span>
+              <span className="ua-detail-value">{submission.description || '—'}</span>
+            </div>
+            {(submission.additionalNotes || submission.instructions) && (
+              <div className="ua-detail-item full">
+                <span className="ua-detail-label">Additional Notes</span>
+                <span className="ua-detail-value">{submission.additionalNotes || submission.instructions}</span>
               </div>
             )}
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Allowed File Types</span>
-              <span className="ua-stat-value">{submission.rules.allowedFileTypes || 'Any'}</span>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Cohort</span>
+              <span className="ua-detail-value">{submission.cohortName}</span>
             </div>
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Max Attempts</span>
-              <span className="ua-stat-value">{submission.rules.maxAttempts}</span>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Submission Type</span>
+              <span className="ua-detail-value">
+                {submission.submissionType === 'BOTH' ? 'File or Text' : submission.submissionType === 'FILE' ? 'File only' : 'Text only'}
+              </span>
             </div>
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Late Submissions</span>
-              <span className={`ua-stat-value ${submission.rules.lateAllowed ? 'green' : 'red'}`}>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Deadline</span>
+              <span className="ua-detail-value">{submission.dueDate}{submission.dueTime ? ` at ${submission.dueTime.slice(0, 5)}` : ' at 23:59'}</span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Max Points</span>
+              <span className="ua-detail-value">{submission.maxPoints}</span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Template File</span>
+              <span className="ua-detail-value">
+                {(submission.hasTemplateFile || submission.hasTemplate) ? (
+                  <button className="ua-link-btn" onClick={handleDownloadTemplate}>
+                    <FileDown size={12} /> {submission.templateFileName ?? 'Download template'}
+                  </button>
+                ) : '—'}
+              </span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Allowed File Types</span>
+              <span className="ua-detail-value">{submission.rules.allowedFileTypes || 'Any'}</span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Max File Size</span>
+              <span className="ua-detail-value">{submission.rules.maxFileSizeBytes ? `${Math.round(submission.rules.maxFileSizeBytes / (1024 * 1024))} MB` : '—'}</span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Word Count</span>
+              <span className="ua-detail-value">
+                {submission.rules.minWordCount || submission.rules.maxWordCount
+                  ? `${submission.rules.minWordCount ?? 0} – ${submission.rules.maxWordCount ?? '∞'}`
+                  : '—'}
+              </span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Naming Convention</span>
+              <span className="ua-detail-value">{submission.rules.namingPattern || '—'}</span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Required Headings</span>
+              <span className="ua-detail-value">{submission.rules.requiredHeadings || '—'}</span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Max Attempts</span>
+              <span className="ua-detail-value">{submission.rules.maxAttempts}</span>
+            </div>
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Late Submissions</span>
+              <span className={`ua-detail-value ${submission.rules.lateAllowed ? 'green' : 'red'}`}>
                 {submission.rules.lateAllowed ? 'Allowed' : 'Not allowed'}
               </span>
             </div>
-            <div className="ua-stat-row">
-              <span className="ua-stat-label">Last Notified</span>
-              <span className="ua-stat-value">
+            <div className="ua-detail-item">
+              <span className="ua-detail-label">Last Notified</span>
+              <span className="ua-detail-value">
                 {submission.lastNotifiedAt ? new Date(submission.lastNotifiedAt).toLocaleString() : 'Never'}
               </span>
             </div>
@@ -156,6 +222,14 @@ export default function SubmissionDetailPage() {
           <div className="ua-card-header">
             <p className="ua-card-title"><GraduationCap size={14} /> Students<span className="ua-count">{students.length} total{subsTracked ? ` · ${submittedCount} submitted` : ''} · {graded} graded · {draftCount} draft</span></p>
             <div className="ua-header-actions">
+              <button
+                className="ua-btn ua-btn-secondary"
+                onClick={handleDownloadZip}
+                disabled={submittedCount === 0}
+                title={submittedCount === 0 ? 'No submissions to download' : 'Download every submission as a ZIP'}
+              >
+                <FileArchive size={12} /> Download All (ZIP)
+              </button>
               <button
                 className="ua-btn ua-btn-secondary"
                 onClick={handleExport}
@@ -253,16 +327,16 @@ export default function SubmissionDetailPage() {
                         <td className="col-muted">{g?.feedback || '—'}</td>
                         <td className="col-actions">
                           {(() => {
-                            const sub = submissionFor(s.id)
+                            const sub = subsTracked ? submissionFor(s.id) : undefined
                             if (!sub?.uploadId) return null
                             return (
                               <>
                                 <button
                                   className="ua-icon-btn"
-                                  title="Download submission"
-                                  onClick={() => handleDownloadStudentFile(sub.uploadId!, sub.fileName)}
+                                  title={`Download ${sub.fileName}`}
+                                  onClick={() => handleDownloadUpload(sub.uploadId!, sub.fileName)}
                                 >
-                                  <Download size={13} />
+                                  <FileDown size={13} />
                                 </button>
                                 <button
                                   className="ua-icon-btn"
@@ -276,11 +350,27 @@ export default function SubmissionDetailPage() {
                           })()}
                           <button
                             className="ua-icon-btn"
+                            title="Re-open for this student (late exception)"
+                            onClick={() => handleReopen(s.id, `${s.firstName} ${s.lastName}`)}
+                          >
+                            <Unlock size={13} />
+                          </button>
+                          <button
+                            className="ua-icon-btn"
                             title={g ? 'Edit grade' : 'Grade student'}
                             onClick={() => setGradeTarget(s)}
                           >
                             <Pencil size={13} />
                           </button>
+                          {g?.status === 'RELEASED' && (
+                            <button
+                              className="ua-icon-btn"
+                              title="Un-release grade (move back to draft)"
+                              onClick={() => unrelease(s.id)}
+                            >
+                              <Undo2 size={13} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     )
