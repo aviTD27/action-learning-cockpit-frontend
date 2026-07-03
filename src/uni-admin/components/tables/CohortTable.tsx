@@ -6,6 +6,7 @@ import { useLecturers } from '../../hooks/useLecturers'
 import { createCohort, updateCohort } from '../../api/uniAdmin'
 import type { CohortResponse, CreateCohortRequest } from '../../api/types'
 import CohortModal from '../modals/CohortModal'
+import CohortStudentsModal from '../modals/CohortStudentsModal'
 import StatusBadge from '../shared/StatusBadge'
 import '../../styles/uniAdmin.css'
 
@@ -16,6 +17,7 @@ export default function CohortTable() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<CohortResponse | null>(null)
+  const [studentsTarget, setStudentsTarget] = useState<CohortResponse | null>(null)
 
   const archivedProgrammeIds = new Set(
     programmes.filter(p => p.status === 'ARCHIVED').map(p => p.id),
@@ -76,6 +78,13 @@ export default function CohortTable() {
                     <td className="col-actions">
                       <button
                         className="ua-icon-btn"
+                        title="View enrolled students"
+                        onClick={() => setStudentsTarget(c)}
+                      >
+                        <Users size={13} />
+                      </button>
+                      <button
+                        className="ua-icon-btn"
                         title={locked ? 'Programme is archived — restore it to edit this cohort' : 'Edit cohort'}
                         disabled={locked}
                         onClick={() => openEdit(c)}
@@ -98,6 +107,12 @@ export default function CohortTable() {
         lecturers={lecturers}
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
+      />
+
+      <CohortStudentsModal
+        open={studentsTarget !== null}
+        cohort={studentsTarget}
+        onClose={() => setStudentsTarget(null)}
       />
     </div>
   )
