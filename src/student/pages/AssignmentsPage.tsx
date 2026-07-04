@@ -258,6 +258,9 @@ function CalendarView({ assignments }: { assignments: Assignment[] }) {
   const byDate = useMemo(() => {
     const map: Record<string, Assignment[]> = {}
     assignments.forEach(a => {
+
+
+      
       const key = a.dueDate.slice(0, 10)
       ;(map[key] ??= []).push(a)
     })

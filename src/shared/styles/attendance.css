@@ -1,0 +1,236 @@
+/* ── Session form ── */
+.att-form-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.att-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 140px;
+}
+
+.att-form-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* ── Session list ── */
+.att-session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.att-session-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  background: white;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s, border-color 0.12s;
+  font-family: inherit;
+}
+
+.att-session-item:hover { background: #f9fafb; border-color: #d1d5db; }
+.att-session-item.active { border-color: #1E3A5F; background: #eff6ff; }
+
+.att-session-meta { font-size: 0.72rem; color: #9ca3af; margin-top: 2px; }
+.att-session-progress { font-size: 0.72rem; color: #9ca3af; }
+
+/* ── Student grid ── */
+.att-student-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.875rem;
+  padding: 1rem;
+}
+
+.att-student-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 0.625rem;
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  background: white;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.att-student-card.marked-present { border-color: #16a34a; background: #f0fdf4; }
+.att-student-card.marked-absent  { border-color: #dc2626; background: #fef2f2; }
+.att-student-card.marked-late    { border-color: #d97706; background: #fffbeb; }
+
+/* ── Student avatar ── */
+.att-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.att-student-info { display: flex; flex-direction: column; gap: 2px; }
+.att-student-name { font-size: 0.8125rem; font-weight: 700; color: #1E3A5F; line-height: 1.2; }
+.att-student-ref  { font-size: 0.7rem; color: #9ca3af; }
+
+/* ── Status buttons ── */
+.att-status-btns { display: flex; gap: 0.3rem; }
+
+.att-status-btn {
+  flex: 1;
+  padding: 0.3rem 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  background: white;
+  color: #6b7280;
+  transition: all 0.12s;
+  text-align: center;
+  font-family: inherit;
+}
+
+.att-status-btn:hover { background: #f9fafb; }
+
+.att-status-btn.present.active { background: #16a34a; border-color: #16a34a; color: white; }
+.att-status-btn.absent.active  { background: #dc2626; border-color: #dc2626; color: white; }
+.att-status-btn.late.active    { background: #d97706; border-color: #d97706; color: white; }
+
+.att-status-btn.present:hover:not(.active) { border-color: #16a34a; color: #16a34a; }
+.att-status-btn.absent:hover:not(.active)  { border-color: #dc2626; color: #dc2626; }
+.att-status-btn.late:hover:not(.active)    { border-color: #d97706; color: #d97706; }
+
+/* ── Late minutes input ── */
+.att-late-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.att-late-input {
+  width: 56px;
+  padding: 0.25rem 0.375rem;
+  border: 1.5px solid #d97706;
+  border-radius: 0.375rem;
+  font-size: 0.78rem;
+  text-align: center;
+  font-family: inherit;
+  outline: none;
+}
+
+.att-late-input:focus { border-color: #b45309; }
+.att-late-label { font-size: 0.72rem; color: #6b7280; }
+
+/* ── Attendance rate bar ── */
+.att-rate-bar-wrap {
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.att-rate-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+/* ── Exam eligibility badges ── */
+.att-qual-yes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #15803d;
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.att-qual-no {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* ── Status inline badges (student records) ── */
+.att-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.att-badge-present { background: #dcfce7; color: #15803d; }
+.att-badge-absent  { background: #fee2e2; color: #dc2626; }
+.att-badge-late    { background: #fef3c7; color: #b45309; }
+
+/* ── Records list row ── */
+.att-record-row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.8125rem;
+}
+
+.att-record-row:last-child { border-bottom: none; }
+
+.att-record-header {
+  background: #1E3A5F;
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+/* ── Admin table row hover ── */
+.att-admin-row:hover { background: #f9fafb; }
+
+/* ── Empty state ── */
+.att-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  text-align: center;
+}

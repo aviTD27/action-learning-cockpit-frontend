@@ -6,6 +6,7 @@ import AssignmentsPage from '../student/pages/AssignmentsPage'
 import GradesPage from '../student/pages/GradesPage'
 import NotificationsPage from '../student/pages/NotificationsPage'
 import StudentAnnouncementsPage from '../student/pages/AnnouncementsPage'
+import StudentAttendancePage from '../student/pages/AttendancePage'
 import MyCohortPage from '../student/pages/MyCohortPage'
 import StudentTimetablePage from '../student/pages/TimetablePage'
 
@@ -35,6 +36,12 @@ export default function StudentRoutes() {
       <Route path="/student/announcements" element={
         <StudentLayout title="Announcements" subtitle="Messages from lecturers and admin">
           <StudentAnnouncementsPage />
+        </StudentLayout>
+      } />
+
+      <Route path="/student/attendance" element={
+        <StudentLayout title="Attendance" subtitle="Your attendance records and exam eligibility">
+          <StudentAttendancePage />
         </StudentLayout>
       } />
 
