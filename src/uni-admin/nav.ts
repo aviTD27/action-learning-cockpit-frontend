@@ -6,6 +6,7 @@ import {
   GraduationCap,
   Home,
   Megaphone,
+  Layers,
   Presentation,
   UserCheck,
   UserRound,
@@ -16,7 +17,8 @@ import type { NavItem, SidebarUser } from '../shared/layout/Sidebar'
 export const UNI_ADMIN_NAV: NavItem[] = [
   { label: 'Dashboard',     icon: Home,         path: '/uni-admin',                 end: true },
   { label: 'Programmes',    icon: BookOpen,      path: '/uni-admin/programmes' },
-  { label: 'Cohorts',       icon: Users,         path: '/uni-admin/cohorts' },
+  { label: 'Intakes',       icon: Users,         path: '/uni-admin/cohorts' },
+  { label: 'Courses',       icon: Layers,        path: '/uni-admin/courses' },
   { label: 'Lecturers',     icon: Presentation,  path: '/uni-admin/lecturers' },
   { label: 'Students',      icon: GraduationCap, path: '/uni-admin/students' },
   { label: 'Timetable',     icon: CalendarDays,  path: '/uni-admin/timetable' },

@@ -73,9 +73,10 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
 
   if (!open) return null
 
+  // Show intakes that run the selected programme (an intake can host several programmes).
   const cohortsForProgramme = programmeId === ''
     ? cohorts
-    : cohorts.filter(c => c.programmeId === programmeId)
+    : cohorts.filter(c => c.programmeIds.includes(programmeId as number))
 
   const submit = async () => {
     if (!firstName.trim() || !lastName.trim()) { setError('First and last name are required'); return }

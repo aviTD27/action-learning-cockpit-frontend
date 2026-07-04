@@ -43,7 +43,7 @@ export default function GradeReviewPage() {
                 <thead>
                   <tr>
                     <th>Submission</th>
-                    <th>Cohort</th>
+                    <th>Course</th>
                     <th>Graded</th>
                     <th>Draft</th>
                     <th>Released</th>
@@ -56,7 +56,7 @@ export default function GradeReviewPage() {
                     return (
                       <tr key={s.id}>
                         <td className="col-name">{s.title}</td>
-                        <td className="col-muted">{s.cohortName}</td>
+                        <td className="col-muted">{s.courseName}</td>
                         <td>{summary.graded}</td>
                         <td className={summary.draft > 0 ? 'col-highlight' : 'col-muted'}>{summary.draft}</td>
                         <td className="col-muted">{summary.released}</td>

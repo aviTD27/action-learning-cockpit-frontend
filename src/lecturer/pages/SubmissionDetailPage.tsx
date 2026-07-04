@@ -34,7 +34,7 @@ export default function SubmissionDetailPage() {
   const { submissions, notify, publish, archive, unarchive, reopen } = useSubmissions()
   const submission = submissions.find(s => s.id === submissionId)
 
-  const { students, loading } = useStudents(submission?.cohortId)
+  const { students, loading } = useStudents({ programmeId: submission?.programmeId })
   const { setGrade, releaseAll, gradeFor, draftCount } = useGrades(submissionId)
   const { available: subsTracked, submissionFor, submittedCount, reload: reloadSubs } = useStudentSubmissions(submissionId)
 
@@ -100,7 +100,7 @@ export default function SubmissionDetailPage() {
   const graded = students.filter(s => gradeFor(s.id)).length
 
   return (
-    <Layout navItems={LECTURER_NAV} user={sidebarUser} title={submission.title} subtitle={`${submission.cohortName} · due ${submission.dueDate}`}>
+    <Layout navItems={LECTURER_NAV} user={sidebarUser} title={submission.title} subtitle={`${submission.courseName} · due ${submission.dueDate}`}>
       <div className="ua-page">
 
         <Link to="/lecturer/submissions" className="ua-link"><ArrowLeft size={12} /> Back to submissions</Link>
@@ -150,8 +150,8 @@ export default function SubmissionDetailPage() {
               </div>
             )}
             <div className="ua-detail-item">
-              <span className="ua-detail-label">Cohort</span>
-              <span className="ua-detail-value">{submission.cohortName}</span>
+              <span className="ua-detail-label">Course</span>
+              <span className="ua-detail-value">{submission.courseName}</span>
             </div>
             <div className="ua-detail-item">
               <span className="ua-detail-label">Submission Type</span>
@@ -254,7 +254,7 @@ export default function SubmissionDetailPage() {
             {loading ? (
               <p className="ua-table-empty">Loading students…</p>
             ) : students.length === 0 ? (
-              <p className="ua-table-empty">No students in this cohort.</p>
+              <p className="ua-table-empty">No students in this course.</p>
             ) : (
               <table className="ua-table">
                 <thead>

@@ -8,7 +8,7 @@ import {
 import Layout from '../../shared/layout/Layout'
 import { LECTURER_NAV } from '../nav'
 import { useAuth } from '../../auth/AuthContext'
-import { useCohorts } from '../../uni-admin/hooks/useCohorts'
+import { useCourses } from '../../uni-admin/hooks/useCourses'
 import { useStudents } from '../../uni-admin/hooks/useStudents'
 import { useSubmissions } from '../hooks/useSubmissions'
 import { useGradeOverview } from '../hooks/useGradeOverview'
@@ -43,7 +43,7 @@ function ChartTooltip({ active, payload, label }: any) {
 
 export default function LecturerDashboard() {
   const { displayName } = useAuth()
-  const { cohorts, loading: loadingCohorts } = useCohorts()
+  const { courses, loading: loadingCourses } = useCourses()
   const { students, loading: loadingStudents } = useStudents()
   const { submissions, loading: loadingSubs } = useSubmissions()
   const { grades } = useGradeOverview()
@@ -53,7 +53,7 @@ export default function LecturerDashboard() {
     getLecturerOverview().then(res => setOverview(res.data)).catch(() => setOverview(null))
   }, [])
 
-  const loading = loadingCohorts || loadingStudents || loadingSubs
+  const loading = loadingCourses || loadingStudents || loadingSubs
   const isEmpty = !loading && submissions.length === 0
 
   const institution = useMemo(
@@ -62,14 +62,14 @@ export default function LecturerDashboard() {
   )
   const sidebarUser = { name: displayName ?? '', role: 'Lecturer', institution }
 
-  const ongoingCohorts = cohorts.filter(c => c.status === 'ONGOING').length
+  const activeCourses = courses.filter(c => c.status === 'ACTIVE').length
   const activeStudents = students.filter(s => s.status === 'ACTIVE').length
   const releasedGrades = grades.filter(g => g.status === 'RELEASED').length
   const draftGrades = grades.filter(g => g.status === 'DRAFT').length
 
   const subsPerCohort = useMemo(() => {
     const counts: Record<string, number> = {}
-    submissions.forEach(s => { counts[s.cohortName] = (counts[s.cohortName] ?? 0) + 1 })
+    submissions.forEach(s => { counts[s.courseName] = (counts[s.courseName] ?? 0) + 1 })
     return Object.entries(counts)
       .map(([name, value]) => ({ name: trunc(name), submissions: value, full: name }))
       .sort((a, b) => b.submissions - a.submissions)
@@ -84,14 +84,14 @@ export default function LecturerDashboard() {
   ), [releasedGrades, draftGrades])
 
   const avgScorePerCohort = useMemo(() => {
-    const subMap = new Map<number, { cohortName: string; maxPoints: number }>()
-    submissions.forEach(s => subMap.set(s.id, { cohortName: s.cohortName, maxPoints: s.maxPoints }))
+    const subMap = new Map<number, { courseName: string; maxPoints: number }>()
+    submissions.forEach(s => subMap.set(s.id, { courseName: s.courseName, maxPoints: s.maxPoints }))
     const buckets: Record<string, number[]> = {}
     grades.filter(g => g.status === 'RELEASED').forEach(g => {
       const sub = subMap.get(g.submissionId)
       if (!sub || sub.maxPoints <= 0) return
       const pct = Math.min(100, Math.max(0, (g.grade / sub.maxPoints) * 100))
-      ;(buckets[sub.cohortName] ??= []).push(pct)
+      ;(buckets[sub.courseName] ??= []).push(pct)
     })
     return Object.entries(buckets)
       .map(([name, arr]) => ({
@@ -132,9 +132,9 @@ export default function LecturerDashboard() {
             <div className="db-kpi-note">total submissions</div>
           </Link>
           <div className="db-kpi db-kpi-green">
-            <div className="db-kpi-label">Cohorts</div>
-            <div className="db-kpi-value">{loading ? '—' : cohorts.length}</div>
-            <div className="db-kpi-note">{loading ? '' : `${ongoingCohorts} ongoing`}</div>
+            <div className="db-kpi-label">Courses</div>
+            <div className="db-kpi-value">{loading ? '—' : courses.length}</div>
+            <div className="db-kpi-note">{loading ? '' : `${activeCourses} active`}</div>
           </div>
           <div className="db-kpi db-kpi-indigo">
             <div className="db-kpi-label">Students</div>
@@ -162,7 +162,7 @@ export default function LecturerDashboard() {
               <Link to="/lecturer/submissions" className="db-onboard-card">
                 <ClipboardList size={20} className="db-onboard-icon" />
                 <span className="db-onboard-card-title">Create an Assignment</span>
-                <span className="db-onboard-card-text">Set a title, deadline, submission type and Smart-Gate rules for your cohort.</span>
+                <span className="db-onboard-card-text">Set a title, deadline, submission type and Smart-Gate rules for your course.</span>
               </Link>
               <Link to="/lecturer/notify" className="db-onboard-card">
                 <AlertTriangle size={20} className="db-onboard-icon" />
@@ -181,7 +181,7 @@ export default function LecturerDashboard() {
         <div className="db-row-2-1">
 
           <div className="db-chart-card">
-            <p className="db-chart-title">Assignments per Cohort</p>
+            <p className="db-chart-title">Assignments per Course</p>
             {loading ? (
               <div className="db-no-data">Loading…</div>
             ) : subsPerCohort.length === 0 ? (
@@ -250,7 +250,7 @@ export default function LecturerDashboard() {
                   <Link key={d.id} to={`/lecturer/submissions/${d.id}`} className="db-deadline-row" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="db-deadline-main">
                       <span className="db-deadline-title">{d.title}</span>
-                      <span className="db-deadline-cohort">{d.cohortName}</span>
+                      <span className="db-deadline-cohort">{d.courseName}</span>
                     </div>
                     <span
                       className="db-pill"
@@ -268,7 +268,7 @@ export default function LecturerDashboard() {
           </div>
 
           <div className="db-chart-card">
-            <p className="db-chart-title">Average Score per Cohort</p>
+            <p className="db-chart-title">Average Score per Course</p>
             {loading ? (
               <div className="db-no-data">Loading…</div>
             ) : avgScorePerCohort.length === 0 ? (
@@ -330,7 +330,7 @@ export default function LecturerDashboard() {
                     {overview.needsGrading.map(n => (
                       <tr key={n.submissionId}>
                         <td className="col-name">{n.title}</td>
-                        <td className="col-muted">{n.cohortName ?? '—'}</td>
+                        <td className="col-muted">{n.courseName ?? '—'}</td>
                         <td><span className="ua-badge ua-badge-payment_pending">{n.awaiting}</span></td>
                         <td className="col-actions">
                           <Link to={`/lecturer/submissions/${n.submissionId}`} className="ua-btn ua-btn-primary ua-btn-xs">Grade</Link>
@@ -397,7 +397,7 @@ export default function LecturerDashboard() {
                     {overview.atRisk.map(s => (
                       <tr key={s.studentId}>
                         <td className="col-name">{s.studentName}<div className="col-muted" style={{ fontSize: 11 }}>{s.studentRef}</div></td>
-                        <td className="col-muted">{s.cohortName ?? '—'}</td>
+                        <td className="col-muted">{s.courseName ?? '—'}</td>
                         <td>{s.avgScorePct != null ? `${s.avgScorePct}%` : '—'}</td>
                         <td className="col-muted" style={{ fontSize: 11 }}>{s.reason}</td>
                       </tr>

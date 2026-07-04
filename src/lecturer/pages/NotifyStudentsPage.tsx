@@ -13,19 +13,19 @@ export default function NotifyStudentsPage() {
   const { students } = useStudents()
   const [notice, setNotice] = useState<string | null>(null)
 
-  const studentCountByCohort = useMemo(() => {
+  const studentCountByProgramme = useMemo(() => {
     const counts = new Map<number, number>()
     for (const s of students) {
-      counts.set(s.cohortId, (counts.get(s.cohortId) ?? 0) + 1)
+      counts.set(s.programmeId, (counts.get(s.programmeId) ?? 0) + 1)
     }
     return counts
   }, [students])
 
   const [notifyingAll, setNotifyingAll] = useState(false)
 
-  const handleNotify = (id: number, title: string, cohortId: number) => {
+  const handleNotify = (id: number, title: string, programmeId: number) => {
     notify(id)
-    const count = studentCountByCohort.get(cohortId) ?? 0
+    const count = studentCountByProgramme.get(programmeId) ?? 0
     setNotice(`Notification sent for "${title}" — ${count} student${count === 1 ? '' : 's'} emailed and notified on the platform.`)
   }
 
@@ -41,7 +41,7 @@ export default function NotifyStudentsPage() {
   }
 
   return (
-    <Layout navItems={LECTURER_NAV} user={sidebarUser} title="Notify Students" subtitle="Send submission reminders to cohorts">
+    <Layout navItems={LECTURER_NAV} user={sidebarUser} title="Notify Students" subtitle="Send submission reminders to students">
       <div className="ua-page">
 
         {notice && (
@@ -70,7 +70,7 @@ export default function NotifyStudentsPage() {
                 <thead>
                   <tr>
                     <th>Submission</th>
-                    <th>Cohort</th>
+                    <th>Course</th>
                     <th>Recipients</th>
                     <th>Due Date</th>
                     <th>Last Notified</th>
@@ -81,8 +81,8 @@ export default function NotifyStudentsPage() {
                   {submissions.map(s => (
                     <tr key={s.id}>
                       <td className="col-name">{s.title}</td>
-                      <td className="col-muted">{s.cohortName}</td>
-                      <td>{studentCountByCohort.get(s.cohortId) ?? 0} students</td>
+                      <td className="col-muted">{s.courseName}</td>
+                      <td>{studentCountByProgramme.get(s.programmeId) ?? 0} students</td>
                       <td className="col-muted">{s.dueDate}</td>
                       <td className="col-muted">
                         {s.lastNotifiedAt ? new Date(s.lastNotifiedAt).toLocaleString() : 'Never'}
@@ -90,7 +90,7 @@ export default function NotifyStudentsPage() {
                       <td className="col-actions">
                         <button
                           className="ua-btn ua-btn-primary"
-                          onClick={() => handleNotify(s.id, s.title, s.cohortId)}
+                          onClick={() => handleNotify(s.id, s.title, s.programmeId)}
                         >
                           <Bell size={12} /> Notify
                         </button>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  getAssignmentsForCohort,
+  getAssignmentsForProgramme,
   getMyGrades,
   getMyProfile,
   getMyUploadStatus,
@@ -52,7 +52,7 @@ export function useStudentDashboard() {
         const profile = await getMyProfile()
 
         const [assignments, grades] = await Promise.all([
-          getAssignmentsForCohort(profile.cohortId),
+          getAssignmentsForProgramme(profile.programmeId),
           getMyGrades(),
         ])
 

@@ -17,7 +17,7 @@ export default function UpcomingDeadlines({ items }: { items: DeadlineItem[] }) 
               <li key={d.id} className="ua-deadline-row">
                 <div className="ua-deadline-main">
                   <span className="ua-deadline-title">{d.title}</span>
-                  <span className="ua-deadline-cohort">{d.cohortName}</span>
+                  <span className="ua-deadline-cohort">{d.courseName}</span>
                 </div>
                 <div className="ua-deadline-meta">
                   <span className="ua-deadline-date">{d.dueDate}</span>

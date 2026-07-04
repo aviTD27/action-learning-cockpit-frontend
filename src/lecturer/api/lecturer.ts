@@ -13,7 +13,7 @@ const api = apiClient
 
 //  Submissions 
 
-export const getSubmissions = (params?: { cohortId?: number; lecturerId?: number }) =>
+export const getSubmissions = (params?: { courseId?: number; lecturerId?: number }) =>
   api.get<SubmissionResponse[]>('/submissions', { params })
 
 export const getSubmission = (id: number) =>
