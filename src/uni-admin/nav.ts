@@ -7,6 +7,7 @@ import {
   Home,
   Megaphone,
   Presentation,
+  UserCheck,
   UserRound,
   Users,
 } from 'lucide-react'
@@ -19,6 +20,7 @@ export const UNI_ADMIN_NAV: NavItem[] = [
   { label: 'Lecturers',     icon: Presentation,  path: '/uni-admin/lecturers' },
   { label: 'Students',      icon: GraduationCap, path: '/uni-admin/students' },
   { label: 'Timetable',     icon: CalendarDays,  path: '/uni-admin/timetable' },
+  { label: 'Attendance',    icon: UserCheck,     path: '/uni-admin/attendance' },
   { label: 'Announcements', icon: Megaphone,     path: '/uni-admin/announcements' },
   { label: 'Compliance',    icon: ClipboardList, path: '/uni-admin/compliance' },
   { label: 'Analytics',     icon: BarChart3,     path: '/uni-admin/analytics' },

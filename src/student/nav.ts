@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, Home, Megaphone, Star, UserRound, Users } from 'lucide-react'
+import { BookOpen, CalendarDays, Home, Megaphone, Star, UserCheck, UserRound, Users } from 'lucide-react'
 import type { NavItem } from '../shared/layout/Sidebar'
 
 export function getStudentNav(announcementUnread = 0, gradeUnread = 0): NavItem[] {
@@ -11,6 +11,7 @@ export function getStudentNav(announcementUnread = 0, gradeUnread = 0): NavItem[
       path:  '/student/grades',
       badge: gradeUnread > 0 ? gradeUnread : undefined,
     },
+    { label: 'Attendance', icon: UserCheck, path: '/student/attendance' },
     {
       label: 'Announcements',
       icon:  Megaphone,
