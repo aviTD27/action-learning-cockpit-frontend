@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getMyProfile, getAssignmentsForCohort, type AssignmentItem } from '../api/studentApi'
+import { getMyProfile, getAssignmentsForProgramme, type AssignmentItem } from '../api/studentApi'
 
 export type AssignmentStatus = 'pending' | 'past-due'
 
@@ -22,7 +22,7 @@ export function useStudentAssignments() {
     async function load() {
       try {
         const profile = await getMyProfile()
-        const items = await getAssignmentsForCohort(profile.cohortId)
+        const items = await getAssignmentsForProgramme(profile.programmeId)
         const mapped: Assignment[] = items
           .map(a => ({ ...a, status: computeStatus(a.dueDate) }))
           .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())

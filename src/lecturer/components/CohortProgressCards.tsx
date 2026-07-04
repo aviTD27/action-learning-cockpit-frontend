@@ -1,22 +1,22 @@
-import { Users } from 'lucide-react'
-import type { CohortProgressItem } from '../lib/dashboardStats'
+import { Layers } from 'lucide-react'
+import type { CourseProgressItem } from '../lib/dashboardStats'
 import '../styles/lecturer.css'
 
-export default function CohortProgressCards({ items }: { items: CohortProgressItem[] }) {
+export default function CohortProgressCards({ items }: { items: CourseProgressItem[] }) {
   return (
     <div className="ua-card">
       <div className="ua-card-header">
-        <p className="ua-card-title"><Users size={14} /> Cohort Progress<span className="ua-count">{items.length} ongoing</span></p>
+        <p className="ua-card-title"><Layers size={14} /> Course Progress<span className="ua-count">{items.length} courses</span></p>
       </div>
       <div className="ua-panel-body">
         {items.length === 0 ? (
-          <p className="ua-table-empty">No ongoing cohorts.</p>
+          <p className="ua-table-empty">No courses assigned yet.</p>
         ) : (
           <div className="ua-cohort-grid">
             {items.map(c => (
-              <div className="ua-cohort-card" key={c.cohortId}>
+              <div className="ua-cohort-card" key={c.courseId}>
                 <div className="ua-cohort-head">
-                  <span className="ua-cohort-name">{c.cohortName}</span>
+                  <span className="ua-cohort-name">{c.courseName}</span>
                   <span className="ua-cohort-prog">{c.programmeName}</span>
                 </div>
                 <div className="ua-cohort-stats">

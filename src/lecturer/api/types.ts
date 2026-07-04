@@ -12,8 +12,10 @@ export interface SubmissionResponse {
   additionalNotes: string | null
   submissionType: SubmissionType
   status: SubmissionLifecycle
-  cohortId: number
-  cohortName: string
+  courseId: number
+  courseName: string
+  programmeId: number
+  programmeName: string
   lecturerId: number | null
   dueDate: string
   dueTime: string | null
@@ -51,8 +53,8 @@ export interface CreateSubmissionRequest {
   additionalNotes?: string | null
   submissionType?: SubmissionType
   status?: SubmissionLifecycle
-  cohortId?: number
-  cohortIds?: number[]
+  courseId?: number
+  courseIds?: number[]
   lecturerId?: number
   dueDate: string
   dueTime?: string | null
@@ -107,47 +109,4 @@ export interface ScoringReport {
   embeddingsComputed: boolean
   requiresHumanReview: boolean
   criteria: CriterionScore[]
-}
-
-export interface NeedsGradingItem {
-  submissionId: number
-  title: string
-  cohortName: string | null
-  awaiting: number
-  oldestSubmittedAt: string | null
-}
-
-export interface ActivityItem {
-  type: string
-  text: string
-  at: string
-}
-
-export interface AtRiskStudent {
-  studentId: number
-  studentName: string
-  studentRef: string
-  cohortName: string | null
-  programmeName: string | null
-  avgScorePct: number | null
-  gradedCount: number
-  missedSubmissions: number
-  reason: string
-}
-
-export interface GradeBand {
-  band: string
-  count: number
-}
-
-export interface LecturerOverview {
-  gradingBacklog: number
-  compliancePassed: number
-  complianceFailed: number
-  onTime: number
-  late: number
-  needsGrading: NeedsGradingItem[]
-  atRisk: AtRiskStudent[]
-  gradeDistribution: GradeBand[]
-  recentActivity: ActivityItem[]
 }

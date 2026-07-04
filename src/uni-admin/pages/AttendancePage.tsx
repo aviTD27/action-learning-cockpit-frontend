@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AlertCircle, BarChart3, CheckCheck, Users, UserRound } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
 import { UNI_ADMIN_NAV } from '../nav'
-import { useAuth } from '../../auth/AuthContext'
+import { useUniAdminSidebarUser } from '../hooks/useUniAdminSidebarUser'
 import { getCohorts } from '../api/uniAdmin'
 import type { CohortResponse } from '../api/types'
 import {
@@ -91,8 +91,7 @@ function StudentDetailModal({ stats, onClose }: DetailModalProps) {
 }
 
 export default function UniAdminAttendancePage() {
-  const { displayName } = useAuth()
-  const sidebarUser = { name: displayName ?? '', role: 'UNI ADMIN' }
+  const sidebarUser = useUniAdminSidebarUser()
 
   const [cohorts,          setCohorts]          = useState<CohortResponse[]>([])
   const [selectedCohortId, setSelectedCohortId] = useState<number | ''>('')

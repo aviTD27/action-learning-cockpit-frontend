@@ -2,13 +2,12 @@ import { useState } from 'react'
 import { Megaphone, Plus, SendHorizonal } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
 import { UNI_ADMIN_NAV } from '../nav'
-import { useAuth } from '../../auth/AuthContext'
+import { useUniAdminSidebarUser } from '../hooks/useUniAdminSidebarUser'
 import SendAnnouncementModal from '../../shared/components/SendAnnouncementModal'
 import '../styles/uniAdmin.css'
 
 export default function UniAdminAnnouncementsPage() {
-  const { displayName } = useAuth()
-  const sidebarUser = { name: displayName ?? '', role: 'UNI ADMIN' }
+  const sidebarUser = useUniAdminSidebarUser()
 
   const [modalOpen,  setModalOpen]  = useState(false)
   const [sentCount,  setSentCount]  = useState(0)

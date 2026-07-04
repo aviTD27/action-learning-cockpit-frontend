@@ -20,8 +20,10 @@ export interface Submission {
   additionalNotes?: string
   submissionType: SubmissionType
   status: SubmissionLifecycle
-  cohortId: number
-  cohortName: string
+  courseId: number
+  courseName: string
+  programmeId: number
+  programmeName: string
   dueDate: string
   dueTime?: string | null
   maxPoints: number
@@ -40,9 +42,9 @@ export interface CreateSubmissionData {
   additionalNotes?: string
   submissionType: SubmissionType
   status?: SubmissionLifecycle
-  cohortId: number
-  cohortName: string
-  cohortIds?: number[]
+  courseId: number
+  courseName: string
+  courseIds?: number[]
   dueDate: string
   dueTime?: string | null
   maxPoints: number

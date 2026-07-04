@@ -8,6 +8,12 @@ export const COHORT_STATUSES = [
 
 export type CohortStatus = (typeof COHORT_STATUSES)[number]
 
+export const COHORT_SEASONS = ['SPRING', 'FALL'] as const
+export type CohortSeason = (typeof COHORT_SEASONS)[number]
+
+export const COURSE_STATUSES = ['ACTIVE', 'ARCHIVED'] as const
+export type CourseStatus = (typeof COURSE_STATUSES)[number]
+
 export const LECTURER_STATUSES = ['ACTIVE', 'INACTIVE'] as const
 
 export type LecturerStatus = (typeof LECTURER_STATUSES)[number]
@@ -50,16 +56,22 @@ export interface ProgrammeResponse {
   universityId: number | null
   universityName: string | null
   status: ProgrammeStatus
+  cohortIds: number[]
+  cohortNames: string[]
+  semesterCount: number
 }
 
 export interface CohortResponse {
   id: number
   name: string
-  programmeId: number
-  programmeName: string
+  season: CohortSeason
+  academicYear: number
+  universityId: number | null
+  universityName: string | null
   status: CohortStatus
-  lecturerIds: number[]
-  lecturerNames: string[]
+  programmeIds: number[]
+  programmeNames: string[]
+  studentCount: number
 }
 
 export interface LecturerResponse {
@@ -96,10 +108,11 @@ export interface CreateProgrammeRequest {
 }
 
 export interface CreateCohortRequest {
-  name: string
-  programmeId: number
+  name?: string
+  season: CohortSeason
+  academicYear: number
   status?: CohortStatus
-  lecturerIds?: number[]
+  programmeIds?: number[]
 }
 
 export interface CreateLecturerRequest {
@@ -190,28 +203,43 @@ export interface CohortBenchmark {
   rank: number
 }
 
-export interface GradingBacklog {
-  awaitingGrades: number
-  turnedIn: number
-  released: number
+
+// ── Semesters & Courses (new hierarchy) ────────────────────────────────────────
+export interface SemesterResponse {
+  id: number
+  name: string
+  orderIndex: number
+  programmeId: number
+  programmeName: string
+  courseCount: number
 }
 
-export interface AtRiskStudent {
-  studentId: number
-  studentName: string
-  studentRef: string
-  cohortName: string | null
-  programmeName: string | null
-  avgScorePct: number | null
-  gradedCount: number
-  missedSubmissions: number
-  reason: string
+export interface CreateSemesterRequest {
+  name: string
+  orderIndex?: number
+  programmeId: number
 }
 
-export interface LecturerWorkload {
-  lecturerId: number
-  lecturerName: string
-  assignments: number
-  cohorts: number
-  gradingBacklog: number
+export interface CourseResponse {
+  id: number
+  name: string
+  code: string | null
+  description: string | null
+  status: CourseStatus
+  semesterId: number
+  semesterName: string
+  programmeId: number
+  programmeName: string
+  lecturerId: number | null
+  lecturerName: string | null
+  studentCount: number
+  assignmentCount: number
+}
+
+export interface CreateCourseRequest {
+  name: string
+  code?: string
+  description?: string
+  semesterId: number
+  lecturerId?: number | null
 }

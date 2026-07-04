@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Archive, ArchiveRestore, ClipboardList, Eye, Pencil, Plus, Send, Trash2 } from 'lucide-react'
-import { useCohorts } from '../../uni-admin/hooks/useCohorts'
+import { useCourses } from '../../uni-admin/hooks/useCourses'
 import { useSubmissions } from '../hooks/useSubmissions'
 import { uploadTemplate } from '../api/lecturer'
 import SubmissionModal from './SubmissionModal'
@@ -17,17 +17,17 @@ const STATUS_CLASS: Record<string, string> = {
 
 export default function SubmissionTable() {
   const { submissions, create, update, remove, publish, archive, unarchive, reload, error } = useSubmissions()
-  const { cohorts } = useCohorts()
+  const { courses } = useCourses()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Submission | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Submission | null>(null)
   const [archiveTarget, setArchiveTarget] = useState<Submission | null>(null)
-  const [cohortFilter, setCohortFilter] = useState<number | ''>('')
+  const [courseFilter, setCourseFilter] = useState<number | ''>('')
 
-  const visible = cohortFilter === ''
+  const visible = courseFilter === ''
     ? submissions
-    : submissions.filter(s => s.cohortId === cohortFilter)
+    : submissions.filter(s => s.courseId === courseFilter)
 
   const openCreate = () => { setEditTarget(null); setModalOpen(true) }
   const openEdit = (submission: Submission) => { setEditTarget(submission); setModalOpen(true) }
@@ -48,11 +48,11 @@ export default function SubmissionTable() {
         <div className="ua-header-actions">
           <select
             className="ua-modal-input ua-filter"
-            value={cohortFilter}
-            onChange={e => setCohortFilter(e.target.value === '' ? '' : Number(e.target.value))}
+            value={courseFilter}
+            onChange={e => setCourseFilter(e.target.value === '' ? '' : Number(e.target.value))}
           >
-            <option value="">All cohorts</option>
-            {cohorts.map(c => (
+            <option value="">All courses</option>
+            {courses.map(c => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
@@ -72,7 +72,7 @@ export default function SubmissionTable() {
             <thead>
               <tr>
                 <th>Title</th>
-                <th>Cohort</th>
+                <th>Course</th>
                 <th>Type</th>
                 <th>Due</th>
                 <th>Status</th>
@@ -84,7 +84,7 @@ export default function SubmissionTable() {
               {visible.map(s => (
                 <tr key={s.id}>
                   <td className="col-name">{s.title}</td>
-                  <td className="col-highlight">{s.cohortName}</td>
+                  <td className="col-highlight">{s.courseName}</td>
                   <td className="col-muted">{s.submissionType === 'BOTH' ? 'File/Text' : s.submissionType === 'FILE' ? 'File' : 'Text'}</td>
                   <td className="col-muted">{s.dueDate}{s.dueTime ? ` ${s.dueTime.slice(0, 5)}` : ''}</td>
                   <td>

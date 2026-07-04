@@ -46,7 +46,8 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
 
   const submit = async () => {
     if (!firstName.trim() || !lastName.trim()) { setError('First and last name are required'); return }
-    if (email.trim() && !/^\S+@\S+\.\S+$/.test(email)) { setError('Enter a valid personal email or leave it blank'); return }
+    // Personal email only applies when creating (login email is auto-generated & fixed).
+    if (!existing && email.trim() && !/^\S+@\S+\.\S+$/.test(email)) { setError('Enter a valid personal email or leave it blank'); return }
     if (!lecturerRef.trim()) { setError('Lecturer reference is required'); return }
     if (programmeIds.length === 0) { setError('Select at least one programme'); return }
     setSaving(true)
@@ -56,7 +57,8 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
         lastName: lastName.trim(),
         lecturerRef: lecturerRef.trim(),
         programmeIds,
-        ...(email.trim() ? { email: email.trim() } : {}),
+        // Never send the email on edit — the login email must stay fixed.
+        ...(!existing && email.trim() ? { email: email.trim() } : {}),
         ...(phone.trim() ? { phone: phone.trim() } : {}),
         ...(existing ? { status } : {}),
       })
@@ -88,9 +90,19 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
 
         <div className="ua-two-col">
           <div className="ua-modal-field">
-            <label className="ua-modal-label">Personal Email</label>
-            <input className="ua-modal-input" type="email" value={email}
-              onChange={e => setEmail(e.target.value)} placeholder="their personal email, e.g. name@gmail.com" />
+            {existing ? (
+              <>
+                <label className="ua-modal-label">Login Email <span style={{ fontWeight: 400, color: '#9ca3af' }}>(read-only)</span></label>
+                <input className="ua-modal-input" value={email} readOnly
+                  style={{ background: '#f9fafb', color: '#6b7280', cursor: 'default' }} />
+              </>
+            ) : (
+              <>
+                <label className="ua-modal-label">Personal Email</label>
+                <input className="ua-modal-input" type="email" value={email}
+                  onChange={e => setEmail(e.target.value)} placeholder="their personal email, e.g. name@gmail.com" />
+              </>
+            )}
           </div>
           <div className="ua-modal-field">
             <label className="ua-modal-label">Phone</label>
@@ -98,12 +110,17 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
               onChange={e => setPhone(e.target.value)} placeholder="optional" />
           </div>
         </div>
-        <p className="ua-field-hint">Login credentials are emailed to the personal address. The professional login email is generated automatically.</p>
+        {!existing && (
+          <p className="ua-field-hint">Login credentials are emailed to the personal address. The professional login email is generated automatically.</p>
+        )}
 
         <div className="ua-modal-field">
-          <label className="ua-modal-label">Lecturer Ref *</label>
+          <label className="ua-modal-label">Lecturer Ref *{existing && <span style={{ fontWeight: 400, color: '#9ca3af' }}> (read-only)</span>}</label>
           <input className="ua-modal-input" value={lecturerRef}
-            onChange={e => setLecturerRef(e.target.value)} placeholder="e.g. LEC-2026-001" />
+            readOnly={!!existing}
+            onChange={e => setLecturerRef(e.target.value)}
+            placeholder="e.g. LEC-2026-001"
+            style={existing ? { background: '#f9fafb', color: '#6b7280', cursor: 'default' } : undefined} />
         </div>
 
         <div className="ua-modal-field">
