@@ -110,3 +110,43 @@ export interface ScoringReport {
   requiresHumanReview: boolean
   criteria: CriterionScore[]
 }
+
+export interface LecturerAtRiskStudent {
+  studentId: number
+  studentName: string
+  studentRef: string
+  courseName: string | null
+  avgScorePct: number | null
+  missedSubmissions: number
+  reason: string
+}
+
+export interface LecturerRecentActivity {
+  type: string
+  text: string
+  at: string
+}
+
+export interface LecturerGradeDistribution {
+  band: string
+  count: number
+}
+
+export interface LecturerNeedsGrading {
+  submissionId: number
+  title: string
+  courseName: string | null
+  awaiting: number
+}
+
+export interface LecturerOverview {
+  gradingBacklog: number
+  compliancePassed: number
+  complianceFailed: number
+  onTime: number
+  late: number
+  needsGrading: LecturerNeedsGrading[]
+  gradeDistribution: LecturerGradeDistribution[]
+  atRisk: LecturerAtRiskStudent[]
+  recentActivity: LecturerRecentActivity[]
+}
