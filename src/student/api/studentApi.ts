@@ -73,11 +73,13 @@ export const turnInDocument = (uploadId: number): Promise<void> =>
   apiClient.patch(`/submissions/uploads/${uploadId}/turn-in`).then(() => {})
 
 export interface MyUploadStatus {
-  uploadId: number
+  uploadId: number | null
   turnedIn: boolean
   fileName: string | null
   turnedInAt: string | null
   compliancePassed: boolean
+  late: boolean
+  reopened: boolean
 }
 
 export const getMyUploadStatus = (submissionId: number): Promise<MyUploadStatus | null> =>
