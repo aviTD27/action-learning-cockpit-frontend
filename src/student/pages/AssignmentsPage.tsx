@@ -103,15 +103,20 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const [turnedIn, setTurnedIn]             = useState(false)
   const [submittedAt, setSubmittedAt]       = useState<string | null>(null)
   const [isLate, setIsLate]                 = useState(false)
+  const [isReopened, setIsReopened]         = useState(false)
+  const [resubmitting, setResubmitting]     = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
   const [textInput, setTextInput]           = useState('')
 
   useEffect(() => {
     getMyUploadStatus(a.id).then(status => {
-      if (status?.turnedIn) {
-        setTurnedIn(true)
-        setSubmittedAt(status.turnedInAt)
-        setIsLate(status.late)
+      if (status) {
+        setIsReopened(status.reopened)
+        if (status.turnedIn) {
+          setTurnedIn(true)
+          setSubmittedAt(status.turnedInAt)
+          setIsLate(status.late)
+        }
       }
     })
   }, [a.id])
@@ -166,6 +171,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
     try {
       await turnInDocument(report.uploadId)
       setTurnedIn(true)
+      setResubmitting(false)
       const status = await getMyUploadStatus(a.id)
       if (status) {
         setSubmittedAt(status.turnedInAt)
@@ -193,8 +199,11 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const hasInstructions = !!(a.instructions || a.additionalNotes)
   const hasTemplate = !!(a.hasTemplateFile || a.hasTemplate)
   const instructionsText = a.instructions || a.additionalNotes
-  const showFileInput = a.submissionType === 'FILE' || a.submissionType === 'BOTH'
-  const showTextInput = a.submissionType === 'TEXT' || a.submissionType === 'BOTH'
+  const isPastDeadline = a.status === 'past-due'
+  const canSubmit = !isPastDeadline || isReopened
+  const showForm = (!turnedIn || resubmitting) && canSubmit
+  const showFileInput = (a.submissionType === 'FILE' || a.submissionType === 'BOTH') && showForm
+  const showTextInput = (a.submissionType === 'TEXT' || a.submissionType === 'BOTH') && showForm
 
   return (
     <div className="asgn-card">
@@ -238,7 +247,46 @@ function AssignmentCard({ a }: { a: Assignment }) {
         <span className="asgn-card-points">{a.maxPoints} pts</span>
       </div>
 
-      {!turnedIn && showFileInput && (
+      {/* Submitted state */}
+      {turnedIn && !resubmitting && (
+        <div className="asgn-submission-result">
+          <div className="asgn-turnedin-badge">
+            <CheckCircle2 size={14} /> Submitted successfully
+          </div>
+          {isLate && <div className="asgn-late-badge">LATE</div>}
+          {submittedAt && (
+            <div className="asgn-submitted-at">
+              Submitted at {formatTimestamp(submittedAt)}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Resubmit — only available before deadline (or if reopened) */}
+      {turnedIn && !resubmitting && canSubmit && (
+        <button
+          className="asgn-resubmit-btn"
+          onClick={() => { setResubmitting(true); setReport(null); setUploadError(null) }}
+        >
+          Resubmit
+        </button>
+      )}
+
+      {/* Deadline locked — no submission on record */}
+      {!turnedIn && !canSubmit && (
+        <div className="asgn-locked-msg">
+          Deadline has passed. Submissions are no longer accepted.
+        </div>
+      )}
+
+      {/* Reopened notice */}
+      {isReopened && isPastDeadline && showForm && (
+        <div className="asgn-reopened-note">
+          Re-opened by lecturer — late submission accepted.
+        </div>
+      )}
+
+      {showFileInput && (
         <div className="asgn-upload-row">
           <button
             className="asgn-upload-btn"
@@ -258,7 +306,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
         </div>
       )}
 
-      {!turnedIn && showTextInput && (
+      {showTextInput && (
         <div className="asgn-text-row">
           <textarea
             className="asgn-text-area"
@@ -278,9 +326,9 @@ function AssignmentCard({ a }: { a: Assignment }) {
         </div>
       )}
 
-      {!turnedIn && uploadError && <p className="asgn-upload-error">{uploadError}</p>}
-      {!turnedIn && report && <ComplianceReportPanel report={report} />}
-      {!turnedIn && report?.overallPass && (
+      {showForm && uploadError && <p className="asgn-upload-error">{uploadError}</p>}
+      {showForm && report && <ComplianceReportPanel report={report} />}
+      {showForm && report?.overallPass && (
         <button
           className="asgn-turnin-btn"
           onClick={handleTurnIn}
@@ -288,19 +336,6 @@ function AssignmentCard({ a }: { a: Assignment }) {
         >
           {turningIn ? 'Submitting…' : 'Turn In'}
         </button>
-      )}
-      {turnedIn && (
-        <div className="asgn-submission-result">
-          <div className="asgn-turnedin-badge">
-            <CheckCircle2 size={14} /> Submitted successfully
-          </div>
-          {isLate && <div className="asgn-late-badge">LATE</div>}
-          {submittedAt && (
-            <div className="asgn-submitted-at">
-              Submitted at {formatTimestamp(submittedAt)}
-            </div>
-          )}
-        </div>
       )}
     </div>
   )
