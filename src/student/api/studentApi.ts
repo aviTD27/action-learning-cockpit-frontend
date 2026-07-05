@@ -39,6 +39,7 @@ export interface GradeItem {
   feedback: string | null
   gradedAt: string
   releasedAt: string | null
+  revised: boolean
 }
 
 export const getMyGrades = () =>
