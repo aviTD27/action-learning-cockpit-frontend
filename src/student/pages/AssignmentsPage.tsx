@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
-import { BookOpen, Calendar, ChevronLeft, ChevronRight, List } from 'lucide-react'
+import { useEffect, useRef, useState, useMemo, type ChangeEvent } from 'react'
+import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Download, FileText, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
+import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport } from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/assignments.css'
+import '../styles/compliance.css'
 
 type FilterTab = 'all' | 'pending' | 'past-due'
 type ViewMode  = 'list' | 'calendar'
@@ -41,8 +43,168 @@ function submissionType(allowedFileTypes: string | null): string {
   return `File (${allowedFileTypes})`
 }
 
+function formatTimestamp(iso: string | null): string {
+  if (!iso) return ''
+  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+}
+
+/* ── Compliance report ── */
+function ComplianceCheckRow({ result }: { result: CheckResult }) {
+  if (result.skipped) {
+    return (
+      <div className="compliance-check skipped">
+        <span className="compliance-icon-wrap"><Minus size={14} /></span>
+        <div>
+          <span className="compliance-label">{result.label}:</span>
+          <span className="compliance-msg">{result.message}</span>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className={`compliance-check ${result.passed ? 'passed' : 'failed'}`}>
+      <span className="compliance-icon-wrap">
+        {result.passed ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+      </span>
+      <div>
+        <span className="compliance-label">{result.label}:</span>
+        <span className="compliance-msg">{result.message}</span>
+        {result.detail && <div className="compliance-detail">{result.detail}</div>}
+      </div>
+    </div>
+  )
+}
+
+function ComplianceReportPanel({ report }: { report: ComplianceReport }) {
+  return (
+    <div className={`compliance-panel ${report.overallPass ? 'pass' : 'fail'}`}>
+      <div className="compliance-banner">
+        {report.overallPass
+          ? <><CheckCircle2 size={15} /> Document passed all compliance checks</>
+          : <><XCircle size={15} /> Document failed one or more compliance checks</>}
+      </div>
+      <div className="compliance-checks">
+        <ComplianceCheckRow result={report.fileType} />
+        <ComplianceCheckRow result={report.naming} />
+        <ComplianceCheckRow result={report.wordCount} />
+        <ComplianceCheckRow result={report.headings} />
+      </div>
+    </div>
+  )
+}
+
 /* ── List view card ── */
 function AssignmentCard({ a }: { a: Assignment }) {
+  const fileInputRef                        = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading]           = useState(false)
+  const [report, setReport]                 = useState<ComplianceReport | null>(null)
+  const [uploadError, setUploadError]       = useState<string | null>(null)
+  const [turningIn, setTurningIn]           = useState(false)
+  const [turnedIn, setTurnedIn]             = useState(false)
+  const [submittedAt, setSubmittedAt]       = useState<string | null>(null)
+  const [isLate, setIsLate]                 = useState(false)
+  const [isReopened, setIsReopened]         = useState(false)
+  const [resubmitting, setResubmitting]     = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
+  const [textInput, setTextInput]           = useState('')
+
+  useEffect(() => {
+    getMyUploadStatus(a.id).then(status => {
+      if (status) {
+        setIsReopened(status.reopened)
+        if (status.turnedIn) {
+          setTurnedIn(true)
+          setSubmittedAt(status.turnedInAt)
+          setIsLate(status.late)
+        }
+      }
+    })
+  }, [a.id])
+
+  const doUpload = async (file: File) => {
+    const HARD_LIMIT = 50 * 1024 * 1024
+    const limit = a.maxFileSizeBytes && a.maxFileSizeBytes > 0
+      ? Math.min(a.maxFileSizeBytes, HARD_LIMIT)
+      : HARD_LIMIT
+    if (file.size > limit) {
+      setReport(null)
+      setUploadError(
+        `"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — too large. ` +
+        `The maximum allowed for this assignment is ${Math.round(limit / 1024 / 1024)} MB.`,
+      )
+      return
+    }
+    setUploading(true)
+    setUploadError(null)
+    try {
+      const r = await uploadDocument(a.id, file)
+      setReport(r)
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      setUploadError(msg ?? 'Upload failed. Please check your connection and try again.')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    await doUpload(file)
+  }
+
+  const handleTextSubmit = async () => {
+    if (!textInput.trim()) {
+      setUploadError('Please enter some text before submitting.')
+      return
+    }
+    const blob = new Blob([textInput], { type: 'text/plain' })
+    const safeName = a.title.replace(/[^a-zA-Z0-9]/g, '_')
+    const file = new File([blob], `${safeName}_submission.txt`, { type: 'text/plain' })
+    await doUpload(file)
+  }
+
+  const handleTurnIn = async () => {
+    if (!report?.uploadId) return
+    setTurningIn(true)
+    try {
+      await turnInDocument(report.uploadId)
+      setTurnedIn(true)
+      setResubmitting(false)
+      const status = await getMyUploadStatus(a.id)
+      if (status) {
+        setSubmittedAt(status.turnedInAt)
+        setIsLate(status.late)
+      }
+    } catch {
+      setUploadError('Turn-in failed. Please try again.')
+    } finally {
+      setTurningIn(false)
+    }
+  }
+
+  const handleDownloadTemplate = async () => {
+    const res = await downloadAssignmentTemplate(a.id)
+    const url = URL.createObjectURL(res.data)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = a.templateFileName || 'template'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  const hasInstructions = !!(a.instructions || a.additionalNotes)
+  const hasTemplate = !!(a.hasTemplateFile || a.hasTemplate)
+  const instructionsText = a.instructions || a.additionalNotes
+  const isPastDeadline = a.status === 'past-due'
+  const canSubmit = !isPastDeadline || isReopened
+  const showForm = (!turnedIn || resubmitting) && canSubmit
+  const showFileInput = (a.submissionType === 'FILE' || a.submissionType === 'BOTH') && showForm
+  const showTextInput = (a.submissionType === 'TEXT' || a.submissionType === 'BOTH') && showForm
+
   return (
     <div className="asgn-card">
       <div className="asgn-card-top">
@@ -55,12 +217,141 @@ function AssignmentCard({ a }: { a: Assignment }) {
       {a.description && (
         <p className="asgn-card-desc">{a.description}</p>
       )}
+
+      {(hasInstructions || hasTemplate) && (
+        <div className="asgn-info-row">
+          {hasInstructions && (
+            <button className="asgn-info-btn" onClick={() => setShowInstructions(v => !v)}>
+              <FileText size={12} />
+              {showInstructions ? 'Hide instructions' : 'View instructions'}
+            </button>
+          )}
+          {hasTemplate && (
+            <button className="asgn-info-btn" onClick={handleDownloadTemplate}>
+              <Download size={12} /> Download template
+            </button>
+          )}
+        </div>
+      )}
+
+      {showInstructions && instructionsText && (
+        <div className="asgn-instructions">
+          <p>{instructionsText}</p>
+        </div>
+      )}
+
       <div className="asgn-card-footer">
         <span style={{ color: urgencyColor(a.status, a.dueDate), fontSize: '0.75rem', fontWeight: 600 }}>
           {formatDue(a.dueDate)}
         </span>
         <span className="asgn-card-points">{a.maxPoints} pts</span>
       </div>
+
+      {/* Submitted state */}
+      {turnedIn && !resubmitting && (
+        <div className="asgn-submission-result">
+          <div className="asgn-turnedin-badge">
+            <CheckCircle2 size={14} /> Submitted successfully
+          </div>
+          {isLate && <div className="asgn-late-badge">LATE</div>}
+          {submittedAt && (
+            <div className="asgn-submitted-at">
+              Submitted at {formatTimestamp(submittedAt)}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Resubmit — only available before deadline (or if reopened) */}
+      {turnedIn && !resubmitting && canSubmit && (
+        <button
+          className="asgn-resubmit-btn"
+          onClick={() => { setResubmitting(true); setReport(null); setUploadError(null) }}
+        >
+          Resubmit
+        </button>
+      )}
+
+      {/* Deadline locked — no submission on record */}
+      {!turnedIn && !canSubmit && (
+        <div className="asgn-locked-msg">
+          Deadline has passed. Submissions are no longer accepted.
+        </div>
+      )}
+
+      {/* Reopened notice */}
+      {isReopened && isPastDeadline && showForm && (
+        <div className="asgn-reopened-note">
+          Re-opened by lecturer — late submission accepted.
+        </div>
+      )}
+
+      {showFileInput && (
+        <div className="asgn-upload-row">
+          <button
+            className="asgn-upload-btn"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <Upload size={13} />
+            {uploading ? 'Checking…' : 'Upload File'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.docx"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+        </div>
+      )}
+
+      {showTextInput && (
+        <div className="asgn-text-row">
+          <textarea
+            className="asgn-text-area"
+            placeholder="Enter your submission text here…"
+            value={textInput}
+            onChange={e => setTextInput(e.target.value)}
+            disabled={uploading}
+          />
+          <button
+            className="asgn-upload-btn"
+            onClick={handleTextSubmit}
+            disabled={uploading || !textInput.trim()}
+          >
+            <FileText size={13} />
+            {uploading ? 'Checking…' : 'Submit Text'}
+          </button>
+        </div>
+      )}
+
+      {showForm && uploadError && <p className="asgn-upload-error">{uploadError}</p>}
+      {showForm && report && <ComplianceReportPanel report={report} />}
+      {showForm && report && !report.overallPass && (
+        <div className="asgn-fix-row">
+          <span className="asgn-fix-hint">Fix the issues above then reupload your corrected version.</span>
+          {showFileInput && (
+            <button
+              className="asgn-upload-btn"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload size={13} />
+              {uploading ? 'Checking…' : 'Upload corrected file'}
+            </button>
+          )}
+        </div>
+      )}
+      {showForm && report?.overallPass && (
+        <button
+          className="asgn-turnin-btn"
+          onClick={handleTurnIn}
+          disabled={turningIn}
+        >
+          {turningIn ? 'Submitting…' : 'Turn In'}
+        </button>
+      )}
     </div>
   )
 }
@@ -74,6 +365,9 @@ function CalendarView({ assignments }: { assignments: Assignment[] }) {
   const byDate = useMemo(() => {
     const map: Record<string, Assignment[]> = {}
     assignments.forEach(a => {
+
+
+      
       const key = a.dueDate.slice(0, 10)
       ;(map[key] ??= []).push(a)
     })
