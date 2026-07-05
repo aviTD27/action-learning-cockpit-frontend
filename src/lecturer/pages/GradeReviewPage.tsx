@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCheck, Eye } from 'lucide-react'
 import Layout from '../../shared/layout/Layout'
-import { LECTURER_NAV, LECTURER_USER } from '../nav'
+import { LECTURER_NAV } from '../nav'
+import { useLecturerSidebarUser } from '../hooks/useLecturerSidebarUser'
 import { useSubmissions } from '../hooks/useSubmissions'
 import { useGradeOverview } from '../hooks/useGradeOverview'
 import '../styles/lecturer.css'
 
 export default function GradeReviewPage() {
+  const sidebarUser = useLecturerSidebarUser()
   const { submissions } = useSubmissions()
   const { releaseSubmission, summaryFor } = useGradeOverview()
   const [notice, setNotice] = useState<string | null>(null)
@@ -20,7 +22,7 @@ export default function GradeReviewPage() {
   const totalDraft = submissions.reduce((sum, s) => sum + summaryFor(s.id).draft, 0)
 
   return (
-    <Layout navItems={LECTURER_NAV} user={LECTURER_USER} title="Grade Review" subtitle="Review draft grades and release them to students">
+    <Layout navItems={LECTURER_NAV} user={sidebarUser} title="Grade Review" subtitle="Review draft grades and release them to students">
       <div className="ua-page">
 
         {notice && (
@@ -41,7 +43,7 @@ export default function GradeReviewPage() {
                 <thead>
                   <tr>
                     <th>Submission</th>
-                    <th>Cohort</th>
+                    <th>Course</th>
                     <th>Graded</th>
                     <th>Draft</th>
                     <th>Released</th>
@@ -54,7 +56,7 @@ export default function GradeReviewPage() {
                     return (
                       <tr key={s.id}>
                         <td className="col-name">{s.title}</td>
-                        <td className="col-muted">{s.cohortName}</td>
+                        <td className="col-muted">{s.courseName}</td>
                         <td>{summary.graded}</td>
                         <td className={summary.draft > 0 ? 'col-highlight' : 'col-muted'}>{summary.draft}</td>
                         <td className="col-muted">{summary.released}</td>

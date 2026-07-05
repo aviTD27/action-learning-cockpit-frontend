@@ -24,7 +24,11 @@ function urgencyClass(iso: string, pastDue: boolean): string {
 }
 
 export default function DashboardPage() {
-  const { stats, upcomingDeadlines, recentGrades } = useStudentDashboard()
+  const { stats, upcomingDeadlines, recentGrades, loading } = useStudentDashboard()
+
+  if (loading) {
+    return <div className="sd-page" style={{ padding: '2rem', color: '#6b7280' }}>Loading dashboard...</div>
+  }
 
   const KPIS = [
     { icon: BookOpen,    label: 'Total Assignments', value: stats.totalAssignments, color: ''       },

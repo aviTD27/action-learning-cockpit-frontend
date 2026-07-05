@@ -7,10 +7,15 @@ import type { StudentSubmission } from '../types'
 function toStudentSubmission(r: StudentSubmissionResponse): StudentSubmission {
   return {
     studentId: r.studentId,
+    status: r.status,
+    uploadId: r.uploadId ?? null,
     fileName: r.fileName,
     submittedAt: r.submittedAt,
     attemptNumber: r.attemptNumber,
     late: r.late,
+    overallScore: r.overallScore ?? null,
+    scoreLevel: r.scoreLevel ?? null,
+    reopened: r.reopened,
   }
 }
 
