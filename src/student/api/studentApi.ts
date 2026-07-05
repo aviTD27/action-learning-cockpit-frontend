@@ -78,6 +78,7 @@ export interface MyUploadStatus {
   fileName: string | null
   turnedInAt: string | null
   compliancePassed: boolean
+  late: boolean
 }
 
 export const getMyUploadStatus = (submissionId: number): Promise<MyUploadStatus | null> =>
