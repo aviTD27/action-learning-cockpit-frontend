@@ -328,6 +328,21 @@ function AssignmentCard({ a }: { a: Assignment }) {
 
       {showForm && uploadError && <p className="asgn-upload-error">{uploadError}</p>}
       {showForm && report && <ComplianceReportPanel report={report} />}
+      {showForm && report && !report.overallPass && (
+        <div className="asgn-fix-row">
+          <span className="asgn-fix-hint">Fix the issues above then reupload your corrected version.</span>
+          {showFileInput && (
+            <button
+              className="asgn-upload-btn"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload size={13} />
+              {uploading ? 'Checking…' : 'Upload corrected file'}
+            </button>
+          )}
+        </div>
+      )}
       {showForm && report?.overallPass && (
         <button
           className="asgn-turnin-btn"
