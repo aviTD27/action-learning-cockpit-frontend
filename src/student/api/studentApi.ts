@@ -84,6 +84,7 @@ export interface MyUploadStatus {
   compliancePassed: boolean
   late: boolean
   reopened: boolean
+  complianceReport: ComplianceReport | null
 }
 
 export const getMyUploadStatus = (submissionId: number): Promise<MyUploadStatus | null> =>

@@ -116,6 +116,8 @@ function AssignmentCard({ a }: { a: Assignment }) {
           setTurnedIn(true)
           setSubmittedAt(status.turnedInAt)
           setIsLate(status.late)
+        } else if (status.complianceReport) {
+          setReport(status.complianceReport)
         }
       }
     })
