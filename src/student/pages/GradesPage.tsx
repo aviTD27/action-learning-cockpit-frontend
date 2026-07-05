@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react'
-import { Award, BarChart2, ChevronDown, ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
-import { useStudentGrades } from '../hooks/useStudentGrades'
+import { useEffect, useMemo, useState } from 'react'
+import { Award, BarChart2, BookOpen, ChevronDown, ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
 import type { GradeItem } from '../api/studentApi'
-import { markGradeNotificationsRead } from '../api/studentApi'
+import {
+  getMyGrades,
+  getMyProfile,
+  getAssignmentsForProgramme,
+  markGradeNotificationsRead,
+} from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/grades.css'
 
@@ -22,16 +26,12 @@ function formatDate(iso: string): string {
   })
 }
 
-function abbrev(title: string, max = 13): string {
-  return title.length > max ? title.slice(0, max - 1) + '…' : title
-}
-
-/* ── Summary KPI bar ── */
+/* ── Overall KPI bar ── */
 function SummaryBar({ grades }: { grades: GradeItem[] }) {
-  const pcts     = grades.map(g => scorePct(g.grade, g.maxPoints))
-  const avg      = Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length)
-  const highest  = Math.max(...pcts)
-  const lowest   = Math.min(...pcts)
+  const pcts    = grades.map(g => scorePct(g.grade, g.maxPoints))
+  const avg     = Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length)
+  const highest = Math.max(...pcts)
+  const lowest  = Math.min(...pcts)
 
   return (
     <div className="sd-kpi-row">
@@ -43,13 +43,11 @@ function SummaryBar({ grades }: { grades: GradeItem[] }) {
         </span>
         <span className="sd-kpi-label">Overall Average</span>
       </div>
-
       <div className="sd-kpi-card">
         <TrendingUp size={20} className="sd-kpi-icon green" />
         <span className="sd-kpi-value green">{highest}%</span>
         <span className="sd-kpi-label">Highest Score</span>
       </div>
-
       <div className="sd-kpi-card">
         <TrendingDown size={20} className={`sd-kpi-icon ${lowest >= 50 ? 'orange' : ''}`}
                       style={lowest < 50 ? { color: '#dc2626' } : undefined} />
@@ -59,47 +57,10 @@ function SummaryBar({ grades }: { grades: GradeItem[] }) {
         </span>
         <span className="sd-kpi-label">Lowest Score</span>
       </div>
-
       <div className="sd-kpi-card">
         <BarChart2 size={20} className="sd-kpi-icon blue" />
         <span className="sd-kpi-value blue">{grades.length}</span>
         <span className="sd-kpi-label">Graded Assignments</span>
-      </div>
-    </div>
-  )
-}
-
-/* ── Bar chart ── */
-function BarChart({ grades }: { grades: GradeItem[] }) {
-  return (
-    <div className="sd-card">
-      <div className="sd-card-header">
-        <h3 className="sd-card-title"><BarChart2 size={15} /> Score per Assignment</h3>
-      </div>
-      <div className="grades-chart-area">
-        <div className="grades-chart-bars">
-          {grades.map(g => {
-            const p = scorePct(g.grade, g.maxPoints)
-            return (
-              <div key={g.submissionId} className="grades-chart-col">
-                <div
-                  className="grades-chart-bar"
-                  style={{ height: `${Math.max(p, 2)}%`, backgroundColor: scoreColor(p) }}
-                  title={`${g.submissionTitle}: ${g.grade}/${g.maxPoints} (${p}%)`}
-                >
-                  <span className="grades-chart-bar-label">{p}%</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        <div className="grades-chart-labels">
-          {grades.map(g => (
-            <span key={g.submissionId} className="grades-chart-col-label" title={g.submissionTitle}>
-              {abbrev(g.submissionTitle)}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   )
@@ -151,13 +112,98 @@ function GradeRow({ grade }: { grade: GradeItem }) {
   )
 }
 
+/* ── Course section (collapsible) ── */
+interface CourseGroup {
+  courseName: string
+  grades: GradeItem[]
+}
+
+function CourseSection({ group }: { group: CourseGroup }) {
+  const [open, setOpen] = useState(true)
+  const pcts  = group.grades.map(g => scorePct(g.grade, g.maxPoints))
+  const avg   = Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length)
+  const color = scoreColor(avg)
+
+  return (
+    <div className="grades-course-section">
+      <div className="grades-course-header" onClick={() => setOpen(o => !o)}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
+          <BookOpen size={14} style={{ color: '#6366f1', flexShrink: 0 }} />
+          <span className="grades-course-name">{group.courseName}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+          <span className="grades-course-count">
+            {group.grades.length} assignment{group.grades.length !== 1 ? 's' : ''}
+          </span>
+          <span className="grades-course-avg" style={{ color, borderColor: color, background: `${color}14` }}>
+            avg {avg}%
+          </span>
+          <span className="grades-row-expand">
+            {open ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+          </span>
+        </div>
+      </div>
+      {open && (
+        <div className="grades-course-body">
+          {group.grades.map(g => <GradeRow key={g.submissionId} grade={g} />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ── Main page ── */
 export default function GradesPage() {
-  const { grades, loading, error } = useStudentGrades()
+  const [grades,  setGrades]  = useState<GradeItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error,   setError]   = useState<string | null>(null)
 
   useEffect(() => {
-    markGradeNotificationsRead().catch(() => {})
+    async function load() {
+      try {
+        // Fetch grades and student profile in parallel
+        const [rawGrades, profile] = await Promise.all([
+          getMyGrades(),
+          getMyProfile(),
+        ])
+
+        // Fetch assignments for this student's programme to get course names
+        const assignments = await getAssignmentsForProgramme(profile.programmeId)
+
+        // Build explicit lookup: submissionId → courseName
+        const courseBySubmission = new Map(
+          assignments
+            .filter(a => a.courseName)
+            .map(a => [a.id, a.courseName as string])
+        )
+
+        // Enrich each grade with the course name from the assignments lookup
+        const enriched = rawGrades.map(g => ({
+          ...g,
+          courseName: g.courseName ?? courseBySubmission.get(g.submissionId) ?? null,
+        }))
+
+        setGrades(enriched)
+        markGradeNotificationsRead().catch(() => {})
+      } catch {
+        setError('Failed to load grades.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
+
+  // Group grades by course name
+  const courseGroups = useMemo<CourseGroup[]>(() => {
+    const map = new Map<string, GradeItem[]>()
+    for (const g of grades) {
+      const key = g.courseName ?? '—'
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(g)
+    }
+    return Array.from(map.entries()).map(([courseName, grds]) => ({ courseName, grades: grds }))
+  }, [grades])
 
   if (loading) return <p className="sd-table-empty">Loading grades…</p>
   if (error)   return <p className="sd-table-empty">{error}</p>
@@ -179,16 +225,19 @@ export default function GradesPage() {
   return (
     <div className="sd-page">
       <SummaryBar grades={grades} />
-      <BarChart grades={grades} />
 
       <div className="sd-card">
         <div className="sd-card-header">
           <h3 className="sd-card-title">
-            <Award size={15} /> All Grades
-            <span className="sd-card-count">{grades.length} released</span>
+            <Award size={15} /> Grades by Course
+            <span className="sd-card-count">
+              {courseGroups.length} course{courseGroups.length !== 1 ? 's' : ''} · {grades.length} graded
+            </span>
           </h3>
         </div>
-        {grades.map(g => <GradeRow key={g.submissionId} grade={g} />)}
+        {courseGroups.map(group => (
+          <CourseSection key={group.courseName} group={group} />
+        ))}
       </div>
     </div>
   )

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { isAxiosError } from 'axios'
+import { getLecturers } from '../../api/uniAdmin'
+import { useAuth } from '../../../auth/AuthContext'
 import type { CourseResponse, CreateCourseRequest, LecturerResponse } from '../../api/types'
 import '../../styles/uniAdmin.css'
 
@@ -12,20 +14,21 @@ function apiErrorMessage(err: unknown, fallback: string): string {
 interface Props {
   open: boolean
   semesterId: number
-  programmeId: number
   lecturers: LecturerResponse[]
   existing?: CourseResponse | null
   onClose: () => void
   onSave: (data: CreateCourseRequest) => Promise<void>
 }
 
-export default function CourseModal({ open, semesterId, programmeId, lecturers, existing, onClose, onSave }: Props) {
+export default function CourseModal({ open, semesterId, lecturers: initialLecturers, existing, onClose, onSave }: Props) {
+  const { universityId } = useAuth()
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
   const [description, setDescription] = useState('')
   const [lecturerId, setLecturerId] = useState<number | ''>('')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [freshLecturers, setFreshLecturers] = useState<LecturerResponse[]>(initialLecturers)
 
   useEffect(() => {
     if (open) {
@@ -34,15 +37,17 @@ export default function CourseModal({ open, semesterId, programmeId, lecturers, 
       setDescription(existing?.description ?? '')
       setLecturerId(existing?.lecturerId ?? '')
       setError(null)
+      // Always fetch fresh lecturer list when modal opens
+      getLecturers(universityId ?? undefined)
+        .then(r => setFreshLecturers(r.data))
+        .catch(() => {})
     }
-  }, [open, existing])
+  }, [open, existing, universityId])
 
   if (!open) return null
 
-  // Lecturers who teach this course's programme come first; fall back to all lecturers.
-  const eligible = lecturers.filter(l => l.programmeIds.includes(programmeId))
-  const options = eligible.length > 0 ? eligible : lecturers
-  const noLecturers = lecturers.length === 0
+  const activeLecturers = freshLecturers.filter(l => l.status === 'ACTIVE')
+  const noLecturers     = activeLecturers.length === 0
 
   const submit = async () => {
     if (!name.trim()) { setError('Name is required'); return }
@@ -120,7 +125,7 @@ export default function CourseModal({ open, semesterId, programmeId, lecturers, 
                 onChange={e => setLecturerId(e.target.value === '' ? '' : Number(e.target.value))}
               >
                 <option value="">Unassigned</option>
-                {options.map(l => (
+                {activeLecturers.map(l => (
                   <option key={l.id} value={l.id}>{l.firstName} {l.lastName}</option>
                 ))}
               </select>

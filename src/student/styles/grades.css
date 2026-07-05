@@ -185,6 +185,58 @@
   margin: 0;
 }
 
+/* ── Course sections ── */
+.grades-course-section {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.grades-course-section:last-child {
+  border-bottom: none;
+}
+
+.grades-course-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  background: #f9fafb;
+  transition: background-color 0.1s;
+}
+
+.grades-course-header:hover {
+  background: #f3f4f6;
+}
+
+.grades-course-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1E3A5F;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grades-course-count {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.grades-course-avg {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+
+.grades-course-body {
+  border-top: 1px solid #f3f4f6;
+}
+
 /* ── Empty state ── */
 .grades-empty {
   display: flex;
