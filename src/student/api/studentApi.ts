@@ -30,6 +30,10 @@ export interface AssignmentItem {
   allowedFileTypes: string | null
   lateAllowed: boolean
   lecturerId: number | null
+  courseId?: number
+  courseName?: string | null
+  programmeId?: number
+  programmeName?: string | null
   minWordCount: number | null
   maxWordCount: number | null
   maxFileSizeBytes: number | null
@@ -100,6 +104,8 @@ export const uploadDocument = (submissionId: number, file: File): Promise<Compli
 export interface GradeItem {
   submissionId: number
   submissionTitle: string
+  courseId?: number
+  courseName?: string | null
   maxPoints: number
   grade: number
   feedback: string | null

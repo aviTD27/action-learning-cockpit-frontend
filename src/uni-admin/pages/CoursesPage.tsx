@@ -225,7 +225,6 @@ export default function CoursesPage() {
         <CourseModal
           open={courseModalOpen}
           semesterId={courseSemesterId}
-          programmeId={effectiveProgrammeId}
           lecturers={lecturers}
           existing={courseEdit}
           onClose={() => setCourseModalOpen(false)}
