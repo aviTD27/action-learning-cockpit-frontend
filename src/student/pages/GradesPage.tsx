@@ -124,13 +124,19 @@ function GradeRow({ grade }: { grade: GradeItem }) {
           {grade.grade % 1 === 0 ? grade.grade : grade.grade.toFixed(1)} / {grade.maxPoints}
         </span>
         <span className="grades-row-pct" style={{ color }}>{p}%</span>
-        <span className="grades-row-date">{formatDate(grade.gradedAt)}</span>
+        <span className="grades-row-date">{formatDate(grade.releasedAt ?? grade.gradedAt)}</span>
         <span className="grades-row-expand">
           {open ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
         </span>
       </div>
       {open && (
         <div className="grades-feedback-panel">
+          <div className="grades-feedback-meta">
+            <span>Released: {formatDate(grade.releasedAt ?? grade.gradedAt)}</span>
+            {grade.releasedAt && grade.gradedAt !== grade.releasedAt && (
+              <span>Graded: {formatDate(grade.gradedAt)}</span>
+            )}
+          </div>
           <div className="grades-feedback-label">Feedback</div>
           {grade.feedback
             ? <p className="grades-feedback-text">{grade.feedback}</p>

@@ -104,6 +104,7 @@ export interface GradeItem {
   grade: number
   feedback: string | null
   gradedAt: string
+  releasedAt: string | null
 }
 
 export const getMyGrades = () =>
