@@ -1,9 +1,10 @@
 .sidebar {
   width: 12rem;
-  min-height: 100vh;
+  height: 100%;
   background-color: #1E3A5F;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .sidebar-logo {
@@ -69,10 +70,14 @@
 
 .sidebar-nav {
   flex: 1;
+  min-height: 0;
   padding: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(46, 95, 158, 0.6) transparent;
 }
 
 .nav-link {
@@ -99,6 +104,7 @@
 }
 
 .sidebar-footer {
+  flex-shrink: 0;
   padding: 0.75rem;
   border-top: 1px solid #2E5F9E;
 }

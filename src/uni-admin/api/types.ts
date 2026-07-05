@@ -203,6 +203,30 @@ export interface CohortBenchmark {
   rank: number
 }
 
+export interface GradingBacklog {
+  awaitingGrades: number
+  turnedIn: number
+}
+
+export interface AtRiskStudent {
+  studentId: number
+  studentName: string
+  studentRef: string
+  cohortName: string | null
+  courseName?: string | null
+  avgScorePct: number | null
+  missedSubmissions: number
+  reason: string
+}
+
+export interface LecturerWorkload {
+  lecturerId: number
+  lecturerName: string
+  assignments: number
+  cohorts: number
+  gradingBacklog: number
+}
+
 
 // ── Semesters & Courses (new hierarchy) ────────────────────────────────────────
 export interface SemesterResponse {

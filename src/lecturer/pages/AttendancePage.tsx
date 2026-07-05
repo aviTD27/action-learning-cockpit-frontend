@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { CalendarDays, CheckCheck, Clock, Plus, Save, UserRound, Users } from 'lucide-react'
-import { getCohorts } from '../../uni-admin/api/uniAdmin'
-import type { CohortResponse } from '../../uni-admin/api/types'
+import { BookOpen, CalendarDays, CheckCheck, Clock, Plus, Save, UserRound, Users } from 'lucide-react'
+import { getCohorts, getCourses, getLecturers } from '../../uni-admin/api/uniAdmin'
+import type { CohortResponse, CourseResponse } from '../../uni-admin/api/types'
+import { useAuth } from '../../auth/AuthContext'
 import {
   createSession,
   getLecturerSessions,
@@ -24,28 +25,53 @@ function todayIso() {
 }
 
 export default function LecturerAttendancePage() {
-  const [cohorts,          setCohorts]          = useState<CohortResponse[]>([])
-  const [selectedCohortId, setSelectedCohortId] = useState<number | ''>('')
-  const [sessionDate,      setSessionDate]      = useState(todayIso())
-  const [topic,            setTopic]            = useState('')
-  const [sessions,         setSessions]         = useState<AttendanceSession[]>([])
-  const [creating,         setCreating]         = useState(false)
-  const [activeSession,    setActiveSession]    = useState<AttendanceSession | null>(null)
-  const [students,         setStudents]         = useState<SessionStudentResponse[]>([])
-  const [marks,            setMarks]            = useState<Record<number, MarkState>>({})
-  const [loadingStudents,  setLoadingStudents]  = useState(false)
-  const [saving,           setSaving]           = useState(false)
-  const [savedBanner,      setSavedBanner]      = useState(false)
-  const [error,            setError]            = useState<string | null>(null)
+  const { email, universityId } = useAuth()
 
+  const [cohorts,            setCohorts]            = useState<CohortResponse[]>([])
+  const [allLecturerCourses, setAllLecturerCourses] = useState<CourseResponse[]>([])
+  const [cohortCourses,      setCohortCourses]      = useState<CourseResponse[]>([])
+  const [selectedCohortId,   setSelectedCohortId]   = useState<number | ''>('')
+  const [selectedCourseId,   setSelectedCourseId]   = useState<number | ''>('')
+  const [sessionDate,        setSessionDate]        = useState(todayIso())
+  const [sessions,           setSessions]           = useState<AttendanceSession[]>([])
+  const [creating,           setCreating]           = useState(false)
+  const [activeSession,      setActiveSession]      = useState<AttendanceSession | null>(null)
+  const [students,           setStudents]           = useState<SessionStudentResponse[]>([])
+  const [marks,              setMarks]              = useState<Record<number, MarkState>>({})
+  const [loadingStudents,    setLoadingStudents]    = useState(false)
+  const [saving,             setSaving]             = useState(false)
+  const [savedBanner,        setSavedBanner]        = useState(false)
+  const [error,              setError]              = useState<string | null>(null)
+
+  // Load cohorts + lecturer's own courses on mount
   useEffect(() => {
     getCohorts().then(r => setCohorts(r.data)).catch(() => {})
-  }, [])
 
+    getLecturers(universityId ?? undefined)
+      .then(r => {
+        const me = r.data.find(l => l.email === email)
+        if (!me) return
+        return getCourses({ lecturerId: me.id }).then(cr => setAllLecturerCourses(cr.data))
+      })
+      .catch(() => {})
+  }, [email, universityId])
+
+  // When cohort changes, filter courses to those in the cohort's programme
   useEffect(() => {
-    if (!selectedCohortId) { setSessions([]); return }
+    if (!selectedCohortId) {
+      setCohortCourses([])
+      setSelectedCourseId('')
+      setSessions([])
+      return
+    }
+    const cohort = cohorts.find(c => c.id === selectedCohortId)
+    const progIds = cohort?.programmeIds ?? []
+    const filtered = allLecturerCourses.filter(c => progIds.includes(c.programmeId))
+    setCohortCourses(filtered)
+    setSelectedCourseId(filtered.length === 1 ? filtered[0].id : '')
+
     getLecturerSessions(selectedCohortId as number).then(setSessions).catch(() => {})
-  }, [selectedCohortId])
+  }, [selectedCohortId, cohorts, allLecturerCourses])
 
   useEffect(() => {
     if (!activeSession) return
@@ -73,11 +99,10 @@ export default function LecturerAttendancePage() {
       const session = await createSession({
         cohortId:    selectedCohortId as number,
         sessionDate,
-        topic:       topic.trim() || undefined,
+        topic:       selectedCourse?.name,
       })
       setSessions(prev => [session, ...prev])
       setActiveSession(session)
-      setTopic('')
     } catch {
       setError('Failed to create session. It may already exist for this cohort and date.')
     } finally {
@@ -139,6 +164,8 @@ export default function LecturerAttendancePage() {
   const lateCount    = students.filter(s => marks[s.studentId]?.status === 'LATE').length
   const absentCount  = students.filter(s => marks[s.studentId]?.status === 'ABSENT').length
 
+  const selectedCourse = cohortCourses.find(c => c.id === selectedCourseId)
+
   return (
     <div className="ua-page">
 
@@ -149,8 +176,10 @@ export default function LecturerAttendancePage() {
         </div>
         <div style={{ padding: '0.875rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <div className="att-form-row">
+
+            {/* Cohort */}
             <div className="att-form-field">
-              <label className="att-form-label">Cohort *</label>
+              <label className="att-form-label">Cohort / Intake *</label>
               <select
                 className="ua-modal-input"
                 value={selectedCohortId}
@@ -166,6 +195,48 @@ export default function LecturerAttendancePage() {
                 ))}
               </select>
             </div>
+
+            {/* Course — auto-populated from lecturer's assignments */}
+            <div className="att-form-field" style={{ flex: 1.5 }}>
+              <label className="att-form-label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <BookOpen size={11} /> Course
+              </label>
+              {!selectedCohortId ? (
+                <input
+                  className="ua-modal-input"
+                  disabled
+                  placeholder="Select a cohort first…"
+                  style={{ background: '#f9fafb', color: '#9ca3af', cursor: 'not-allowed' }}
+                />
+              ) : cohortCourses.length === 0 ? (
+                <input
+                  className="ua-modal-input"
+                  disabled
+                  placeholder="No course assigned for this cohort"
+                  style={{ background: '#fef2f2', color: '#ef4444', cursor: 'not-allowed' }}
+                />
+              ) : cohortCourses.length === 1 ? (
+                <input
+                  className="ua-modal-input"
+                  disabled
+                  value={cohortCourses[0].name}
+                  style={{ background: '#f0fdf4', color: '#15803d', fontWeight: 600, cursor: 'not-allowed' }}
+                />
+              ) : (
+                <select
+                  className="ua-modal-input"
+                  value={selectedCourseId}
+                  onChange={e => setSelectedCourseId(e.target.value ? Number(e.target.value) : '')}
+                >
+                  <option value="">Select course…</option>
+                  {cohortCourses.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Date */}
             <div className="att-form-field">
               <label className="att-form-label">Date *</label>
               <input
@@ -175,15 +246,7 @@ export default function LecturerAttendancePage() {
                 onChange={e => setSessionDate(e.target.value)}
               />
             </div>
-            <div className="att-form-field" style={{ flex: 2 }}>
-              <label className="att-form-label">Topic (optional)</label>
-              <input
-                className="ua-modal-input"
-                value={topic}
-                onChange={e => setTopic(e.target.value)}
-                placeholder="e.g. Introduction to React"
-              />
-            </div>
+
             <button
               className="ua-btn ua-btn-primary"
               style={{ flexShrink: 0, alignSelf: 'flex-end' }}
@@ -193,6 +256,22 @@ export default function LecturerAttendancePage() {
               <Plus size={13} /> {creating ? 'Creating…' : 'New Session'}
             </button>
           </div>
+
+          {/* Course context pill */}
+          {selectedCourse && (
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: '#eff6ff', color: '#1d4ed8', borderRadius: 6,
+              padding: '4px 10px', fontSize: '0.75rem', fontWeight: 600, alignSelf: 'flex-start',
+            }}>
+              <BookOpen size={11} />
+              Session will be recorded under: <span style={{ fontWeight: 800 }}>{selectedCourse.name}</span>
+              {selectedCourse.programmeName && (
+                <span style={{ fontWeight: 400, color: '#60a5fa' }}>· {selectedCourse.programmeName}</span>
+              )}
+            </div>
+          )}
+
           {error && (
             <p style={{ fontSize: '0.8rem', color: '#dc2626', margin: 0 }}>{error}</p>
           )}
@@ -293,7 +372,6 @@ export default function LecturerAttendancePage() {
                     st === 'LATE'    ? 'marked-late'     : ''
                   return (
                     <div key={s.studentId} className={`att-student-card ${cardClass}`}>
-                      {/* Avatar + info */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                         <div className="att-avatar">
                           <UserRound size={20} color="#9ca3af" />
@@ -304,7 +382,6 @@ export default function LecturerAttendancePage() {
                         </div>
                       </div>
 
-                      {/* Status buttons */}
                       <div className="att-status-btns">
                         <button
                           className={`att-status-btn present ${st === 'PRESENT' ? 'active' : ''}`}
@@ -320,7 +397,6 @@ export default function LecturerAttendancePage() {
                         >Late</button>
                       </div>
 
-                      {/* Minutes late */}
                       {st === 'LATE' && (
                         <div className="att-late-row">
                           <Clock size={12} style={{ color: '#d97706', flexShrink: 0 }} />
