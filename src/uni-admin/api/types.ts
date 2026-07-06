@@ -119,7 +119,6 @@ export interface CreateLecturerRequest {
   firstName: string
   lastName: string
   email?: string
-  lecturerRef: string
   phone?: string
   programmeIds: number[]
   status?: LecturerStatus
@@ -130,7 +129,6 @@ export interface CreateStudentRequest {
   lastName: string
   /** Only required when creating — platform email is auto-generated server-side. */
   personalEmail?: string
-  studentRef: string
   programmeId: number
   status: StudentStatus
   cohortId: number

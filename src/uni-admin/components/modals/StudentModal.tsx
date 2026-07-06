@@ -41,7 +41,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [personalEmail, setPersonalEmail] = useState('')
-  const [studentRef, setStudentRef] = useState('')
   const [programmeId, setProgrammeId] = useState<number | ''>('')
   const [cohortId, setCohortId] = useState<number | ''>('')
   const [status, setStatus] = useState<StudentStatus>('ACTIVE')
@@ -63,7 +62,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
       setFirstName(existing?.firstName ?? '')
       setLastName(existing?.lastName ?? '')
       setPersonalEmail('')
-      setStudentRef(existing?.studentRef ?? '')
       setProgrammeId(existing?.programmeId ?? '')
       setCohortId(existing?.cohortId ?? '')
       setStatus(existing?.status ?? 'ACTIVE')
@@ -84,7 +82,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
       setError('A valid personal email is required — login credentials will be sent there')
       return
     }
-    if (!studentRef.trim()) { setError('Student reference is required'); return }
     if (programmeId === '') { setError('Programme is required'); return }
     if (cohortId === '') { setError('Cohort is required'); return }
     setSaving(true)
@@ -92,7 +89,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
       const payload: CreateStudentRequest = {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        studentRef: studentRef.trim(),
         programmeId: programmeId as number,
         status,
         cohortId: cohortId as number,
@@ -164,12 +160,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
             />
           </div>
         )}
-
-        <div className="ua-modal-field">
-          <label className="ua-modal-label">Student Ref *</label>
-          <input className="ua-modal-input" value={studentRef}
-            onChange={e => setStudentRef(e.target.value)} placeholder="e.g. STU-2026-001" />
-        </div>
 
         <div className="ua-modal-field">
           <label className="ua-modal-label">Programme *</label>
