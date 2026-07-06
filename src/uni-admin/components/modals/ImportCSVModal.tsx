@@ -114,7 +114,7 @@ function prepareStudents(records: Record<string, string>[], programmes: Programm
     return {
       line, label,
       request: {
-        firstName: rec.firstname, lastName: rec.lastname, email: rec.email,
+        firstName: rec.firstname, lastName: rec.lastname, personalEmail: rec.email,
         studentRef: rec.studentref,
         programmeId, status: status as CreateStudentRequest['status'], cohortId,
       },
