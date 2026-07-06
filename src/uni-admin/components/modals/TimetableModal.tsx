@@ -59,7 +59,7 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
       .catch(() => {})
   }, [open, universityId])
 
-  // Reset form fields on open
+  // Reset / populate form on open
   useEffect(() => {
     if (!open) return
     setTitle(existing?.title ?? '')
@@ -70,11 +70,25 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
     setColor(existing?.color ?? PRESET_COLORS[0])
     setCohortId(existing?.cohortId ?? '')
     setLecturerId(existing?.lecturerId ?? '')
-    setCourseSearch('')
+    // Show the existing course name in the search box immediately; selectedCourse
+    // will be resolved against the courses list once it loads (see effect below)
+    setCourseSearch(existing?.title ?? '')
     setSelectedCourse(null)
     setDropdownOpen(false)
     setError(null)
   }, [open, existing])
+
+  // Once courses are loaded, find and pre-select the matching course for editing
+  useEffect(() => {
+    if (!existing || courses.length === 0) return
+    const match = courses.find(c => c.name === existing.title)
+    if (match) {
+      setSelectedCourse(match)
+      setCourseSearch(match.name)
+      // Only override lecturerId if the course has one and none is already set
+      if (match.lecturerId && !existing.lecturerId) setLecturerId(match.lecturerId)
+    }
+  }, [courses, existing])
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -105,7 +119,9 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
   }
 
   const submit = async () => {
-    if (!selectedCourse)  { setError('Select a course'); return }
+    // When adding: must pick a course. When editing: title is already set from existing.
+    if (!existing && !selectedCourse) { setError('Select a course'); return }
+    if (!title.trim())    { setError('Course / title is required'); return }
     if (!room.trim())     { setError('Room is required'); return }
     if (!cohortId)        { setError('Select a cohort'); return }
     if (startTime >= endTime) { setError('End time must be after start time'); return }
@@ -188,8 +204,8 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
             )}
           </div>
 
-          {/* Lecturer pill — auto-populated from selected course */}
-          {selectedCourse?.lecturerName && (
+          {/* Lecturer pill — from selected course, or from existing entry while courses load */}
+          {(selectedCourse?.lecturerName ?? existing?.lecturerName) && (
             <div style={{
               marginTop: '0.4rem',
               display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -197,7 +213,7 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
               border: '1px solid #bfdbfe', borderRadius: 6,
               padding: '3px 10px', fontSize: '0.75rem', fontWeight: 600,
             }}>
-              Lecturer: {selectedCourse.lecturerName}
+              Lecturer: {selectedCourse?.lecturerName ?? existing?.lecturerName}
             </div>
           )}
         </div>
