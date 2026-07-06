@@ -14,8 +14,8 @@ import '../../styles/uniAdmin.css'
 type ImportMode = 'student' | 'lecturer'
 type AnyRequest = CreateStudentRequest | CreateLecturerRequest
 
-const STUDENT_HEADERS = ['firstName', 'lastName', 'email', 'studentRef', 'programme', 'cohort', 'status']
-const LECTURER_HEADERS = ['firstName', 'lastName', 'email', 'lecturerRef', 'programmes', 'status']
+const STUDENT_HEADERS = ['firstName', 'lastName', 'email', 'programme', 'cohort', 'status']
+const LECTURER_HEADERS = ['firstName', 'lastName', 'email', 'programmes', 'status']
 const EMAIL_RE = /^\S+@\S+\.\S+$/
 
 interface PreparedRow {
@@ -71,8 +71,8 @@ function parseRecords(text: string): Record<string, string>[] {
 
 function templateFor(mode: ImportMode): string {
   return mode === 'student'
-    ? [STUDENT_HEADERS.join(','), 'Jane,Smith,jane.smith@epita.fr,STU-2026-001,MSc-SE,MSc-2026-Fall,ACTIVE'].join('\r\n')
-    : [LECTURER_HEADERS.join(','), 'John,Doe,john.doe@epita.fr,LEC-2026-001,MSc-SE; MSc-DS,ACTIVE'].join('\r\n')
+    ? [STUDENT_HEADERS.join(','), 'Jane,Smith,jane.smith@epita.fr,MSc-SE,MSc-2026-Fall,ACTIVE'].join('\r\n')
+    : [LECTURER_HEADERS.join(','), 'John,Doe,john.doe@epita.fr,MSc-SE; MSc-DS,ACTIVE'].join('\r\n')
 }
 
 function downloadCsv(filename: string, content: string): void {
@@ -101,9 +101,9 @@ function prepareStudents(records: Record<string, string>[], programmes: Programm
   const cohortByName = new Map(cohorts.map(c => [c.name.trim().toLowerCase(), c.id]))
   return records.map((rec, i) => {
     const line = i + 1
-    const label = `${rec.firstname || '?'} ${rec.lastname || ''} (${rec.studentref || rec.email || 'row ' + line})`.trim()
+    const label = `${rec.firstname || '?'} ${rec.lastname || ''} (${rec.email || 'row ' + line})`.trim()
     const fail = (error: string): PreparedRow => ({ line, label, error })
-    if (!rec.firstname || !rec.lastname || !rec.email || !rec.studentref) return fail('missing a required field (firstName, lastName, email, studentRef)')
+    if (!rec.firstname || !rec.lastname || !rec.email) return fail('missing a required field (firstName, lastName, email)')
     if (!EMAIL_RE.test(rec.email)) return fail(`invalid email "${rec.email}"`)
     const programmeId = progByKey.get((rec.programme || '').toLowerCase())
     if (!programmeId) return fail(`unknown programme "${rec.programme}"`)
@@ -115,7 +115,6 @@ function prepareStudents(records: Record<string, string>[], programmes: Programm
       line, label,
       request: {
         firstName: rec.firstname, lastName: rec.lastname, personalEmail: rec.email,
-        studentRef: rec.studentref,
         programmeId, status: status as CreateStudentRequest['status'], cohortId,
       },
     }
@@ -126,9 +125,9 @@ function prepareLecturers(records: Record<string, string>[], programmes: Program
   const progByKey = programmeIndex(programmes)
   return records.map((rec, i) => {
     const line = i + 1
-    const label = `${rec.firstname || '?'} ${rec.lastname || ''} (${rec.lecturerref || rec.email || 'row ' + line})`.trim()
+    const label = `${rec.firstname || '?'} ${rec.lastname || ''} (${rec.email || 'row ' + line})`.trim()
     const fail = (error: string): PreparedRow => ({ line, label, error })
-    if (!rec.firstname || !rec.lastname || !rec.email || !rec.lecturerref) return fail('missing a required field (firstName, lastName, email, lecturerRef)')
+    if (!rec.firstname || !rec.lastname || !rec.email) return fail('missing a required field (firstName, lastName, email)')
     if (!EMAIL_RE.test(rec.email)) return fail(`invalid email "${rec.email}"`)
     const names = (rec.programmes || '').split(/[;|]/).map(s => s.trim()).filter(Boolean)
     if (names.length === 0) return fail('no programmes listed (use ";" to separate multiple)')
@@ -144,8 +143,7 @@ function prepareLecturers(records: Record<string, string>[], programmes: Program
       line, label,
       request: {
         firstName: rec.firstname, lastName: rec.lastname, email: rec.email,
-        lecturerRef: rec.lecturerref, programmeIds,
-        status: status as CreateLecturerRequest['status'],
+        programmeIds, status: status as CreateLecturerRequest['status'],
       },
     }
   })
