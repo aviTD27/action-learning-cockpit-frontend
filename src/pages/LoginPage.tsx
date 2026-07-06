@@ -56,10 +56,11 @@ export default function LoginPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <div className="auth-logo-title">
-            <GraduationCap size={20} /> ALC
-          </div>
-          <div className="auth-logo-sub">Action Learning Cockpit</div>
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className="auth-logo-title">
+              <GraduationCap size={20} /> ALC
+            </div>
+          </Link>
         </div>
 
         <h1 className="auth-heading">Sign in to your account</h1>

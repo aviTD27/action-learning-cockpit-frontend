@@ -27,7 +27,6 @@ export default function LandingPage() {
       <header className="lp-nav">
         <div className="lp-brand">
           <GraduationCap size={22} /> <span>ALC</span>
-          <small>Action Learning Cockpit</small>
         </div>
         <nav className="lp-nav-links">
           <a href="#features">Features</a>
@@ -112,9 +111,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="lp-footer">
-        <div className="lp-brand"><GraduationCap size={18} /> <span>ALC</span></div>
         <span>© {new Date().getFullYear()} Action Learning Cockpit</span>
-        <Link to="/login">Login</Link>
       </footer>
     </div>
   )

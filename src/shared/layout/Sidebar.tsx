@@ -65,7 +65,6 @@ export default function Sidebar({ items, user }: Props) {
         <div className="sidebar-logo-title">
           <GraduationCap size={18} /> ALC
         </div>
-        <div className="sidebar-logo-sub">Action Learning Cockpit</div>
       </div>
 
       {displayName && (
