@@ -3,7 +3,7 @@ import { isAxiosError } from 'axios'
 import WeeklyCalendar from '../components/WeeklyCalendar'
 import TimetableModal from '../../uni-admin/components/modals/TimetableModal'
 import {
-  getTimetable, createTimetableEntry, updateTimetableEntry, deleteTimetableEntry,
+  getWeeklyTimetable, createTimetableEntry, updateTimetableEntry, deleteTimetableEntry,
   getCohorts, getLecturers,
 } from '../../uni-admin/api/uniAdmin'
 import type { CohortResponse, CreateTimetableRequest, LecturerResponse, TimetableEntry } from '../../uni-admin/api/types'
@@ -30,7 +30,10 @@ export default function TimetablePage({ canEdit, universityId }: Props) {
 
   useEffect(() => {
     const fetches = [
-      getTimetable().then(r => setEntries(r.data)).catch(() => {}),
+      getWeeklyTimetable().then(r => {
+        const flat = (Object.values(r.data) as TimetableEntry[][]).flat()
+        setEntries(flat)
+      }).catch(() => {}),
     ]
     if (canEdit) {
       fetches.push(

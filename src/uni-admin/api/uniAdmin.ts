@@ -21,6 +21,7 @@ import type {
   StudentResponse,
   TenantSummary,
   TimetableEntry,
+  WeeklyTimetable,
   TrendPoint,
   UniversityResponse,
 } from './types'
@@ -84,6 +85,7 @@ export const getLecturerWorkload  = (universityId?: number) => api.get<LecturerW
 
 // Timetable
 export const getTimetable          = ()                                    => api.get<TimetableEntry[]>('/timetable')
+export const getWeeklyTimetable    = ()                                    => api.get<WeeklyTimetable>('/timetable/weekly')
 export const createTimetableEntry  = (data: CreateTimetableRequest)        => api.post<TimetableEntry>('/timetable', data)
 export const updateTimetableEntry  = (id: number, data: CreateTimetableRequest) => api.put<TimetableEntry>(`/timetable/${id}`, data)
 export const deleteTimetableEntry  = (id: number)                          => api.delete<void>(`/timetable/${id}`)

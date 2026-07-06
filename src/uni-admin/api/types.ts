@@ -177,7 +177,10 @@ export interface TimetableEntry {
   lecturerName: string | null
   universityId: number
   universityName: string
+  programmeNames?: string[]
 }
+
+export type WeeklyTimetable = Partial<Record<DayOfWeek, TimetableEntry[]>>
 
 export interface CreateTimetableRequest {
   title: string

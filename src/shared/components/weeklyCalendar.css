@@ -115,8 +115,6 @@
 /* ─── Entry block ───────────────────────────────────────────────────── */
 .wc-entry {
   position: absolute;
-  left: 3px;
-  right: 3px;
   border-radius: 7px;
   padding: 5px 7px;
   overflow: hidden;
@@ -124,6 +122,10 @@
   box-shadow: 0 1px 3px rgba(0,0,0,.15);
   box-sizing: border-box;
   transition: filter 0.15s, box-shadow 0.15s;
+  min-width: 0;
+}
+.wc-entry--compact {
+  padding: 4px 5px;
 }
 .wc-entry:hover {
   filter: brightness(0.9);
@@ -146,6 +148,26 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 1px;
+}
+.wc-entry-lecturer {
+  font-weight: 600;
+  color: #fff;
+}
+.wc-entry-prog {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,.7);
+  background: rgba(0,0,0,.2);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
+}
+.wc-entry--compact .wc-entry-title {
+  font-size: 0.65rem;
 }
 
 /* ─── Action buttons (edit / delete) ───────────────────────────────── */
