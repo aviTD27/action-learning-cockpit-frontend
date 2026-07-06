@@ -45,3 +45,17 @@ export const markLecturerAnnouncementRead = (recipientId: number) =>
 
 export const markAllAnnouncementsRead = () =>
   apiClient.patch('/announcements/me/read-all')
+
+// Sent history (uni admin & lecturer — announcements the current user sent)
+export interface SentAnnouncement {
+  id:             number
+  subject:        string
+  message:        string
+  audience:       AnnouncementAudience
+  cohortName?:    string | null
+  recipientCount: number
+  sentAt:         string
+}
+
+export const getMySentAnnouncements = () =>
+  apiClient.get<SentAnnouncement[]>('/announcements/sent').then(r => r.data)
