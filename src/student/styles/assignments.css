@@ -309,3 +309,84 @@
 
 .asgn-cal-item-pending { background: #dbeafe; color: #1d4ed8; }
 .asgn-cal-item-due     { background: #fee2e2; color: #b91c1c; }
+
+/* ── Criteria feedback panel ── */
+.criteria-panel {
+  margin-top: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.criteria-panel-header {
+  background: #1E3A5F;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.85rem;
+}
+
+.criteria-item {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.criteria-item:last-child { border-bottom: none; }
+
+.criteria-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.3rem;
+}
+
+.criteria-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.criteria-pct {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.criteria-bar-track {
+  height: 5px;
+  background: #e5e7eb;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.criteria-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.criteria-feedback {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.criteria-review-note {
+  font-size: 0.72rem;
+  color: #b45309;
+  padding: 0.4rem 0.85rem;
+  border-top: 1px solid #fef3c7;
+  background: #fffbeb;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .criteria-panel { border-color: #374151; }
+  .criteria-panel-header { background: #1E3A5F; }
+  .criteria-item { border-bottom-color: #1f2937; }
+  .criteria-label { color: #e5e7eb; }
+  .criteria-feedback { color: #9ca3af; }
+  .criteria-bar-track { background: #374151; }
+}

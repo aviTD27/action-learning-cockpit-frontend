@@ -76,6 +76,23 @@ export interface ComplianceReport {
 export const turnInDocument = (uploadId: number): Promise<void> =>
   apiClient.patch(`/submissions/uploads/${uploadId}/turn-in`).then(() => {})
 
+export interface CriterionScore {
+  label: string
+  score: number
+  feedback: string
+  confidence: string
+  requiresReview: boolean
+}
+
+export interface ScoringReport {
+  overallScore: number
+  level: string
+  wordCount: number
+  embeddingsComputed: boolean
+  requiresHumanReview: boolean
+  criteria: CriterionScore[]
+}
+
 export interface MyUploadStatus {
   uploadId: number | null
   turnedIn: boolean
@@ -85,6 +102,7 @@ export interface MyUploadStatus {
   late: boolean
   reopened: boolean
   complianceReport: ComplianceReport | null
+  scoringReport: ScoringReport | null
 }
 
 export const getMyUploadStatus = (submissionId: number): Promise<MyUploadStatus | null> =>

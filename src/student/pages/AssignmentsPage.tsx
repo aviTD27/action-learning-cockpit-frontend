@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo, type ChangeEvent } from 'react'
 import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Download, FileText, List, Minus, Upload, XCircle } from 'lucide-react'
 import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
-import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport } from '../api/studentApi'
+import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport, type ScoringReport } from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/assignments.css'
 import '../styles/compliance.css'
@@ -93,11 +93,40 @@ function ComplianceReportPanel({ report }: { report: ComplianceReport }) {
   )
 }
 
+/* ── Criteria feedback panel ── */
+function CriteriaFeedbackPanel({ report }: { report: ScoringReport }) {
+  return (
+    <div className="criteria-panel">
+      <div className="criteria-panel-header">AI Reflection Feedback</div>
+      {report.criteria.map(c => {
+        const pct = Math.round(c.score * 100)
+        const color = pct >= 65 ? '#16a34a' : pct >= 40 ? '#d97706' : '#dc2626'
+        return (
+          <div key={c.label} className="criteria-item">
+            <div className="criteria-item-top">
+              <span className="criteria-label">{c.label}</span>
+              <span className="criteria-pct" style={{ color }}>{pct}%</span>
+            </div>
+            <div className="criteria-bar-track">
+              <div className="criteria-bar-fill" style={{ width: `${pct}%`, background: color }} />
+            </div>
+            <p className="criteria-feedback">{c.feedback}</p>
+          </div>
+        )
+      })}
+      {report.requiresHumanReview && (
+        <p className="criteria-review-note">One or more criteria flagged for human review.</p>
+      )}
+    </div>
+  )
+}
+
 /* ── List view card ── */
 function AssignmentCard({ a }: { a: Assignment }) {
   const fileInputRef                        = useRef<HTMLInputElement>(null)
   const [uploading, setUploading]           = useState(false)
   const [report, setReport]                 = useState<ComplianceReport | null>(null)
+  const [scoring, setScoring]               = useState<ScoringReport | null>(null)
   const [uploadError, setUploadError]       = useState<string | null>(null)
   const [turningIn, setTurningIn]           = useState(false)
   const [turnedIn, setTurnedIn]             = useState(false)
@@ -116,8 +145,9 @@ function AssignmentCard({ a }: { a: Assignment }) {
           setTurnedIn(true)
           setSubmittedAt(status.turnedInAt)
           setIsLate(status.late)
-        } else if (status.complianceReport) {
-          setReport(status.complianceReport)
+        } else {
+          if (status.complianceReport) setReport(status.complianceReport)
+          if (status.scoringReport) setScoring(status.scoringReport)
         }
       }
     })
@@ -138,9 +168,14 @@ function AssignmentCard({ a }: { a: Assignment }) {
     }
     setUploading(true)
     setUploadError(null)
+    setScoring(null)
     try {
       const r = await uploadDocument(a.id, file)
       setReport(r)
+      if (r.overallPass) {
+        const status = await getMyUploadStatus(a.id)
+        if (status?.scoringReport) setScoring(status.scoringReport)
+      }
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
       setUploadError(msg ?? 'Upload failed. Please check your connection and try again.')
@@ -268,7 +303,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
       {turnedIn && !resubmitting && canSubmit && (
         <button
           className="asgn-resubmit-btn"
-          onClick={() => { setResubmitting(true); setReport(null); setUploadError(null) }}
+          onClick={() => { setResubmitting(true); setReport(null); setScoring(null); setUploadError(null) }}
         >
           Resubmit
         </button>
@@ -330,6 +365,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
 
       {showForm && uploadError && <p className="asgn-upload-error">{uploadError}</p>}
       {showForm && report && <ComplianceReportPanel report={report} />}
+      {showForm && report?.overallPass && scoring && <CriteriaFeedbackPanel report={scoring} />}
       {showForm && report?.overallPass && (
         <button
           className="asgn-turnin-btn"
