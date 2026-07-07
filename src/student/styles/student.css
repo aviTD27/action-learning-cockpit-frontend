@@ -152,6 +152,8 @@
 
 .sd-badge-submitted  { background: #dcfce7; color: #15803d; }
 .sd-badge-pending    { background: #fef9c3; color: #a16207; }
+.sd-badge-upcoming   { background: #dbeafe; color: #1d4ed8; }
+.sd-badge-completed  { background: #dcfce7; color: #15803d; }
 .sd-badge-past-due   { background: #fee2e2; color: #b91c1c; }
 .sd-badge-graded     { background: #dbeafe; color: #1d4ed8; }
 .sd-badge-revised    { background: #ede9fe; color: #6d28d9; }

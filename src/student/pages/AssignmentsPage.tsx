@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState, useMemo, type ChangeEvent } from 'react'
+import { useRef, useState, useMemo, type ChangeEvent } from 'react'
 import { BookOpen, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Download, FileText, List, Minus, Upload, XCircle } from 'lucide-react'
-import { useStudentAssignments, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
+import { useStudentAssignments, isDeadlinePassed, type Assignment, type AssignmentStatus } from '../hooks/useStudentAssignments'
 import { uploadDocument, turnInDocument, getMyUploadStatus, downloadAssignmentTemplate, type CheckResult, type ComplianceReport, type ScoringReport } from '../api/studentApi'
 import '../styles/student.css'
 import '../styles/assignments.css'
 import '../styles/compliance.css'
 
-type FilterTab = 'all' | 'pending' | 'past-due'
+type FilterTab = 'all' | 'upcoming' | 'past-due' | 'completed'
 type ViewMode  = 'list' | 'calendar'
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
@@ -14,8 +14,9 @@ const MONTH_NAMES = ['January','February','March','April','May','June',
 const DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 
 function StatusBadge({ status }: { status: AssignmentStatus }) {
-  if (status === 'past-due') return <span className="sd-badge sd-badge-past-due">Past Due</span>
-  return <span className="sd-badge sd-badge-pending">Pending</span>
+  if (status === 'completed') return <span className="sd-badge sd-badge-completed">Completed</span>
+  if (status === 'past-due')  return <span className="sd-badge sd-badge-past-due">Past Due</span>
+  return <span className="sd-badge sd-badge-upcoming">Upcoming</span>
 }
 
 function formatDue(iso: string): string {
@@ -31,7 +32,8 @@ function formatDue(iso: string): string {
 }
 
 function urgencyColor(status: AssignmentStatus, iso: string): string {
-  if (status === 'past-due') return '#b91c1c'
+  if (status === 'completed') return '#15803d'
+  if (status === 'past-due')  return '#b91c1c'
   const days = Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000)
   if (days <= 1) return '#dc2626'
   if (days <= 3) return '#ea580c'
@@ -122,36 +124,21 @@ function CriteriaFeedbackPanel({ report }: { report: ScoringReport }) {
 }
 
 /* ── List view card ── */
-function AssignmentCard({ a }: { a: Assignment }) {
+function AssignmentCard({ a, onCompleted }: { a: Assignment; onCompleted: (id: number) => void }) {
+  const init = a.uploadStatus
   const fileInputRef                        = useRef<HTMLInputElement>(null)
   const [uploading, setUploading]           = useState(false)
-  const [report, setReport]                 = useState<ComplianceReport | null>(null)
-  const [scoring, setScoring]               = useState<ScoringReport | null>(null)
+  const [report, setReport]                 = useState<ComplianceReport | null>(init && !init.turnedIn ? init.complianceReport : null)
+  const [scoring, setScoring]               = useState<ScoringReport | null>(init && !init.turnedIn ? init.scoringReport : null)
   const [uploadError, setUploadError]       = useState<string | null>(null)
   const [turningIn, setTurningIn]           = useState(false)
-  const [turnedIn, setTurnedIn]             = useState(false)
-  const [submittedAt, setSubmittedAt]       = useState<string | null>(null)
-  const [isLate, setIsLate]                 = useState(false)
-  const [isReopened, setIsReopened]         = useState(false)
+  const [turnedIn, setTurnedIn]             = useState(init?.turnedIn ?? false)
+  const [submittedAt, setSubmittedAt]       = useState<string | null>(init?.turnedIn ? init.turnedInAt : null)
+  const [isLate, setIsLate]                 = useState(init?.turnedIn ? init.late : false)
+  const [isReopened]                        = useState(init?.reopened ?? false)
   const [resubmitting, setResubmitting]     = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
   const [textInput, setTextInput]           = useState('')
-
-  useEffect(() => {
-    getMyUploadStatus(a.id).then(status => {
-      if (status) {
-        setIsReopened(status.reopened)
-        if (status.turnedIn) {
-          setTurnedIn(true)
-          setSubmittedAt(status.turnedInAt)
-          setIsLate(status.late)
-        } else {
-          if (status.complianceReport) setReport(status.complianceReport)
-          if (status.scoringReport) setScoring(status.scoringReport)
-        }
-      }
-    })
-  }, [a.id])
 
   const doUpload = async (file: File) => {
     const HARD_LIMIT = 50 * 1024 * 1024
@@ -209,6 +196,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
       await turnInDocument(report.uploadId)
       setTurnedIn(true)
       setResubmitting(false)
+      onCompleted(a.id)
       const status = await getMyUploadStatus(a.id)
       if (status) {
         setSubmittedAt(status.turnedInAt)
@@ -236,7 +224,7 @@ function AssignmentCard({ a }: { a: Assignment }) {
   const hasInstructions = !!(a.instructions || a.additionalNotes)
   const hasTemplate = !!(a.hasTemplateFile || a.hasTemplate)
   const instructionsText = a.instructions || a.additionalNotes
-  const isPastDeadline = a.status === 'past-due'
+  const isPastDeadline = isDeadlinePassed(a.dueDate)
   const canSubmit = !isPastDeadline || isReopened
   const showForm = (!turnedIn || resubmitting) && canSubmit
   const showFileInput = (a.submissionType === 'FILE' || a.submissionType === 'BOTH') && showForm
@@ -424,7 +412,7 @@ function CalendarView({ assignments }: { assignments: Assignment[] }) {
             <div key={key} className={`asgn-cal-cell ${isToday ? 'asgn-cal-today' : ''}`}>
               <span className="asgn-cal-date">{day}</span>
               {items.map(a => (
-                <div key={a.id} className={`asgn-cal-item ${a.status === 'past-due' ? 'asgn-cal-item-due' : 'asgn-cal-item-pending'}`}>
+                <div key={a.id} className={`asgn-cal-item ${a.status === 'past-due' ? 'asgn-cal-item-due' : a.status === 'completed' ? 'asgn-cal-item-completed' : 'asgn-cal-item-upcoming'}`}>
                   {a.title}
                 </div>
               ))}
@@ -438,15 +426,14 @@ function CalendarView({ assignments }: { assignments: Assignment[] }) {
 
 /* ── Main page ── */
 export default function AssignmentsPage() {
-  const { assignments, loading, error } = useStudentAssignments()
+  const { assignments, loading, error, markCompleted } = useStudentAssignments()
   const [view,   setView]   = useState<ViewMode>('list')
   const [filter, setFilter] = useState<FilterTab>('all')
   const [search, setSearch] = useState('')
 
   const filtered = useMemo(() => {
     let list = assignments
-    if (filter === 'pending')  list = list.filter(a => a.status === 'pending')
-    if (filter === 'past-due') list = list.filter(a => a.status === 'past-due')
+    if (filter !== 'all') list = list.filter(a => a.status === filter)
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(a => a.title.toLowerCase().includes(q))
@@ -455,9 +442,10 @@ export default function AssignmentsPage() {
   }, [assignments, filter, search])
 
   const counts = useMemo(() => ({
-    all:      assignments.length,
-    pending:  assignments.filter(a => a.status === 'pending').length,
+    all:        assignments.length,
+    upcoming:   assignments.filter(a => a.status === 'upcoming').length,
     'past-due': assignments.filter(a => a.status === 'past-due').length,
+    completed:  assignments.filter(a => a.status === 'completed').length,
   }), [assignments])
 
   if (loading) return <p className="sd-table-empty">Loading assignments…</p>
@@ -470,13 +458,13 @@ export default function AssignmentsPage() {
       <div className="asgn-controls">
         {/* Filter tabs */}
         <div className="asgn-tabs">
-          {(['all', 'pending', 'past-due'] as FilterTab[]).map(t => (
+          {(['all', 'upcoming', 'past-due', 'completed'] as FilterTab[]).map(t => (
             <button
               key={t}
               className={`asgn-tab ${filter === t ? 'active' : ''}`}
               onClick={() => setFilter(t)}
             >
-              {t === 'all' ? 'All' : t === 'pending' ? 'Pending' : 'Past Due'}
+              {t === 'all' ? 'All' : t === 'upcoming' ? 'Upcoming' : t === 'past-due' ? 'Past Due' : 'Completed'}
               <span className="asgn-tab-count">{counts[t]}</span>
             </button>
           ))}
@@ -515,7 +503,7 @@ export default function AssignmentsPage() {
         </div>
       ) : (
         <div className="asgn-list">
-          {filtered.map(a => <AssignmentCard key={a.id} a={a} />)}
+          {filtered.map(a => <AssignmentCard key={a.id} a={a} onCompleted={markCompleted} />)}
         </div>
       )}
 
