@@ -11,7 +11,7 @@ export default function LecturerAnnouncementsPage() {
   const [tab,        setTab]        = useState<Tab>('inbox')
   const [modalOpen,  setModalOpen]  = useState(false)
   const [sentBanner, setSentBanner] = useState(false)
-  const [inboxKey,   setInboxKey]   = useState(0)
+  const [inboxKey]                  = useState(0)
   const [sentKey,    setSentKey]    = useState(0)
 
   const handleSent = () => {
