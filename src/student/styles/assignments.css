@@ -308,6 +308,8 @@
 }
 
 .asgn-cal-item-pending { background: #dbeafe; color: #1d4ed8; }
+.asgn-cal-item-upcoming  { background: #dbeafe; color: #1d4ed8; }
+.asgn-cal-item-completed { background: #dcfce7; color: #15803d; }
 .asgn-cal-item-due     { background: #fee2e2; color: #b91c1c; }
 
 /* ── Criteria feedback panel ── */
