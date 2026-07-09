@@ -8,22 +8,22 @@ export type AnnouncementAudience =
   | 'SPECIFIC_LECTURERS'
 
 export interface AnnouncementInboxItem {
-  recipientId:      number
-  announcementId:   number
-  subject:          string
-  message:          string
-  senderName:       string
-  senderRole:       string
-  audience:         AnnouncementAudience
-  sentAt:           string
-  read:             boolean
+  recipientId: number
+  announcementId: number
+  subject: string
+  message: string
+  senderName: string
+  senderRole: string
+  audience: AnnouncementAudience
+  sentAt: string
+  read: boolean
 }
 
 export interface CreateAnnouncementRequest {
-  subject:     string
-  message:     string
-  audience:    AnnouncementAudience
-  cohortId?:   number | null
+  subject: string
+  message: string
+  audience: AnnouncementAudience
+  cohortId?: number | null
   studentIds?: number[] | null
   lecturerIds?: number[] | null
 }
@@ -46,15 +46,14 @@ export const markLecturerAnnouncementRead = (recipientId: number) =>
 export const markAllAnnouncementsRead = () =>
   apiClient.patch('/announcements/me/read-all')
 
-// Sent history (uni admin & lecturer — announcements the current user sent)
 export interface SentAnnouncement {
-  id:             number
-  subject:        string
-  message:        string
-  audience:       AnnouncementAudience
-  cohortName?:    string | null
+  id: number
+  subject: string
+  message: string
+  audience: AnnouncementAudience
+  cohortName?: string | null
   recipientCount: number
-  sentAt:         string
+  sentAt: string
 }
 
 export const getMySentAnnouncements = () =>

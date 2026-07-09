@@ -6,19 +6,19 @@ import {
 import './styles/landing.css'
 
 const FEATURES = [
-  { icon: Building2,    color: '#2563eb', bg: '#dbeafe', title: 'Multi-university',  text: 'Each university runs its own programmes, cohorts, lecturers and students in a fully isolated workspace.' },
-  { icon: ClipboardList, color: '#7c3aed', bg: '#ede9fe', title: 'Assignments',       text: 'Lecturers create submissions with rules, deadlines and allowed file types for their cohorts.' },
-  { icon: CheckCircle2,  color: '#16a34a', bg: '#dcfce7', title: 'Grading & review',  text: 'Grade with feedback, keep grades as drafts, then release them to students — Fail / Pass / Good / Distinction.' },
-  { icon: Users,         color: '#0891b2', bg: '#cffafe', title: 'Student tracking',  text: 'See cohort progress, who has submitted, and grading status at a glance.' },
-  { icon: Bell,          color: '#d97706', bg: '#fef3c7', title: 'Notifications',     text: 'Automated deadline reminders and grade release alerts keep students on track.' },
-  { icon: ShieldCheck,   color: '#1E3A5F', bg: '#eef2f7', title: 'Role-based access', text: 'Platform Admin, Uni Admin, Lecturer and Student each see only what they should.' },
+  { icon: Building2, color: '#2563eb', bg: '#dbeafe', title: 'Multi-university', text: 'Each university runs its own programmes, cohorts, lecturers and students in a fully isolated workspace.' },
+  { icon: ClipboardList, color: '#7c3aed', bg: '#ede9fe', title: 'Assignments', text: 'Lecturers create submissions with rules, deadlines and allowed file types for their cohorts.' },
+  { icon: CheckCircle2, color: '#16a34a', bg: '#dcfce7', title: 'Grading & review', text: 'Grade with feedback, keep grades as drafts, then release them to students  Fail / Pass / Good / Distinction.' },
+  { icon: Users, color: '#0891b2', bg: '#cffafe', title: 'Student tracking',  text: 'See cohort progress, who has submitted, and grading status at a glance.' },
+  { icon: Bell, color: '#d97706', bg: '#fef3c7', title: 'Notifications', text: 'Automated deadline reminders and grade release alerts keep students on track.' },
+  { icon: ShieldCheck, color: '#1E3A5F', bg: '#eef2f7', title: 'Role-based access', text: 'Platform Admin, Uni Admin, Lecturer and Student each see only what they should.' },
 ]
 
 const STEPS = [
-  { icon: Building2,  title: 'Request access',    text: 'A university submits an access request from this page.' },
-  { icon: ShieldCheck, title: 'Get approved',     text: 'The platform team reviews and approves the request, creating the Uni Admin account.' },
-  { icon: BookOpen,   title: 'Build the structure', text: 'The Uni Admin sets up programmes, cohorts, lecturers and students.' },
-  { icon: UploadCloud, title: 'Teach & learn',    text: 'Lecturers set work and grade it; students submit and receive their results.' },
+  { icon: Building2, title: 'Request access', text: 'A university submits an access request from this page.' },
+  { icon: ShieldCheck, title: 'Get approved', text: 'The platform team reviews and approves the request, creating the Uni Admin account.' },
+  { icon: BookOpen, title: 'Build the structure', text: 'The Uni Admin sets up programmes, cohorts, lecturers and students.' },
+  { icon: UploadCloud, title: 'Teach & learn', text: 'Lecturers set work and grade it; students submit and receive their results.' },
 ]
 
 export default function LandingPage() {
@@ -43,7 +43,7 @@ export default function LandingPage() {
         <div className="lp-hero-overlay" />
         <div className="lp-hero-inner">
           <span className="lp-pill">Multi-university learning platform</span>
-          <h1>Run teaching, submissions and grading<br />for every cohort — in one place.</h1>
+          <h1>Run teaching, submissions and grading<br />for every cohort  in one place.</h1>
           <p>
             The Action Learning Cockpit is a multi-tenant LMS that lets universities manage
             programmes, cohorts, lecturers and students, with assignment management, grading
@@ -64,7 +64,7 @@ export default function LandingPage() {
           <span className="lp-section-label">Capabilities</span>
           <h2>Everything a programme needs</h2>
           <p className="lp-section-intro">
-            One platform to manage your entire academic operation — from enrolment to results.
+            One platform to manage your entire academic operation  from enrolment to results.
           </p>
         </div>
         <div className="lp-grid">

@@ -21,15 +21,14 @@ export function isDeadlinePassed(dueDate: string): boolean {
 }
 
 function computeStatus(dueDate: string, uploadStatus: MyUploadStatus | null): AssignmentStatus {
-  // Completed = turned in, regardless of whether it was on time or late.
   if (uploadStatus?.turnedIn) return 'completed'
   return isDeadlinePassed(dueDate) ? 'past-due' : 'upcoming'
 }
 
 export function useStudentAssignments() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
-  const [loading, setLoading]         = useState(true)
-  const [error, setError]             = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function load() {
@@ -54,7 +53,6 @@ export function useStudentAssignments() {
     load()
   }, [])
 
-  /** Call after a successful turn-in so badges/filters update immediately. */
   const markCompleted = useCallback((id: number) => {
     setAssignments(prev =>
       prev.map(a => (a.id === id ? { ...a, status: 'completed' as const } : a)),

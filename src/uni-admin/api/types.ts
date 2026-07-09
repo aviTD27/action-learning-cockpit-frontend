@@ -127,14 +127,12 @@ export interface CreateLecturerRequest {
 export interface CreateStudentRequest {
   firstName: string
   lastName: string
-  /** Only required when creating — platform email is auto-generated server-side. */
   personalEmail?: string
   programmeId: number
   status: StudentStatus
   cohortId: number
 }
 
-//   Analytics (tenant-scoped)                          ─
 export interface TenantSummary {
   totalStudents: number
   activeStudents: number
@@ -160,7 +158,6 @@ export interface GradeDistribution {
   count: number
 }
 
-// ── Timetable ─────────────────────────────────────────────────────────────────
 export type DayOfWeek = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
 export interface TimetableEntry {
@@ -228,8 +225,6 @@ export interface LecturerWorkload {
   gradingBacklog: number
 }
 
-
-// ── Semesters & Courses (new hierarchy) ────────────────────────────────────────
 export interface SemesterResponse {
   id: number
   name: string

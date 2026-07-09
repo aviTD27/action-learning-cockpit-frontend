@@ -13,17 +13,14 @@ import RoleProtectedRoute from '../auth/RoleProtectedRoute'
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Public */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/request-access" element={<RequestAccessPage />} />
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Super Admin + Platform Admin — same access, same pages */}
       <Route element={<RoleProtectedRoute allowedRoles={['ROLE_SUPER_ADMIN', 'ROLE_PLATFORM_ADMIN']} />}>
         {SuperAdminRoutes()}
       </Route>
 
-      {/* All other authenticated roles — same as before */}
       <Route element={<ProtectedRoute />}>
         {PlatformAdminRoutes()}
         {UniAdminRoutes()}

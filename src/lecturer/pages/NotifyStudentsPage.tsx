@@ -26,7 +26,7 @@ export default function NotifyStudentsPage() {
   const handleNotify = (id: number, title: string, programmeId: number) => {
     notify(id)
     const count = studentCountByProgramme.get(programmeId) ?? 0
-    setNotice(`Notification sent for "${title}" — ${count} student${count === 1 ? '' : 's'} emailed and notified on the platform.`)
+    setNotice(`Notification sent for "${title}"  ${count} student${count === 1 ? '' : 's'} emailed and notified on the platform.`)
   }
 
   const handleNotifyAll = async () => {
@@ -34,7 +34,7 @@ export default function NotifyStudentsPage() {
     setNotifyingAll(true)
     try {
       await Promise.all(submissions.map(s => notify(s.id)))
-      setNotice(`Reminders sent for all ${submissions.length} submission${submissions.length === 1 ? '' : 's'} — students who haven't submitted were emailed and notified.`)
+      setNotice(`Reminders sent for all ${submissions.length} submission${submissions.length === 1 ? '' : 's'}  students who haven't submitted were emailed and notified.`)
     } finally {
       setNotifyingAll(false)
     }

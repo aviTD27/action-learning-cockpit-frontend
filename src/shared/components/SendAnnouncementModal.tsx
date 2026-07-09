@@ -13,10 +13,10 @@ interface AudienceOption {
 
 const ADMIN_AUDIENCES: AudienceOption[] = [
   { value: 'ALL_UNIVERSITY_STUDENTS',  label: 'All students in my university' },
-  { value: 'ALL_COHORT_STUDENTS',      label: 'All students in a cohort' },
-  { value: 'SPECIFIC_STUDENTS',        label: 'Specific students' },
+  { value: 'ALL_COHORT_STUDENTS', label: 'All students in a cohort' },
+  { value: 'SPECIFIC_STUDENTS', label: 'Specific students' },
   { value: 'ALL_UNIVERSITY_LECTURERS', label: 'All lecturers in my university' },
-  { value: 'SPECIFIC_LECTURERS',       label: 'Specific lecturers' },
+  { value: 'SPECIFIC_LECTURERS', label: 'Specific lecturers' },
 ]
 
 const LECTURER_AUDIENCES: AudienceOption[] = [
@@ -25,24 +25,24 @@ const LECTURER_AUDIENCES: AudienceOption[] = [
 ]
 
 interface Props {
-  role:    'UNI_ADMIN' | 'LECTURER'
-  open:    boolean
+  role: 'UNI_ADMIN' | 'LECTURER'
+  open: boolean
   onClose: () => void
   onSent:  () => void
 }
 
 export default function SendAnnouncementModal({ role, open, onClose, onSent }: Props) {
-  const [subject,      setSubject]      = useState('')
-  const [message,      setMessage]      = useState('')
-  const [audience,     setAudience]     = useState<AnnouncementAudience>('ALL_COHORT_STUDENTS')
-  const [cohortId,     setCohortId]     = useState<number | ''>('')
-  const [studentIds,   setStudentIds]   = useState<number[]>([])
-  const [lecturerIds,  setLecturerIds]  = useState<number[]>([])
-  const [saving,       setSaving]       = useState(false)
-  const [error,        setError]        = useState<string | null>(null)
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
+  const [audience, setAudience] = useState<AnnouncementAudience>('ALL_COHORT_STUDENTS')
+  const [cohortId, setCohortId] = useState<number | ''>('')
+  const [studentIds, setStudentIds] = useState<number[]>([])
+  const [lecturerIds, setLecturerIds]  = useState<number[]>([])
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const [cohorts,   setCohorts]   = useState<CohortResponse[]>([])
-  const [students,  setStudents]  = useState<StudentResponse[]>([])
+  const [cohorts, setCohorts] = useState<CohortResponse[]>([])
+  const [students, setStudents] = useState<StudentResponse[]>([])
   const [lecturers, setLecturers] = useState<LecturerResponse[]>([])
 
   const audiences = role === 'UNI_ADMIN' ? ADMIN_AUDIENCES : LECTURER_AUDIENCES
@@ -82,11 +82,11 @@ export default function SendAnnouncementModal({ role, open, onClose, onSent }: P
     }
 
     const payload: CreateAnnouncementRequest = {
-      subject:     subject.trim(),
-      message:     message.trim(),
+      subject: subject.trim(),
+      message: message.trim(),
       audience,
-      cohortId:    audience === 'ALL_COHORT_STUDENTS'  ? Number(cohortId) : null,
-      studentIds:  audience === 'SPECIFIC_STUDENTS'    ? studentIds       : null,
+      cohortId: audience === 'ALL_COHORT_STUDENTS'  ? Number(cohortId) : null,
+      studentIds: audience === 'SPECIFIC_STUDENTS'    ? studentIds       : null,
       lecturerIds: audience === 'SPECIFIC_LECTURERS'   ? lecturerIds      : null,
     }
 
@@ -107,7 +107,6 @@ export default function SendAnnouncementModal({ role, open, onClose, onSent }: P
       <div className="ua-modal" style={{ maxWidth: 540 }} onClick={e => e.stopPropagation()}>
         <h2 className="ua-modal-title">New Announcement</h2>
 
-        {/* Audience */}
         <div className="ua-modal-field">
           <label className="ua-modal-label">Send to *</label>
           <select className="ua-modal-input" value={audience}
@@ -118,7 +117,6 @@ export default function SendAnnouncementModal({ role, open, onClose, onSent }: P
           </select>
         </div>
 
-        {/* Cohort picker */}
         {audience === 'ALL_COHORT_STUDENTS' && (
           <div className="ua-modal-field">
             <label className="ua-modal-label">Cohort *</label>
@@ -130,7 +128,6 @@ export default function SendAnnouncementModal({ role, open, onClose, onSent }: P
           </div>
         )}
 
-        {/* Student multi-select */}
         {audience === 'SPECIFIC_STUDENTS' && (
           <div className="ua-modal-field">
             <label className="ua-modal-label">Students * <span style={{ fontWeight: 400, color: '#9ca3af' }}>(click to select)</span></label>
@@ -148,7 +145,6 @@ export default function SendAnnouncementModal({ role, open, onClose, onSent }: P
           </div>
         )}
 
-        {/* Lecturer multi-select */}
         {audience === 'SPECIFIC_LECTURERS' && (
           <div className="ua-modal-field">
             <label className="ua-modal-label">Lecturers * <span style={{ fontWeight: 400, color: '#9ca3af' }}>(click to select)</span></label>
@@ -166,7 +162,6 @@ export default function SendAnnouncementModal({ role, open, onClose, onSent }: P
           </div>
         )}
 
-        {/* Subject */}
         <div className="ua-modal-field">
           <label className="ua-modal-label">Subject *</label>
           <input className="ua-modal-input" value={subject}
@@ -174,7 +169,6 @@ export default function SendAnnouncementModal({ role, open, onClose, onSent }: P
             placeholder="e.g. Class cancelled tomorrow" />
         </div>
 
-        {/* Message */}
         <div className="ua-modal-field">
           <label className="ua-modal-label">Message *</label>
           <textarea className="ua-modal-input" value={message} rows={5}

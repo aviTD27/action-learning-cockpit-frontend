@@ -30,7 +30,6 @@ export default function BulkNotifyModal({
       setError('Subject and message are required.')
       return
     }
-    // TODO: Backend
     setSent(true)
     setError('')
   }
@@ -70,7 +69,6 @@ export default function BulkNotifyModal({
           </div>
         ) : (
           <>
-            {/* Recipient group */}
             <div className="modal-field">
               <label className="modal-label">
                 Send to
@@ -91,7 +89,6 @@ export default function BulkNotifyModal({
               </select>
             </div>
 
-            {/* Subject */}
             <div className="modal-field">
               <label className="modal-label">Subject *</label>
               <input
@@ -102,7 +99,6 @@ export default function BulkNotifyModal({
               />
             </div>
 
-            {/* Message */}
             <div className="modal-field">
               <label className="modal-label">Message *</label>
               <textarea

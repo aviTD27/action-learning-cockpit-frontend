@@ -7,10 +7,10 @@ const DAY_LABELS: Record<DayOfWeek, string> = {
   THURSDAY: 'Thu', FRIDAY: 'Fri', SATURDAY: 'Sat', SUNDAY: 'Sun',
 }
 
-const HOUR_START  = 7
-const HOUR_END    = 21
+const HOUR_START = 7
+const HOUR_END = 21
 const TOTAL_HOURS = HOUR_END - HOUR_START
-const ROW_H       = 56
+const ROW_H = 56
 
 function toMinutes(t: string) {
   const [h, m] = t.split(':').map(Number)
@@ -32,14 +32,10 @@ function heightPx(startTime: string, endTime: string) {
 
 const TOTAL_H_PX = TOTAL_HOURS * ROW_H
 
-// ── Overlap layout ────────────────────────────────────────────────────────────
-// Greedy interval-column assignment: each overlapping group of entries is split
-// into parallel sub-columns so all entries in the same time span are visible.
-
 interface LayoutEntry {
   entry: TimetableEntry
-  colIndex: number  // 0-based sub-column within the overlap group
-  colTotal: number  // how many sub-columns are needed in this time range
+  colIndex: number
+  colTotal: number
 }
 
 function overlaps(s1: number, e1: number, s2: number, e2: number) {
@@ -54,14 +50,12 @@ function layoutEntries(entries: TimetableEntry[]): LayoutEntry[] {
     return d !== 0 ? d : toMinutes(b.endTime) - toMinutes(a.endTime)
   })
 
-  // colEnd[i] = the minute at which the last entry assigned to column i ends
   const colEnd: number[] = []
   const assigned: number[] = new Array(sorted.length).fill(0)
 
   for (let i = 0; i < sorted.length; i++) {
     const start = toMinutes(sorted[i].startTime)
 
-    // Find the first free column (whose last entry ended at or before this start)
     let col = colEnd.findIndex(e => e <= start)
     if (col === -1) col = colEnd.length
 
@@ -74,7 +68,6 @@ function layoutEntries(entries: TimetableEntry[]): LayoutEntry[] {
     const start = toMinutes(entry.startTime)
     const end   = toMinutes(entry.endTime)
 
-    // colTotal = max sub-column index among all overlapping entries + 1
     let maxCol = 0
     for (let j = 0; j < sorted.length; j++) {
       if (overlaps(toMinutes(sorted[j].startTime), toMinutes(sorted[j].endTime), start, end)) {
@@ -85,8 +78,6 @@ function layoutEntries(entries: TimetableEntry[]): LayoutEntry[] {
     return { entry, colIndex: assigned[i], colTotal: maxCol + 1 }
   })
 }
-
-// ── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
   entries:   TimetableEntry[]
@@ -111,7 +102,6 @@ export default function WeeklyCalendar({ entries, canEdit, onAdd, onEdit, onDele
 
       <div className="wc-card">
 
-        {/* Sticky day-name header */}
         <div className="wc-header">
           <div className="wc-gutter-cell" />
           {DAYS.map(d => (
@@ -119,10 +109,8 @@ export default function WeeklyCalendar({ entries, canEdit, onAdd, onEdit, onDele
           ))}
         </div>
 
-        {/* Scrollable body */}
         <div className="wc-body">
 
-          {/* Hour labels */}
           <div className="wc-gutter">
             {hours.map(h => (
               <div key={h} className="wc-time-label" style={{ height: ROW_H }}>
@@ -131,7 +119,6 @@ export default function WeeklyCalendar({ entries, canEdit, onAdd, onEdit, onDele
             ))}
           </div>
 
-          {/* Day columns */}
           <div className="wc-days">
             {DAYS.map(day => {
               const dayEntries = entries.filter(e => e.dayOfWeek === day)
@@ -148,7 +135,6 @@ export default function WeeklyCalendar({ entries, canEdit, onAdd, onEdit, onDele
                     const h = Math.max(heightPx(entry.startTime, entry.endTime) - 4, 20)
                     const compact = colTotal > 2
 
-                    // Sub-column geometry: GUTTER=3px each side, GAP=2px between cols
                     const gutter = 3, gap = 2
                     const unit = `(100% - ${gutter * 2 + gap * (colTotal - 1)}px) / ${colTotal}`
                     const left = colIndex === 0
@@ -161,13 +147,13 @@ export default function WeeklyCalendar({ entries, canEdit, onAdd, onEdit, onDele
                         key={entry.id}
                         className={`wc-entry${compact ? ' wc-entry--compact' : ''}`}
                         style={{
-                          top:        topPx(entry.startTime),
-                          height:     h,
+                          top: topPx(entry.startTime),
+                          height: h,
                           left,
                           width,
                           background: entry.color || '#6366f1',
                         }}
-                        title={`${entry.title} — ${entry.lecturerName ?? ''} · ${entry.cohortName} · ${entry.room}`}
+                        title={`${entry.title}  ${entry.lecturerName ?? ''} · ${entry.cohortName} · ${entry.room}`}
                       >
                         <div className="wc-entry-title">{entry.title}</div>
 

@@ -26,10 +26,9 @@ function formatDate(iso: string): string {
   })
 }
 
-/* ── Overall KPI bar ── */
 function SummaryBar({ grades }: { grades: GradeItem[] }) {
-  const pcts    = grades.map(g => scorePct(g.grade, g.maxPoints))
-  const avg     = Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length)
+  const pcts = grades.map(g => scorePct(g.grade, g.maxPoints))
+  const avg = Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length)
   const highest = Math.max(...pcts)
   const lowest  = Math.min(...pcts)
 
@@ -66,10 +65,9 @@ function SummaryBar({ grades }: { grades: GradeItem[] }) {
   )
 }
 
-/* ── Expandable grade row ── */
 function GradeRow({ grade }: { grade: GradeItem }) {
   const [open, setOpen] = useState(false)
-  const p     = scorePct(grade.grade, grade.maxPoints)
+  const p = scorePct(grade.grade, grade.maxPoints)
   const color = scoreColor(p)
 
   return (
@@ -112,7 +110,6 @@ function GradeRow({ grade }: { grade: GradeItem }) {
   )
 }
 
-/* ── Course section (collapsible) ── */
 interface CourseGroup {
   courseName: string
   grades: GradeItem[]
@@ -120,8 +117,8 @@ interface CourseGroup {
 
 function CourseSection({ group }: { group: CourseGroup }) {
   const [open, setOpen] = useState(true)
-  const pcts  = group.grades.map(g => scorePct(g.grade, g.maxPoints))
-  const avg   = Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length)
+  const pcts = group.grades.map(g => scorePct(g.grade, g.maxPoints))
+  const avg = Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length)
   const color = scoreColor(avg)
 
   return (
@@ -152,7 +149,6 @@ function CourseSection({ group }: { group: CourseGroup }) {
   )
 }
 
-/* ── Main page ── */
 export default function GradesPage() {
   const [grades,  setGrades]  = useState<GradeItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -161,23 +157,19 @@ export default function GradesPage() {
   useEffect(() => {
     async function load() {
       try {
-        // Fetch grades and student profile in parallel
         const [rawGrades, profile] = await Promise.all([
           getMyGrades(),
           getMyProfile(),
         ])
 
-        // Fetch assignments for this student's programme to get course names
         const assignments = await getAssignmentsForProgramme(profile.programmeId)
 
-        // Build explicit lookup: submissionId → courseName
         const courseBySubmission = new Map(
           assignments
             .filter(a => a.courseName)
             .map(a => [a.id, a.courseName as string])
         )
 
-        // Enrich each grade with the course name from the assignments lookup
         const enriched = rawGrades.map(g => ({
           ...g,
           courseName: g.courseName ?? courseBySubmission.get(g.submissionId) ?? null,
@@ -194,11 +186,10 @@ export default function GradesPage() {
     load()
   }, [])
 
-  // Group grades by course name
   const courseGroups = useMemo<CourseGroup[]>(() => {
     const map = new Map<string, GradeItem[]>()
     for (const g of grades) {
-      const key = g.courseName ?? '—'
+      const key = g.courseName ?? ''
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(g)
     }

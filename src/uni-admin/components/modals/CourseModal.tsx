@@ -37,7 +37,6 @@ export default function CourseModal({ open, semesterId, lecturers: initialLectur
       setDescription(existing?.description ?? '')
       setLecturerId(existing?.lecturerId ?? '')
       setError(null)
-      // Always fetch fresh lecturer list when modal opens
       getLecturers(universityId ?? undefined)
         .then(r => setFreshLecturers(r.data))
         .catch(() => {})
@@ -111,7 +110,7 @@ export default function CourseModal({ open, semesterId, lecturers: initialLectur
           {noLecturers ? (
             <div className="ua-empty-inline">
               <p className="ua-field-hint" style={{ margin: 0 }}>
-                No lecturers yet — add one first, then assign them here.
+                No lecturers yet  add one first, then assign them here.
               </p>
               <Link to="/uni-admin/lecturers" className="ua-btn ua-btn-secondary ua-btn-xs" onClick={onClose}>
                 Go to Lecturers

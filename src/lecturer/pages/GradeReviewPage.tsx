@@ -16,7 +16,7 @@ export default function GradeReviewPage() {
 
   const handleRelease = (id: number, title: string, draft: number) => {
     releaseSubmission(id)
-    setNotice(`${draft} draft grade${draft === 1 ? '' : 's'} for "${title}" released — students will see them once the student portal exists.`)
+    setNotice(`${draft} draft grade${draft === 1 ? '' : 's'} for "${title}" released  students will see them once the student portal exists.`)
   }
 
   const totalDraft = submissions.reduce((sum, s) => sum + summaryFor(s.id).draft, 0)
@@ -37,7 +37,7 @@ export default function GradeReviewPage() {
           </div>
           <div className="ua-table-wrap">
             {submissions.length === 0 ? (
-              <p className="ua-table-empty">No submissions yet — create one from the Submissions page.</p>
+              <p className="ua-table-empty">No submissions yet  create one from the Submissions page.</p>
             ) : (
               <table className="ua-table">
                 <thead>
@@ -66,7 +66,7 @@ export default function GradeReviewPage() {
                           </Link>
                           <button
                             className="ua-btn ua-btn-success"
-                            disabled={summary.draft === 0}
+                            disabled={summary.draft === 0 && summary.released === 0}
                             onClick={() => handleRelease(s.id, s.title, summary.draft)}
                           >
                             <CheckCheck size={12} /> Release

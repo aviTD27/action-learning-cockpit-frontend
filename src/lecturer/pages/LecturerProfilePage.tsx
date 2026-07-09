@@ -12,7 +12,7 @@ function initials(first?: string, last?: string) {
 }
 
 function formatRole(role?: string | null) {
-  if (!role) return '—'
+  if (!role) return ''
   return role.replace('ROLE_', '').replace(/_/g, ' ').toLowerCase()
     .replace(/\b\w/g, c => c.toUpperCase())
 }
@@ -56,7 +56,6 @@ export default function LecturerProfilePage() {
           <p className="ua-table-empty">{error}</p>
         ) : (
           <>
-            {/* Profile header */}
             <div className="ua-card">
               <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                 <div style={{
@@ -81,18 +80,16 @@ export default function LecturerProfilePage() {
               </div>
             </div>
 
-            {/* Info cards */}
             <div className="ua-two-col">
-              {/* Personal info */}
               <div className="ua-card">
                 <div className="ua-card-header">
                   <p className="ua-card-title"><UserRound size={14} /> Personal Info</p>
                 </div>
                 <div style={{ padding: '0.25rem 1rem' }}>
                   {[
-                    { label: 'First name', value: p.firstName || '—' },
-                    { label: 'Last name',  value: p.surname || '—' },
-                    { label: 'Email',      value: p.email || '—' },
+                    { label: 'First name', value: p.firstName || '' },
+                    { label: 'Last name',  value: p.surname || '' },
+                    { label: 'Email',      value: p.email || '' },
                     { label: 'Role',       value: formatRole(p.role) },
                   ].map(r => (
                     <div key={r.label} style={{
@@ -106,14 +103,13 @@ export default function LecturerProfilePage() {
                 </div>
               </div>
 
-              {/* Institution info */}
               <div className="ua-card">
                 <div className="ua-card-header">
                   <p className="ua-card-title"><Landmark size={14} /> Institution</p>
                 </div>
                 <div style={{ padding: '0.25rem 1rem' }}>
                   {[
-                    { label: 'University', icon: Landmark,    value: institutionName || '—' },
+                    { label: 'University', icon: Landmark,    value: institutionName || '' },
                     { label: 'Access',     icon: ShieldCheck, value: formatRole(p.role) },
                   ].map(r => (
                     <div key={r.label} style={{

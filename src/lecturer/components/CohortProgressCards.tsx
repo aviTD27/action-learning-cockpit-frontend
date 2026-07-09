@@ -30,7 +30,7 @@ export default function CohortProgressCards({ items }: { items: CourseProgressIt
                     <div className="ua-progress-fill" style={{ width: `${c.gradedPct}%` }} />
                   </div>
                 </div>
-                <div className="ua-cohort-avg">Avg grade: <strong>{c.avgPercent != null ? `${c.avgPercent}%` : '—'}</strong></div>
+                <div className="ua-cohort-avg">Avg grade: <strong>{c.avgPercent != null ? `${c.avgPercent}%` : ''}</strong></div>
               </div>
             ))}
           </div>

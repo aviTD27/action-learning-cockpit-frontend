@@ -47,7 +47,7 @@ export default function BenchmarkTable({ rows }: { rows: CohortBenchmark[] }) {
             ) : rows.map(row => (
               <tr key={row.cohortId} className={row.rank <= 3 ? 'top-row' : ''}>
                 <td className="cohort-name">{row.cohortName}</td>
-                <td style={{ color: '#6b7280' }}>{row.programmeName ?? '—'}</td>
+                <td style={{ color: '#6b7280' }}>{row.programmeName ?? ''}</td>
                 <td>{row.students}</td>
                 <td>{row.submissions}</td>
                 <td>{row.releasedGrades}</td>

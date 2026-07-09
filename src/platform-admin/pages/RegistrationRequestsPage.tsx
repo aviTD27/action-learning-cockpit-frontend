@@ -82,7 +82,7 @@ export default function RegistrationRequestsPage() {
                   <td>{r.domain}</td>
                   <td>{r.adminFirstName} {r.adminLastName}</td>
                   <td>{r.adminContactEmail}</td>
-                  <td>{r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '—'}</td>
+                  <td>{r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : ''}</td>
                   <td>{badge(r.status)}{r.status === 'DECLINED' && r.declineReason ? <span className="rq-sub">{r.declineReason}</span> : null}</td>
                   <td className="rq-actions">
                     {r.status === 'PENDING' ? (
@@ -90,7 +90,7 @@ export default function RegistrationRequestsPage() {
                         <button className="rq-btn rq-approve" disabled={busyId === r.id} onClick={() => approve(r)}>Approve</button>
                         <button className="rq-btn rq-decline" disabled={busyId === r.id} onClick={() => decline(r)}>Decline</button>
                       </>
-                    ) : <span className="rq-sub">—</span>}
+                    ) : <span className="rq-sub"></span>}
                   </td>
                 </tr>
               ))}

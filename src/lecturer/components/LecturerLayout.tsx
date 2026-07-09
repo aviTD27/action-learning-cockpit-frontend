@@ -4,7 +4,7 @@ import { getLecturerNav } from '../nav'
 import { getAnnouncementUnreadCount } from '../../api/announcementsApi'
 
 interface Props {
-  title:    string
+  title: string
   subtitle: string
   children: ReactNode
 }

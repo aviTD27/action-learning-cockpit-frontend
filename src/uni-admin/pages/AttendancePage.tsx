@@ -93,12 +93,12 @@ function StudentDetailModal({ stats, onClose }: DetailModalProps) {
 export default function UniAdminAttendancePage() {
   const sidebarUser = useUniAdminSidebarUser()
 
-  const [cohorts,          setCohorts]          = useState<CohortResponse[]>([])
+  const [cohorts, setCohorts] = useState<CohortResponse[]>([])
   const [selectedCohortId, setSelectedCohortId] = useState<number | ''>('')
-  const [stats,            setStats]            = useState<StudentAttendanceStats[]>([])
-  const [loading,          setLoading]          = useState(false)
+  const [stats, setStats] = useState<StudentAttendanceStats[]>([])
+  const [loading, setLoading] = useState(false)
   const [selectedStudent,  setSelectedStudent]  = useState<StudentAttendanceStats | null>(null)
-  const [loadingDetail,    setLoadingDetail]    = useState(false)
+  const [loadingDetail, setLoadingDetail] = useState(false)
 
   useEffect(() => {
     getCohorts().then(r => setCohorts(r.data)).catch(() => {})
@@ -130,9 +130,9 @@ export default function UniAdminAttendancePage() {
     }
   }
 
-  const qualified    = stats.filter(s => s.cohorts.some(c => c.qualifiedForExam)).length
+  const qualified = stats.filter(s => s.cohorts.some(c => c.qualifiedForExam)).length
   const notQualified = stats.length - qualified
-  const avgRate      = stats.length > 0
+  const avgRate = stats.length > 0
     ? Math.round(stats.reduce((sum, s) => sum + (s.cohorts[0]?.attendanceRate ?? 0), 0) / stats.length)
     : 0
 
@@ -145,7 +145,6 @@ export default function UniAdminAttendancePage() {
     >
       <div className="ua-page">
 
-        {/* ── Cohort selector ── */}
         <div className="ua-card">
           <div className="ua-card-header">
             <p className="ua-card-title"><BarChart3 size={14} /> Attendance Overview</p>
@@ -179,7 +178,6 @@ export default function UniAdminAttendancePage() {
           </div>
         </div>
 
-        {/* ── KPIs ── */}
         {stats.length > 0 && (
           <>
             <div className="ua-kpi-row">
@@ -205,7 +203,6 @@ export default function UniAdminAttendancePage() {
               </div>
             </div>
 
-            {/* ── Stats table ── */}
             <div className="ua-card">
               <div className="ua-card-header">
                 <p className="ua-card-title">
@@ -268,7 +265,6 @@ export default function UniAdminAttendancePage() {
           </>
         )}
 
-        {/* ── Student detail modal ── */}
         {selectedStudent && (
           <StudentDetailModal
             stats={selectedStudent}

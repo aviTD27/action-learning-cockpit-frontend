@@ -5,7 +5,7 @@ import { submitRegistration, type RegistrationRequest } from '../api/registratio
 import './styles/landing.css'
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/
-const URL_RE   = /^(https?:\/\/)?[\w.-]+\.[a-z]{2,}.*$/i
+const URL_RE = /^(https?:\/\/)?[\w.-]+\.[a-z]{2,}.*$/i
 const DOMAIN_RE = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 type Errors = Partial<Record<keyof RegistrationRequest, string>>
@@ -16,10 +16,10 @@ const EMPTY: RegistrationRequest = {
 }
 
 export default function RequestAccessPage() {
-  const [form, setForm]         = useState<RegistrationRequest>(EMPTY)
-  const [errors, setErrors]     = useState<Errors>({})
+  const [form, setForm] = useState<RegistrationRequest>(EMPTY)
+  const [errors, setErrors] = useState<Errors>({})
   const [submitting, setSubmitting] = useState(false)
-  const [done, setDone]         = useState(false)
+  const [done, setDone] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const set = (k: keyof RegistrationRequest) =>
@@ -28,14 +28,14 @@ export default function RequestAccessPage() {
 
   const validate = (): boolean => {
     const er: Errors = {}
-    if (!form.orgName.trim())         er.orgName = 'Required'
-    if (!form.country.trim())         er.country = 'Required'
-    if (!form.websiteUrl.trim())      er.websiteUrl = 'Required'
+    if (!form.orgName.trim()) er.orgName = 'Required'
+    if (!form.country.trim()) er.country = 'Required'
+    if (!form.websiteUrl.trim()) er.websiteUrl = 'Required'
     else if (!URL_RE.test(form.websiteUrl.trim())) er.websiteUrl = 'Enter a valid URL'
-    if (!form.domain.trim())          er.domain = 'Required'
+    if (!form.domain.trim()) er.domain = 'Required'
     else if (!DOMAIN_RE.test(form.domain.trim())) er.domain = 'Enter just the domain, e.g. epita.fr'
-    if (!form.adminFirstName.trim())  er.adminFirstName = 'Required'
-    if (!form.adminLastName.trim())   er.adminLastName = 'Required'
+    if (!form.adminFirstName.trim()) er.adminFirstName = 'Required'
+    if (!form.adminLastName.trim()) er.adminLastName = 'Required'
     if (!form.adminContactEmail.trim()) er.adminContactEmail = 'Required'
     else if (!EMAIL_RE.test(form.adminContactEmail.trim())) er.adminContactEmail = 'Enter a valid email'
     setErrors(er)
@@ -50,9 +50,9 @@ export default function RequestAccessPage() {
     try {
       await submitRegistration({
         ...form,
-        orgName:            form.orgName.trim(),
-        domain:             form.domain.trim().toLowerCase(),
-        adminContactEmail:  form.adminContactEmail.trim().toLowerCase(),
+        orgName: form.orgName.trim(),
+        domain: form.domain.trim().toLowerCase(),
+        adminContactEmail: form.adminContactEmail.trim().toLowerCase(),
       })
       setDone(true)
     } catch (err: any) {
@@ -70,7 +70,7 @@ export default function RequestAccessPage() {
           <CheckCircle2 size={42} className="lp-confirm-icon" />
           <h1>Request received</h1>
           <p>
-            Thanks — your access request for <strong>{form.orgName}</strong> has been submitted.
+            Thanks your access request for <strong>{form.orgName}</strong> has been submitted.
             The platform team will review it and email <strong>{form.adminContactEmail}</strong> with the outcome.
           </p>
           <Link to="/" className="lp-btn lp-btn-primary">Back to home</Link>
@@ -102,8 +102,8 @@ export default function RequestAccessPage() {
   )
 
   const domainValue = form.domain.trim().toLowerCase()
-  const lastName    = form.adminLastName.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
-  const firstName   = form.adminFirstName.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
+  const lastName = form.adminLastName.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
+  const firstName = form.adminFirstName.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
   const emailPreview = domainValue && lastName && firstName
     ? `${firstName}.${lastName}@${domainValue}`
     : null

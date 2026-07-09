@@ -8,8 +8,8 @@ import {
 
 export function useStudentNotifications() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
-  const [loading, setLoading]             = useState(true)
-  const [error, setError]                 = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     getMyNotifications()

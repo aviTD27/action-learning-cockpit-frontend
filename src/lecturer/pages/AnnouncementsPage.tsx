@@ -8,11 +8,11 @@ import '../styles/lecturer.css'
 type Tab = 'inbox' | 'sent'
 
 export default function LecturerAnnouncementsPage() {
-  const [tab,        setTab]        = useState<Tab>('inbox')
+  const [tab, setTab] = useState<Tab>('inbox')
   const [modalOpen,  setModalOpen]  = useState(false)
   const [sentBanner, setSentBanner] = useState(false)
-  const [inboxKey]                  = useState(0)
-  const [sentKey,    setSentKey]    = useState(0)
+  const [inboxKey] = useState(0)
+  const [sentKey, setSentKey] = useState(0)
 
   const handleSent = () => {
     setSentKey(k => k + 1)
@@ -24,7 +24,6 @@ export default function LecturerAnnouncementsPage() {
   return (
     <div className="ua-page" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
 
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#111827', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -45,7 +44,6 @@ export default function LecturerAnnouncementsPage() {
         </div>
       )}
 
-      {/* Tabs */}
       <div style={{ flexShrink: 0, display: 'flex', gap: 2, background: '#f3f4f6', padding: 4, borderRadius: 9, width: 'fit-content' }}>
         {([
           { id: 'inbox', label: 'From Admin',        icon: Inbox       },
@@ -70,7 +68,6 @@ export default function LecturerAnnouncementsPage() {
         ))}
       </div>
 
-      {/* Tab content */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {tab === 'inbox' && (
           <AnnouncementInbox key={inboxKey} recipientRole="ROLE_LECTURER" />

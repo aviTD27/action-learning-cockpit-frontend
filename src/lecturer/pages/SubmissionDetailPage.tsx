@@ -46,7 +46,7 @@ export default function SubmissionDetailPage() {
     notify(submissionId)
     const pending = Math.max(students.length - submittedCount, 0)
     setNotice(pending === 0
-      ? 'Everyone has submitted — no reminders were sent.'
+      ? 'Everyone has submitted  no reminders were sent.'
       : `Reminder sent to ${pending} student${pending === 1 ? '' : 's'} who haven't submitted yet.`)
   }
 
@@ -70,12 +70,12 @@ export default function SubmissionDetailPage() {
   const handleReopen = async (studentId: number, name: string) => {
     await reopen(submissionId, studentId)
     await reloadSubs()
-    setNotice(`Re-opened "${submission?.title}" for ${name} — they can submit a late exception.`)
+    setNotice(`Re-opened "${submission?.title}" for ${name}  they can submit a late exception.`)
   }
 
   const handleRelease = () => {
     releaseAll()
-    setNotice('All draft grades released — students will see them once the student portal exists.')
+    setNotice('All draft grades released  students will see them once the student portal exists.')
   }
 
   const handleExport = () => {
@@ -141,7 +141,7 @@ export default function SubmissionDetailPage() {
           <div className="ua-detail-grid">
             <div className="ua-detail-item full">
               <span className="ua-detail-label">Description / Instructions</span>
-              <span className="ua-detail-value">{submission.description || '—'}</span>
+              <span className="ua-detail-value">{submission.description || ''}</span>
             </div>
             {(submission.additionalNotes || submission.instructions) && (
               <div className="ua-detail-item full">
@@ -174,7 +174,7 @@ export default function SubmissionDetailPage() {
                   <button className="ua-link-btn" onClick={handleDownloadTemplate}>
                     <FileDown size={12} /> {submission.templateFileName ?? 'Download template'}
                   </button>
-                ) : '—'}
+                ) : ''}
               </span>
             </div>
             <div className="ua-detail-item">
@@ -183,23 +183,23 @@ export default function SubmissionDetailPage() {
             </div>
             <div className="ua-detail-item">
               <span className="ua-detail-label">Max File Size</span>
-              <span className="ua-detail-value">{submission.rules.maxFileSizeBytes ? `${Math.round(submission.rules.maxFileSizeBytes / (1024 * 1024))} MB` : '—'}</span>
+              <span className="ua-detail-value">{submission.rules.maxFileSizeBytes ? `${Math.round(submission.rules.maxFileSizeBytes / (1024 * 1024))} MB` : ''}</span>
             </div>
             <div className="ua-detail-item">
               <span className="ua-detail-label">Word Count</span>
               <span className="ua-detail-value">
                 {submission.rules.minWordCount || submission.rules.maxWordCount
                   ? `${submission.rules.minWordCount ?? 0} – ${submission.rules.maxWordCount ?? '∞'}`
-                  : '—'}
+                  : ''}
               </span>
             </div>
             <div className="ua-detail-item">
               <span className="ua-detail-label">Naming Convention</span>
-              <span className="ua-detail-value">{submission.rules.namingPattern || '—'}</span>
+              <span className="ua-detail-value">{submission.rules.namingPattern || ''}</span>
             </div>
             <div className="ua-detail-item">
               <span className="ua-detail-label">Required Headings</span>
-              <span className="ua-detail-value">{submission.rules.requiredHeadings || '—'}</span>
+              <span className="ua-detail-value">{submission.rules.requiredHeadings || ''}</span>
             </div>
             <div className="ua-detail-item">
               <span className="ua-detail-label">Max Attempts</span>
@@ -280,7 +280,7 @@ export default function SubmissionDetailPage() {
                         <td className="col-muted">{s.email}</td>
                         <td>
                           {(() => {
-                            if (!subsTracked) return <span className="col-muted">—</span>
+                            if (!subsTracked) return <span className="col-muted"></span>
                             const sub = submissionFor(s.id)
                             if (!sub) {
                               return (
@@ -303,7 +303,7 @@ export default function SubmissionDetailPage() {
                         <td>
                           {(() => {
                             const sub = submissionFor(s.id)
-                            if (!sub || sub.overallScore == null) return <span className="col-muted">—</span>
+                            if (!sub || sub.overallScore == null) return <span className="col-muted"></span>
                             const pct = Math.round(sub.overallScore * 100)
                             return (
                               <span className={`ua-score-chip ua-score-chip-${sub.scoreLevel ?? 'average'}`}>
@@ -324,9 +324,9 @@ export default function SubmissionDetailPage() {
                               {g.grade} / {submission.maxPoints}
                               <GradeBadge grade={g.grade} maxPoints={submission.maxPoints} />
                             </span>
-                          ) : '—'}
+                          ) : ''}
                         </td>
-                        <td className="col-muted">{g?.feedback || '—'}</td>
+                        <td className="col-muted">{g?.feedback || ''}</td>
                         <td className="col-actions">
                           {(() => {
                             const sub = subsTracked ? submissionFor(s.id) : undefined

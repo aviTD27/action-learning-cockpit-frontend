@@ -31,8 +31,6 @@ interface Props {
 }
 
 export default function StudentModal({ open, existing, programmes, cohorts, onClose, onSave }: Props) {
-  // The admin's email is firstname.lastname@university-domain (generated during registration approval).
-  // Extracting the @-suffix gives us the university domain without any extra API call.
   const { email: adminEmail } = useAuth()
   const domain = adminEmail?.includes('@')
     ? adminEmail.slice(adminEmail.indexOf('@') + 1)
@@ -71,7 +69,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
 
   if (!open) return null
 
-  // Show intakes that run the selected programme (an intake can host several programmes).
   const cohortsForProgramme = programmeId === ''
     ? cohorts
     : cohorts.filter(c => c.programmeIds.includes(programmeId as number))
@@ -79,7 +76,7 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
   const submit = async () => {
     if (!firstName.trim() || !lastName.trim()) { setError('First and last name are required'); return }
     if (!isEditing && !/^\S+@\S+\.\S+$/.test(personalEmail)) {
-      setError('A valid personal email is required — login credentials will be sent there')
+      setError('A valid personal email is required  login credentials will be sent there')
       return
     }
     if (programmeId === '') { setError('Programme is required'); return }
@@ -123,7 +120,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
           </div>
         </div>
 
-        {/* Platform email — auto-generated, always read-only */}
         <div className="ua-modal-field">
           <label className="ua-modal-label">
             Platform Login Email
@@ -142,7 +138,6 @@ export default function StudentModal({ open, existing, programmes, cohorts, onCl
           />
         </div>
 
-        {/* Personal email — only for new students */}
         {!isEditing && (
           <div className="ua-modal-field">
             <label className="ua-modal-label">

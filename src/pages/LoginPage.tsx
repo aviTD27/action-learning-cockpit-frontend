@@ -6,11 +6,11 @@ import { loginUser } from '../api/authService'
 import './auth.css'
 
 const ROLE_ROUTES: Record<string, string> = {
-  ROLE_SUPER_ADMIN:    '/super-admin',
+  ROLE_SUPER_ADMIN: '/super-admin',
   ROLE_PLATFORM_ADMIN: '/super-admin',
-  ROLE_UNI_ADMIN:      '/uni-admin',
-  ROLE_LECTURER:       '/lecturer',
-  ROLE_STUDENT:        '/student',
+  ROLE_UNI_ADMIN: '/uni-admin',
+  ROLE_LECTURER: '/lecturer',
+  ROLE_STUDENT: '/student',
 }
 
 interface Particle {
@@ -153,7 +153,6 @@ export default function LoginPage() {
 
   return (
     <div className="auth-split">
-      {/* LEFT: Branded panel */}
       <div className="auth-brand-panel">
         <div className="auth-brand-shapes">
           <div className="auth-shape auth-shape-1" />
@@ -170,7 +169,7 @@ export default function LoginPage() {
           </div>
           <h1 className="auth-brand-title">Action Learning<br />Cockpit</h1>
           <p className="auth-brand-desc">
-            One platform for teaching, submissions and grading — across all your universities.
+            One platform for teaching, submissions and grading  across all your universities.
           </p>
           <div className="auth-brand-stats">
             <div className="auth-stat">
@@ -191,7 +190,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* RIGHT: Form panel */}
       <div className="auth-form-panel">
         <div className="auth-form-dots" />
         <div className="auth-form-container">
@@ -253,15 +251,6 @@ export default function LoginPage() {
                 {loading ? 'Signing in…' : 'Sign In'}
               </button>
             </form>
-
-            {/* <div className="auth-divider">
-              <span>OR</span>
-            </div>
-
-            <button type="button" className="auth-btn-sso">
-              <GraduationCap size={16} />
-              Sign in with University SSO
-            </button> */}
           </div>
 
           <p className="auth-footer">

@@ -42,7 +42,6 @@ export default function AddLecturerModal({ open, onClose, onSave }: Props) {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
-  // toggle cohort selection
   const toggleCohort = (cohort: string) => {
     setForm(f => ({
       ...f,
@@ -77,7 +76,6 @@ export default function AddLecturerModal({ open, onClose, onSave }: Props) {
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
-        {/* Name row */}
         <div className="modal-row">
           <div className="modal-field">
             <label className="modal-label">First Name *</label>
@@ -101,7 +99,6 @@ export default function AddLecturerModal({ open, onClose, onSave }: Props) {
           </div>
         </div>
 
-        {/* Email */}
         <div className="modal-field">
           <label className="modal-label">Email Address *</label>
           <input
@@ -114,7 +111,6 @@ export default function AddLecturerModal({ open, onClose, onSave }: Props) {
           />
         </div>
 
-        {/* Staff ID + Role */}
         <div className="modal-row">
           <div className="modal-field">
             <label className="modal-label">Staff ID *</label>
@@ -142,7 +138,6 @@ export default function AddLecturerModal({ open, onClose, onSave }: Props) {
           </div>
         </div>
 
-        {/* Cohort assignment */}
         <div className="modal-field">
           <label className="modal-label">
             Assign to Cohorts *

@@ -31,16 +31,15 @@ export default function DashboardPage() {
   }
 
   const KPIS = [
-    { icon: BookOpen,    label: 'Total Assignments', value: stats.totalAssignments, color: ''       },
-    { icon: CheckCircle, label: 'Submitted',          value: stats.submitted,        color: 'green'  },
-    { icon: Clock,       label: 'Pending',            value: stats.pending,          color: 'orange' },
-    { icon: Star,        label: 'Graded',             value: stats.graded,           color: 'blue'   },
+    { icon: BookOpen, label: 'Total Assignments', value: stats.totalAssignments, color: ''},
+    { icon: CheckCircle, label: 'Submitted', value: stats.submitted, color: 'green'},
+    { icon: Clock, label: 'Pending', value: stats.pending, color: 'orange'},
+    { icon: Star, label: 'Graded', value: stats.graded, color: 'blue'},
   ]
 
   return (
     <div className="sd-page">
 
-      {/* KPI row */}
       <div className="sd-kpi-row">
         {KPIS.map(k => (
           <div className="sd-kpi-card" key={k.label}>
@@ -51,7 +50,6 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Upcoming deadlines */}
       <div className="sd-card">
         <div className="sd-card-header">
           <p className="sd-card-title">
@@ -101,10 +99,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom row */}
       <div className="sd-two-col">
 
-        {/* Recent grades */}
         <div className="sd-card">
           <div className="sd-card-header">
             <p className="sd-card-title"><TrendingUp size={14} /> Recent Grades</p>
@@ -139,16 +135,15 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick links */}
         <div className="sd-card">
           <div className="sd-card-header">
             <p className="sd-card-title"><GraduationCap size={14} /> Quick Links</p>
           </div>
           <div style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {[
-              { to: '/student/assignments', icon: BookOpen,    label: 'View all assignments' },
-              { to: '/student/grades',      icon: Star,        label: 'View my grades'       },
-              { to: '/student/cohort',      icon: GraduationCap, label: 'My cohort info'     },
+              { to: '/student/assignments', icon: BookOpen, label: 'View all assignments'},
+              { to: '/student/grades', icon: Star, label: 'View my grades'},
+              { to: '/student/cohort', icon: GraduationCap, label: 'My cohort info'},
             ].map(l => (
               <Link
                 key={l.to}

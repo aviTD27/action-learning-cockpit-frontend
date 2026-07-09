@@ -7,20 +7,20 @@ interface Props {
 }
 
 export default function ChangePasswordModal({ onClose }: Props) {
-  const [current, setCurrent]   = useState('')
-  const [next, setNext]         = useState('')
+  const [current, setCurrent] = useState('')
+  const [next, setNext] = useState('')
   const [confirm, setConfirm]   = useState('')
-  const [error, setError]       = useState<string | null>(null)
-  const [success, setSuccess]   = useState(false)
-  const [saving, setSaving]     = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const validate = (): string | null => {
     if (!current || !next || !confirm) return 'All fields are required.'
-    if (next.length < 8)              return 'New password must be at least 8 characters.'
-    if (!/[A-Z]/.test(next))          return 'New password must include an uppercase letter.'
-    if (!/[0-9]/.test(next))          return 'New password must include a number.'
-    if (!/[^A-Za-z0-9]/.test(next))   return 'New password must include a special character.'
-    if (next !== confirm)             return 'New passwords do not match.'
+    if (next.length < 8) return 'New password must be at least 8 characters.'
+    if (!/[A-Z]/.test(next)) return 'New password must include an uppercase letter.'
+    if (!/[0-9]/.test(next)) return 'New password must include a number.'
+    if (!/[^A-Za-z0-9]/.test(next)) return 'New password must include a special character.'
+    if (next !== confirm) return 'New passwords do not match.'
     return null
   }
 

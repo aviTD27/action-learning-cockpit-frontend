@@ -23,7 +23,7 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
   const [dueTime, setDueTime] = useState('23:59')
   const [maxPoints, setMaxPoints] = useState('20')
   const [templateFile, setTemplateFile] = useState<File | null>(null)
-  // Smart-Gate rules
+
   const [allowedFileTypes, setAllowedFileTypes] = useState('')
   const [maxAttempts, setMaxAttempts] = useState('1')
   const [lateAllowed, setLateAllowed] = useState(false)
@@ -134,7 +134,6 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
       <div className="ua-modal ua-modal-lg" onClick={e => e.stopPropagation()}>
         <h2 className="ua-modal-title">{isEditing ? 'Edit Assignment' : 'Create Assignment'}</h2>
 
-        {/* ── Basics ── */}
         <div className="ua-form-section">
           <p className="ua-form-section-title">Basics</p>
           <div className="ua-form-grid">
@@ -173,7 +172,6 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
           </div>
         </div>
 
-        {/* ── Deadline & Courses ── */}
         <div className="ua-form-section">
           <p className="ua-form-section-title">Deadline &amp; Courses</p>
           <div className="ua-form-grid">
@@ -184,7 +182,7 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
                   onChange={e => setCourseId(e.target.value === '' ? '' : Number(e.target.value))}>
                   <option value="">Select a course…</option>
                   {activeCourses.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} — {c.programmeName}</option>
+                    <option key={c.id} value={c.id}>{c.name}  {c.programmeName}</option>
                   ))}
                 </select>
               </div>
@@ -192,14 +190,14 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
               <div className="ua-modal-field full">
                 <label className="ua-modal-label">Courses * (assign to one or more)</label>
                 {activeCourses.length === 0 ? (
-                  <p className="ua-modal-error">No courses yet — ask your admin to add a course first.</p>
+                  <p className="ua-modal-error">No courses yet  ask your admin to add a course first.</p>
                 ) : (
                   <div className="ua-checklist">
                     {activeCourses.map(c => (
                       <label key={c.id} className="ua-checklist-item">
                         <input type="checkbox" checked={courseIds.includes(c.id)}
                           onChange={() => toggleCourse(c.id)} />
-                        {c.name} — {c.programmeName}
+                        {c.name}  {c.programmeName}
                       </label>
                     ))}
                   </div>
@@ -219,7 +217,6 @@ export default function SubmissionModal({ open, existing, onClose, onSave }: Pro
           </div>
         </div>
 
-        {/* ── Smart-Gate rules ── */}
         <div className="ua-form-section">
           <p className="ua-form-section-title">Submission Rules (Smart-Gate)</p>
           <div className="ua-form-grid-3">

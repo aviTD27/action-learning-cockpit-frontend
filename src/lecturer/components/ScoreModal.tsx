@@ -13,15 +13,15 @@ interface Props {
 
 const LEVEL_CLASS: Record<string, string> = {
   excellent: 'ua-score-excellent',
-  good:      'ua-score-good',
-  average:   'ua-score-average',
-  poor:      'ua-score-poor',
+  good: 'ua-score-good',
+  average: 'ua-score-average',
+  poor: 'ua-score-poor',
 }
 
 const CONF_CLASS: Record<string, string> = {
-  high:   'ua-conf-high',
+  high: 'ua-conf-high',
   medium: 'ua-conf-medium',
-  low:    'ua-conf-low',
+  low: 'ua-conf-low',
 }
 
 function ScoreBar({ score }: { score: number }) {
@@ -54,7 +54,7 @@ export default function ScoreModal({ open, studentName, uploadId, onClose }: Pro
     <div className="ua-modal-overlay" onClick={onClose}>
       <div className="ua-modal ua-score-modal" onClick={e => e.stopPropagation()}>
         <div className="ua-score-modal-header">
-          <h2 className="ua-modal-title"><Brain size={16} /> AI Assessment — {studentName}</h2>
+          <h2 className="ua-modal-title"><Brain size={16} /> AI Assessment  {studentName}</h2>
           <button className="ua-icon-btn" onClick={onClose}><X size={15} /></button>
         </div>
 
@@ -79,7 +79,7 @@ export default function ScoreModal({ open, studentName, uploadId, onClose }: Pro
             {report.requiresHumanReview && (
               <div className="ua-review-warning">
                 <AlertTriangle size={13} />
-                One or more criteria have low confidence — human review recommended.
+                One or more criteria have low confidence  human review recommended.
               </div>
             )}
 

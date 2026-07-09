@@ -39,7 +39,7 @@ export default function GradeModal({ open, student, maxPoints, existing, onClose
   return (
     <div className="ua-modal-overlay" onClick={onClose}>
       <div className="ua-modal" onClick={e => e.stopPropagation()}>
-        <h2 className="ua-modal-title">Grade — {student.firstName} {student.lastName}</h2>
+        <h2 className="ua-modal-title">Grade  {student.firstName} {student.lastName}</h2>
 
         <div className="ua-modal-field">
           <label className="ua-modal-label">Grade * (out of {maxPoints})</label>

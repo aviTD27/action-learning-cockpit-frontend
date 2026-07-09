@@ -24,7 +24,7 @@ const BAND_COLORS: Record<string, string> = {
 const C = ['#6366f1', '#10b981', '#f59e0b', '#0ea5e9', '#ef4444', '#8b5cf6', '#f97316']
 const GRADE_COLORS: Record<string, string> = { RELEASED: '#10b981', DRAFT: '#f59e0b' }
 
-const trunc = (s: string) => (s && s.length > 14 ? s.slice(0, 13) + '…' : s || '—')
+const trunc = (s: string) => (s && s.length > 14 ? s.slice(0, 13) + '…' : s || '')
 
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
@@ -124,36 +124,34 @@ export default function LecturerDashboard() {
           <p className="db-sub">Your assignments, grading progress, and upcoming deadlines at a glance.</p>
         </div>
 
-        {/* KPI Row — clickable tiles */}
         <div className="db-kpi-row">
           <Link to="/lecturer/submissions" className="db-kpi db-kpi-blue" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="db-kpi-label">Assignments</div>
-            <div className="db-kpi-value">{loading ? '—' : submissions.length}</div>
+            <div className="db-kpi-value">{loading ? '' : submissions.length}</div>
             <div className="db-kpi-note">total submissions</div>
           </Link>
           <div className="db-kpi db-kpi-green">
             <div className="db-kpi-label">Courses</div>
-            <div className="db-kpi-value">{loading ? '—' : courses.length}</div>
+            <div className="db-kpi-value">{loading ? '' : courses.length}</div>
             <div className="db-kpi-note">{loading ? '' : `${activeCourses} active`}</div>
           </div>
           <div className="db-kpi db-kpi-indigo">
             <div className="db-kpi-label">Students</div>
-            <div className="db-kpi-value">{loading ? '—' : students.length}</div>
+            <div className="db-kpi-value">{loading ? '' : students.length}</div>
             <div className="db-kpi-note">{loading ? '' : `${activeStudents} active`}</div>
           </div>
           <Link to="/lecturer/grade-review" className="db-kpi db-kpi-amber" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="db-kpi-label">Awaiting Grades</div>
-            <div className="db-kpi-value">{overview ? overview.gradingBacklog : '—'}</div>
+            <div className="db-kpi-value">{overview ? overview.gradingBacklog : ''}</div>
             <div className="db-kpi-note">submitted, not graded</div>
           </Link>
           <Link to="/lecturer/grade-review" className="db-kpi db-kpi-cyan" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="db-kpi-label">Released Grades</div>
-            <div className="db-kpi-value">{loading ? '—' : releasedGrades}</div>
+            <div className="db-kpi-value">{loading ? '' : releasedGrades}</div>
             <div className="db-kpi-note">{loading ? '' : `${draftGrades} drafts pending`}</div>
           </Link>
         </div>
 
-        {/* Empty-state onboarding */}
         {isEmpty && (
           <div className="db-onboard">
             <h2 className="db-onboard-title">Welcome! You have no assignments yet</h2>
@@ -289,7 +287,6 @@ export default function LecturerDashboard() {
           </div>
         </div>
 
-        {/* Submission quality strip: Smart-Gate compliance + on-time/late */}
         {overview && (overview.compliancePassed + overview.complianceFailed + overview.onTime + overview.late) > 0 && (
           <div className="db-chart-card" style={{ marginBottom: '1rem' }}>
             <p className="db-chart-title"><ShieldCheck size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} /> Submission Quality</p>
@@ -309,12 +306,11 @@ export default function LecturerDashboard() {
           </div>
         )}
 
-        {/* Needs grading queue + Grade distribution */}
         <div className="db-row-2-1">
           <div className="db-chart-card">
             <p className="db-chart-title">
               <ClipboardList size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />
-              Needs Grading <span className="db-chart-sub">submitted, not graded — oldest first</span>
+              Needs Grading <span className="db-chart-sub">submitted, not graded  oldest first</span>
             </p>
             {!overview ? (
               <div className="db-no-data">Loading…</div>
@@ -330,7 +326,7 @@ export default function LecturerDashboard() {
                     {overview.needsGrading.map(n => (
                       <tr key={n.submissionId}>
                         <td className="col-name">{n.title}</td>
-                        <td className="col-muted">{n.courseName ?? '—'}</td>
+                        <td className="col-muted">{n.courseName ?? ''}</td>
                         <td><span className="ua-badge ua-badge-payment_pending">{n.awaiting}</span></td>
                         <td className="col-actions">
                           <Link to={`/lecturer/submissions/${n.submissionId}`} className="ua-btn ua-btn-primary ua-btn-xs">Grade</Link>
@@ -376,7 +372,6 @@ export default function LecturerDashboard() {
           </div>
         </div>
 
-        {/* At-risk students + Recent activity */}
         <div className="db-row-equal">
           <div className="db-chart-card">
             <p className="db-chart-title">
@@ -397,8 +392,8 @@ export default function LecturerDashboard() {
                     {overview.atRisk.map(s => (
                       <tr key={s.studentId}>
                         <td className="col-name">{s.studentName}<div className="col-muted" style={{ fontSize: 11 }}>{s.studentRef}</div></td>
-                        <td className="col-muted">{s.courseName ?? '—'}</td>
-                        <td>{s.avgScorePct != null ? `${s.avgScorePct}%` : '—'}</td>
+                        <td className="col-muted">{s.courseName ?? ''}</td>
+                        <td>{s.avgScorePct != null ? `${s.avgScorePct}%` : ''}</td>
                         <td className="col-muted" style={{ fontSize: 11 }}>{s.reason}</td>
                       </tr>
                     ))}

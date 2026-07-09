@@ -21,7 +21,7 @@ export default function KPIRow({ stats }: Props) {
       {KPIS.map(k => (
         <div className="ua-kpi-card" key={k.label}>
           <span className={`ua-kpi-icon ${k.color ?? ''}`}><k.icon size={20} /></span>
-          <span className={`ua-kpi-value ${k.color ?? ''}`}>{k.value ?? '—'}</span>
+          <span className={`ua-kpi-value ${k.color ?? ''}`}>{k.value ?? ''}</span>
           <span className="ua-kpi-label">{k.label}</span>
         </div>
       ))}

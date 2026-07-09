@@ -16,17 +16,17 @@ interface Props {
 export default function TimetablePage({ canEdit, universityId }: Props) {
   const uid = universityId ?? undefined
 
-  const [entries,   setEntries]   = useState<TimetableEntry[]>([])
-  const [cohorts,   setCohorts]   = useState<CohortResponse[]>([])
+  const [entries, setEntries] = useState<TimetableEntry[]>([])
+  const [cohorts, setCohorts] = useState<CohortResponse[]>([])
   const [lecturers, setLecturers] = useState<LecturerResponse[]>([])
-  const [loading,   setLoading]   = useState(true)
-  const [error,     setError]     = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const [modalOpen, setModalOpen] = useState(false)
-  const [editing,   setEditing]   = useState<TimetableEntry | null>(null)
+  const [editing, setEditing] = useState<TimetableEntry | null>(null)
 
   const [deleteTarget, setDeleteTarget] = useState<TimetableEntry | null>(null)
-  const [deleting,     setDeleting]     = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const fetches = [
@@ -44,9 +44,9 @@ export default function TimetablePage({ canEdit, universityId }: Props) {
     Promise.all(fetches).finally(() => setLoading(false))
   }, [canEdit, uid])
 
-  const openAdd  = ()                      => { setEditing(null); setModalOpen(true) }
-  const openEdit = (e: TimetableEntry)     => { setEditing(e);    setModalOpen(true) }
-  const closeModal = ()                    => { setModalOpen(false); setEditing(null) }
+  const openAdd  = () => { setEditing(null); setModalOpen(true) }
+  const openEdit = (e: TimetableEntry) => { setEditing(e); setModalOpen(true) }
+  const closeModal = () => { setModalOpen(false); setEditing(null) }
 
   const handleSave = async (data: CreateTimetableRequest) => {
     if (editing) {
@@ -101,7 +101,6 @@ export default function TimetablePage({ canEdit, universityId }: Props) {
         />
       )}
 
-      {/* Delete confirmation */}
       {deleteTarget && (
         <div className="ua-modal-overlay" onClick={() => setDeleteTarget(null)}>
           <div className="ua-modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>

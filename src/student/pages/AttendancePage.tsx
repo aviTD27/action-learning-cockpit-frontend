@@ -95,7 +95,6 @@ export default function StudentAttendancePage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Build per-course stats from records (topic = course name set by lecturer)
   const courseStats = useMemo<CourseStats[]>(() => {
     const map = new Map<string, CourseStats>()
     for (const r of records) {
@@ -109,14 +108,13 @@ export default function StudentAttendancePage() {
       }
       const cs = map.get(key)!
       cs.total++
-      if (r.status === 'PRESENT')     cs.present++
-      else if (r.status === 'LATE')   cs.late++
+      if (r.status === 'PRESENT') cs.present++
+      else if (r.status === 'LATE') cs.late++
       else if (r.status === 'ABSENT') cs.absent++
     }
     for (const cs of map.values()) {
       cs.rate = cs.total > 0 ? Math.round((cs.present + cs.late) / cs.total * 100) : 0
     }
-    // Attach qualification flag from cohort stats if available
     const cohortMap = new Map(stats?.cohorts.map(c => [c.cohortName, c.qualifiedForExam]) ?? [])
     for (const cs of map.values()) {
       const qual = cohortMap.get(cs.cohortName)
@@ -125,22 +123,20 @@ export default function StudentAttendancePage() {
     return Array.from(map.values())
   }, [records, stats])
 
-  // Overall totals
   const totalSessions = records.length
   const totalPresent  = records.filter(r => r.status === 'PRESENT').length
-  const totalLate     = records.filter(r => r.status === 'LATE').length
-  const totalAbsent   = records.filter(r => r.status === 'ABSENT').length
-  const overallRate   = totalSessions > 0
+  const totalLate = records.filter(r => r.status === 'LATE').length
+  const totalAbsent = records.filter(r => r.status === 'ABSENT').length
+  const overallRate = totalSessions > 0
     ? Math.round((totalPresent + totalLate) / totalSessions * 100)
     : 0
 
   if (loading) return <p className="sd-table-empty">Loading attendance…</p>
-  if (error)   return <p className="sd-table-empty">{error}</p>
+  if (error) return <p className="sd-table-empty">{error}</p>
 
   return (
     <div className="sd-page">
 
-      {/* ── Overall KPI cards ── */}
       {totalSessions > 0 && (
         <div className="sd-kpi-row">
           <div className="sd-kpi-card">
@@ -176,7 +172,6 @@ export default function StudentAttendancePage() {
         </div>
       )}
 
-      {/* ── Per-course breakdown ── */}
       {courseStats.length > 0 && (
         <div className="sd-card">
           <div className="sd-card-header">
@@ -189,7 +184,6 @@ export default function StudentAttendancePage() {
         </div>
       )}
 
-      {/* ── Records list ── */}
       <div className="sd-card">
         <div className="sd-card-header">
           <h3 className="sd-card-title">

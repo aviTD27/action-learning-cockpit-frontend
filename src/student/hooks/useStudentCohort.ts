@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { getMyCohort, type CohortInfo } from '../api/studentApi'
 
 export function useStudentCohort() {
-  const [cohort, setCohort]   = useState<CohortInfo | null>(null)
+  const [cohort, setCohort] = useState<CohortInfo | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     getMyCohort()

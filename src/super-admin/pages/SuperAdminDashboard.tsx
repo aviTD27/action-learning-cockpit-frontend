@@ -37,7 +37,6 @@ const STATUS_COLORS: Record<string, string> = {
   Declined: '#ef4444',
 }
 
-// ── Custom tooltip ────────────────────────────────────────────────────────────
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
@@ -53,7 +52,6 @@ function ChartTooltip({ active, payload, label }: any) {
   )
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function SuperAdminDashboard() {
   const [regs,   setRegs]   = useState<RegistrationResponse[]>([])
   const [admins, setAdmins] = useState<PlatformAdmin[]>([])
@@ -69,12 +67,12 @@ export default function SuperAdminDashboard() {
     }).finally(() => setLoading(false))
   }, [])
 
-  const pending       = regs.filter(r => r.status === 'PENDING').length
-  const approved      = regs.filter(r => r.status === 'APPROVED').length
-  const declined      = regs.filter(r => r.status === 'DECLINED').length
+  const pending = regs.filter(r => r.status === 'PENDING').length
+  const approved = regs.filter(r => r.status === 'APPROVED').length
+  const declined = regs.filter(r => r.status === 'DECLINED').length
   const activeAdmins  = admins.filter(a => !a.blocked).length
 
-  const trend          = buildTrend(regs)
+  const trend = buildTrend(regs)
   const approvedRegs   = regs.filter(r => r.status === 'APPROVED')
 
   const statusData = [
@@ -89,40 +87,36 @@ export default function SuperAdminDashboard() {
     <Layout navItems={SUPER_ADMIN_NAV} title="Super Admin" subtitle="ACL Platform · Global oversight">
       <div className="db-page">
 
-        {/* Header */}
         <div className="db-header">
           <h1 className="db-title">Platform Dashboard</h1>
           <p className="db-sub">Real-time overview of universities, administrators, and platform activity.</p>
         </div>
 
-        {/* KPI Row */}
         <div className="db-kpi-row">
           <div className="db-kpi db-kpi-blue">
             <div className="db-kpi-label">Active Universities</div>
-            <div className="db-kpi-value">{loading ? '—' : approved}</div>
+            <div className="db-kpi-value">{loading ? '' : approved}</div>
             <div className="db-kpi-note">Approved & running</div>
           </div>
           <div className="db-kpi db-kpi-indigo">
             <div className="db-kpi-label">Admin Users</div>
-            <div className="db-kpi-value">{loading ? '—' : activeAdmins}</div>
+            <div className="db-kpi-value">{loading ? '' : activeAdmins}</div>
             <div className="db-kpi-note">Active accounts</div>
           </div>
           <div className="db-kpi db-kpi-amber">
             <div className="db-kpi-label">Pending Reviews</div>
-            <div className="db-kpi-value">{loading ? '—' : pending}</div>
+            <div className="db-kpi-value">{loading ? '' : pending}</div>
             <div className="db-kpi-note">{pending > 0 ? 'Awaiting your action' : 'All clear'}</div>
           </div>
           <div className="db-kpi db-kpi-green">
             <div className="db-kpi-label">Total Requests</div>
-            <div className="db-kpi-value">{loading ? '—' : totalReqs}</div>
+            <div className="db-kpi-value">{loading ? '' : totalReqs}</div>
             <div className="db-kpi-note">Since platform launch</div>
           </div>
         </div>
 
-        {/* Row: Trend + Donut */}
         <div className="db-row-2-1">
 
-          {/* Area chart: registration trend */}
           <div className="db-chart-card">
             <p className="db-chart-title">
               Registration Trend <span className="db-chart-sub">last 6 months</span>
@@ -153,7 +147,6 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
 
-          {/* Donut: status breakdown */}
           <div className="db-chart-card">
             <p className="db-chart-title">Request Status</p>
             {loading ? (
@@ -198,7 +191,6 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
 
-        {/* Approved universities table */}
         {!loading && approvedRegs.length > 0 && (
           <div className="db-leaderboard" style={{ marginTop: '1rem' }}>
             <div className="db-lb-header">
@@ -227,7 +219,7 @@ export default function SuperAdminDashboard() {
                     <td style={{ color: '#6b7280' }}>{r.country}</td>
                     <td style={{ color: '#9ca3af', fontFamily: 'monospace', fontSize: 12 }}>{r.domain}</td>
                     <td style={{ color: '#6b7280', fontSize: 13 }}>
-                      {r.reviewedAt ? new Date(r.reviewedAt).toLocaleDateString() : '—'}
+                      {r.reviewedAt ? new Date(r.reviewedAt).toLocaleDateString() : ''}
                     </td>
                   </tr>
                 ))}

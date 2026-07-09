@@ -56,7 +56,7 @@ export default function SemesterModal({ open, programmeId, existing, onClose, on
             className="ua-modal-input"
             value={name}
             onChange={e => setName(e.target.value)}
-            placeholder="e.g. Year 1 — Semester 1"
+            placeholder="e.g. Year 1  Semester 1"
           />
         </div>
 

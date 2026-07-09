@@ -33,7 +33,18 @@ export function useGradeOverview() {
     }
   }, [])
 
-  useEffect(() => { reload() }, [reload])
+  useEffect(() => {
+    reload()
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        reload()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [reload])
 
   const releaseSubmission = useCallback(async (submissionId: number) => {
     await releaseGrades(submissionId)

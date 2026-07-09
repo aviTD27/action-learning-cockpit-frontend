@@ -221,8 +221,6 @@
   border-radius: 9999px;
 }
 
-/* Layout wrapper  */
-
 .layout {
   display: flex;
   height: 100vh;

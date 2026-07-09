@@ -40,7 +40,7 @@ export default function ComplianceStats() {
         <button
           className="ua-btn ua-btn-primary"
           disabled
-          title="PDF report export is not available yet — backend endpoint pending."
+          title="PDF report export is not available yet  backend endpoint pending."
           style={{ opacity: 0.5, cursor: 'not-allowed' }}
         >
           ⬇️ Download Report
@@ -75,7 +75,7 @@ export default function ComplianceStats() {
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Grade Quality</span>
           <span style={{ fontSize: 13, color: '#6b7280' }}>
-            Average Score: <strong style={{ color: '#ea580c' }}>{hasGrades ? `${summary.avgScorePct}%` : '—'}</strong>
+            Average Score: <strong style={{ color: '#ea580c' }}>{hasGrades ? `${summary.avgScorePct}%` : ''}</strong>
           </span>
         </div>
 
@@ -101,13 +101,13 @@ export default function ComplianceStats() {
               borderRadius: 8,
             }}
           >
-            No grades released yet — the pass/fail split appears once grading begins.
+            No grades released yet  the pass/fail split appears once grading begins.
           </div>
         )}
       </div>
 
       <p style={{ padding: '0.5rem 1rem 0', fontSize: 12, color: '#9ca3af' }}>
-        Pass rate counts released grades of 50% or higher. An on-time submission rate is not shown —
+        Pass rate counts released grades of 50% or higher. An on-time submission rate is not shown 
         the system records when work is graded, not when it is submitted.
       </p>
 

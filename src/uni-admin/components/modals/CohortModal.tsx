@@ -47,7 +47,6 @@ export default function CohortModal({ open, existing, programmes, onClose, onSav
 
   if (!open) return null
 
-  // Only active programmes can be attached to an intake.
   const selectable = programmes.filter(p => p.status === 'ACTIVE')
   const noProgrammes = selectable.length === 0
 
@@ -116,7 +115,7 @@ export default function CohortModal({ open, existing, programmes, onClose, onSav
           {noProgrammes ? (
             <div className="ua-empty-inline">
               <p className="ua-field-hint" style={{ margin: 0 }}>
-                No programmes yet — create a programme first.
+                No programmes yet  create a programme first.
               </p>
               <Link to="/uni-admin/programmes" className="ua-btn ua-btn-primary ua-btn-xs" onClick={onClose}>
                 Go to Programmes

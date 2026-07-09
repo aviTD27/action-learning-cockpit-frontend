@@ -3,7 +3,7 @@ import type { NavItem } from '../shared/layout/Sidebar'
 
 export function getStudentNav(announcementUnread = 0, gradeUnread = 0): NavItem[] {
   return [
-    { label: 'Dashboard',   icon: Home,      path: '/student',            end: true },
+    { label: 'Dashboard', icon: Home, path: '/student', end: true },
     { label: 'Assignments', icon: BookOpen,  path: '/student/assignments' },
     {
       label: 'Grades',
@@ -19,8 +19,8 @@ export function getStudentNav(announcementUnread = 0, gradeUnread = 0): NavItem[
       badge: announcementUnread > 0 ? announcementUnread : undefined,
     },
     { label: 'Timetable', icon: CalendarDays, path: '/student/timetable' },
-    { label: 'My Cohort', icon: Users,        path: '/student/cohort' },
-    { label: 'Profile',   icon: UserRound,    path: '/student/profile' },
+    { label: 'My Cohort', icon: Users, path: '/student/cohort' },
+    { label: 'Profile', icon: UserRound, path: '/student/profile' },
   ]
 }
 

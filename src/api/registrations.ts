@@ -26,11 +26,9 @@ export interface RegistrationResponse extends RegistrationRequest {
   reviewedAt?: string
 }
 
-/** Public landing page access request. */
 export const submitRegistration = (data: RegistrationRequest) =>
   publicApi.post<RegistrationResponse>('/registrations', data)
 
-/** Authenticated Super-Admin review queue. */
 export const listRegistrations = (status?: 'PENDING' | 'APPROVED' | 'DECLINED') =>
   apiClient.get<RegistrationResponse[]>('/registrations', { params: { status } })
 

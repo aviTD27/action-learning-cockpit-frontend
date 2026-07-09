@@ -44,8 +44,6 @@ export interface AssignmentItem {
   hasTemplateFile: boolean
 }
 
-// Assignments for the student's programme (across all its courses).
-// Falls back to university-wide published assignments when the student has no programme.
 export const getAssignmentsForProgramme = (programmeId: number | null) =>
   apiClient.get<AssignmentItem[]>(
     programmeId != null ? `/submissions?programmeId=${programmeId}` : '/submissions'

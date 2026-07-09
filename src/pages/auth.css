@@ -1,8 +1,5 @@
-/* ── Premium Login — Split Layout ── */
-
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-/* ── Animations ── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -28,14 +25,12 @@
   50%      { transform: translateY(-18px); }
 }
 
-/* ── Split container ── */
 .auth-split {
   display: flex;
   min-height: 100vh;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* ── LEFT: Brand panel ── */
 .auth-brand-panel {
   flex: 1;
   background: linear-gradient(170deg, #1a2744 0%, #2d4a7a 40%, #1a2744 100%);
@@ -179,7 +174,6 @@
   background: rgba(255,255,255,0.1);
 }
 
-/* ── RIGHT: Form panel ── */
 .auth-form-panel {
   flex: 1;
   display: flex;
@@ -249,7 +243,6 @@
   margin: 0;
 }
 
-/* ── Form ── */
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -331,7 +324,6 @@
   border-color: #dc2626;
 }
 
-/* ── Error banner ── */
 .auth-error-banner {
   background: #fee2e2;
   border: 1px solid #fecaca;
@@ -342,7 +334,6 @@
   margin-bottom: 0.75rem;
 }
 
-/* ── Buttons ── */
 .auth-btn-primary {
   width: 100%;
   padding: 0.8rem;
@@ -392,7 +383,6 @@
   border-color: rgba(0,0,0,0.12);
 }
 
-/* ── Divider ── */
 .auth-divider {
   display: flex;
   align-items: center;
@@ -412,7 +402,6 @@
   font-weight: 500;
 }
 
-/* ── Footer ── */
 .auth-footer {
   text-align: center;
   margin-top: 1.5rem;
@@ -428,7 +417,6 @@
   color: #3730a3;
 }
 
-/* ── Responsive: stack on narrow screens ── */
 @media (max-width: 768px) {
   .auth-split { flex-direction: column; }
   .auth-brand-panel { min-height: 300px; padding: 2rem; }

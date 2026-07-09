@@ -26,24 +26,22 @@ function todayIso() {
 
 export default function LecturerAttendancePage() {
   const { email, universityId } = useAuth()
-
-  const [cohorts,            setCohorts]            = useState<CohortResponse[]>([])
+  const [cohorts, setCohorts] = useState<CohortResponse[]>([])
   const [allLecturerCourses, setAllLecturerCourses] = useState<CourseResponse[]>([])
-  const [cohortCourses,      setCohortCourses]      = useState<CourseResponse[]>([])
-  const [selectedCohortId,   setSelectedCohortId]   = useState<number | ''>('')
-  const [selectedCourseId,   setSelectedCourseId]   = useState<number | ''>('')
-  const [sessionDate,        setSessionDate]        = useState(todayIso())
-  const [sessions,           setSessions]           = useState<AttendanceSession[]>([])
-  const [creating,           setCreating]           = useState(false)
-  const [activeSession,      setActiveSession]      = useState<AttendanceSession | null>(null)
-  const [students,           setStudents]           = useState<SessionStudentResponse[]>([])
-  const [marks,              setMarks]              = useState<Record<number, MarkState>>({})
-  const [loadingStudents,    setLoadingStudents]    = useState(false)
-  const [saving,             setSaving]             = useState(false)
-  const [savedBanner,        setSavedBanner]        = useState(false)
-  const [error,              setError]              = useState<string | null>(null)
+  const [cohortCourses, setCohortCourses] = useState<CourseResponse[]>([])
+  const [selectedCohortId, setSelectedCohortId] = useState<number | ''>('')
+  const [selectedCourseId, setSelectedCourseId] = useState<number | ''>('')
+  const [sessionDate, setSessionDate] = useState(todayIso())
+  const [sessions, setSessions] = useState<AttendanceSession[]>([])
+  const [creating, setCreating] = useState(false)
+  const [activeSession, setActiveSession] = useState<AttendanceSession | null>(null)
+  const [students, setStudents] = useState<SessionStudentResponse[]>([])
+  const [marks, setMarks] = useState<Record<number, MarkState>>({})
+  const [loadingStudents, setLoadingStudents] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [savedBanner, setSavedBanner] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // Load cohorts + lecturer's own courses on mount
   useEffect(() => {
     getCohorts().then(r => setCohorts(r.data)).catch(() => {})
 
@@ -56,7 +54,6 @@ export default function LecturerAttendancePage() {
       .catch(() => {})
   }, [email, universityId])
 
-  // When cohort changes, filter courses to those in the cohort's programme
   useEffect(() => {
     if (!selectedCohortId) {
       setCohortCourses([])
@@ -97,9 +94,9 @@ export default function LecturerAttendancePage() {
     setCreating(true); setError(null)
     try {
       const session = await createSession({
-        cohortId:    selectedCohortId as number,
+        cohortId: selectedCohortId as number,
         sessionDate,
-        topic:       selectedCourse?.name,
+        topic: selectedCourse?.name,
       })
       setSessions(prev => [session, ...prev])
       setActiveSession(session)
@@ -121,7 +118,7 @@ export default function LecturerAttendancePage() {
       return {
         ...prev,
         [studentId]: {
-          status:      current === status ? null : status,
+          status: current === status ? null : status,
           minutesLate: current === status ? '' : (status === 'LATE' ? (prev[studentId]?.minutesLate ?? '') : ''),
         },
       }
@@ -139,8 +136,8 @@ export default function LecturerAttendancePage() {
       .map(s => {
         const m = marks[s.studentId]
         return {
-          studentId:   s.studentId,
-          status:      m.status!,
+          studentId: s.studentId,
+          status: m.status!,
           minutesLate: m.status === 'LATE' ? (parseInt(m.minutesLate || '0', 10) || 0) : undefined,
         }
       })
@@ -161,7 +158,7 @@ export default function LecturerAttendancePage() {
 
   const markedCount  = students.filter(s => marks[s.studentId]?.status != null).length
   const presentCount = students.filter(s => marks[s.studentId]?.status === 'PRESENT').length
-  const lateCount    = students.filter(s => marks[s.studentId]?.status === 'LATE').length
+  const lateCount = students.filter(s => marks[s.studentId]?.status === 'LATE').length
   const absentCount  = students.filter(s => marks[s.studentId]?.status === 'ABSENT').length
 
   const selectedCourse = cohortCourses.find(c => c.id === selectedCourseId)
@@ -169,7 +166,6 @@ export default function LecturerAttendancePage() {
   return (
     <div className="ua-page">
 
-      {/* ── Session form ── */}
       <div className="ua-card">
         <div className="ua-card-header">
           <p className="ua-card-title"><CalendarDays size={14} /> Session Setup</p>
@@ -177,7 +173,6 @@ export default function LecturerAttendancePage() {
         <div style={{ padding: '0.875rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <div className="att-form-row">
 
-            {/* Cohort */}
             <div className="att-form-field">
               <label className="att-form-label">Cohort / Intake *</label>
               <select
@@ -196,7 +191,6 @@ export default function LecturerAttendancePage() {
               </select>
             </div>
 
-            {/* Course — auto-populated from lecturer's assignments */}
             <div className="att-form-field" style={{ flex: 1.5 }}>
               <label className="att-form-label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <BookOpen size={11} /> Course
@@ -236,7 +230,6 @@ export default function LecturerAttendancePage() {
               )}
             </div>
 
-            {/* Date */}
             <div className="att-form-field">
               <label className="att-form-label">Date *</label>
               <input
@@ -257,7 +250,6 @@ export default function LecturerAttendancePage() {
             </button>
           </div>
 
-          {/* Course context pill */}
           {selectedCourse && (
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -278,7 +270,6 @@ export default function LecturerAttendancePage() {
         </div>
       </div>
 
-      {/* ── Sessions list ── */}
       {sessions.length > 0 && !activeSession && (
         <div className="ua-card">
           <div className="ua-card-header">
@@ -311,7 +302,6 @@ export default function LecturerAttendancePage() {
         </div>
       )}
 
-      {/* ── Student marking ── */}
       {activeSession && (
         <>
           {savedBanner && (
@@ -368,8 +358,8 @@ export default function LecturerAttendancePage() {
                   const st   = mark?.status
                   const cardClass =
                     st === 'PRESENT' ? 'marked-present' :
-                    st === 'ABSENT'  ? 'marked-absent'  :
-                    st === 'LATE'    ? 'marked-late'     : ''
+                    st === 'ABSENT' ? 'marked-absent' :
+                    st === 'LATE' ? 'marked-late' : ''
                   return (
                     <div key={s.studentId} className={`att-student-card ${cardClass}`}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>

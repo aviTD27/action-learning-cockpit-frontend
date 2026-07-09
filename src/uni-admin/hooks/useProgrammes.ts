@@ -13,7 +13,6 @@ export function useProgrammes() {
     setLoading(true)
     setError(null)
     const uni = universityId ?? undefined
-    // Load active + archived so status can be changed in either direction.
     Promise.all([getProgrammes(uni), getArchivedProgrammes(uni)])
       .then(([active, archived]) => setProgrammes([...active.data, ...archived.data]))
       .catch(() => setError('Failed to load programmes'))

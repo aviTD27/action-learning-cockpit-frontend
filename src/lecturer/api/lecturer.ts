@@ -43,7 +43,6 @@ export const unarchiveSubmission = (id: number) =>
 export const reopenSubmission = (id: number, studentId: number) =>
   api.patch<SubmissionResponse>(`/submissions/${id}/reopen/${studentId}`)
 
-// Template file (row 68)
 export const uploadTemplate = (id: number, file: File) => {
   const fd = new FormData()
   fd.append('file', file)
@@ -55,14 +54,11 @@ export const uploadTemplate = (id: number, file: File) => {
 export const downloadTemplate = (id: number) =>
   api.get<Blob>(`/submissions/${id}/template`, { responseType: 'blob' })
 
-// Lecturer downloads (rows 75/76)
 export const downloadUpload = (uploadId: number) =>
   api.get<Blob>(`/submissions/uploads/${uploadId}/download`, { responseType: 'blob' })
 
 export const downloadSubmissionsZip = (id: number) =>
   api.get<Blob>(`/submissions/${id}/download-zip`, { responseType: 'blob' })
-
-//  Grades
 
 export const getGrades = (submissionId: number) =>
   api.get<GradeResponse[]>(`/submissions/${submissionId}/grades`)
@@ -73,12 +69,9 @@ export const setGrade = (submissionId: number, studentId: number, data: GradeReq
 export const releaseGrades = (submissionId: number) =>
   api.patch<GradeResponse[]>(`/submissions/${submissionId}/grades/release`)
 
-// Student submissions
-
 export const getStudentSubmissions = (submissionId: number) =>
   api.get<StudentSubmissionResponse[]>(`/submissions/${submissionId}/student-submissions`)
 
-// Lecturer dashboard overview
 export const getLecturerOverview = () =>
   api.get<LecturerOverview>('/analytics/lecturer/overview')
 

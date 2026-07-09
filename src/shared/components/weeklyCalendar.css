@@ -1,4 +1,3 @@
-/* ─── Root: fills parent height, stacks toolbar + card ─────────────── */
 .wc-root {
   display: flex;
   flex-direction: column;
@@ -7,7 +6,6 @@
   gap: 16px;
 }
 
-/* ─── Toolbar ───────────────────────────────────────────────────────── */
 .wc-toolbar {
   display: flex;
   align-items: center;
@@ -21,7 +19,6 @@
   margin: 0;
 }
 
-/* ─── Card: fills remaining height, clips overflow ──────────────────── */
 .wc-card {
   flex: 1;
   min-height: 0;
@@ -33,7 +30,6 @@
   overflow: hidden;
 }
 
-/* ─── Sticky day-name header ────────────────────────────────────────── */
 .wc-header {
   display: flex;
   flex-shrink: 0;
@@ -59,7 +55,6 @@
 }
 .wc-day-hdr:last-child { border-right: none; }
 
-/* ─── Scrollable body (only this section scrolls) ───────────────────── */
 .wc-body {
   flex: 1;
   min-height: 0;
@@ -68,7 +63,6 @@
   display: flex;
 }
 
-/* ─── Time gutter ───────────────────────────────────────────────────── */
 .wc-gutter {
   width: 52px;
   flex-shrink: 0;
@@ -86,14 +80,12 @@
   box-sizing: border-box;
 }
 
-/* ─── Days flex container ───────────────────────────────────────────── */
 .wc-days {
   display: flex;
   flex: 1;
   min-width: 0;
 }
 
-/* ─── Individual day column ─────────────────────────────────────────── */
 .wc-day-col {
   flex: 1;
   min-width: 110px;
@@ -103,7 +95,6 @@
 }
 .wc-day-col:last-child { border-right: none; }
 
-/* ─── Hour grid lines ───────────────────────────────────────────────── */
 .wc-grid-line {
   position: absolute;
   left: 0;
@@ -112,7 +103,6 @@
   background: #f3f4f6;
 }
 
-/* ─── Entry block ───────────────────────────────────────────────────── */
 .wc-entry {
   position: absolute;
   border-radius: 7px;
@@ -170,7 +160,6 @@
   font-size: 0.65rem;
 }
 
-/* ─── Action buttons (edit / delete) ───────────────────────────────── */
 .wc-entry-actions {
   position: absolute;
   top: 4px;

@@ -7,7 +7,7 @@ import '../styles/assignments.css'
 import '../styles/compliance.css'
 
 type FilterTab = 'all' | 'upcoming' | 'past-due' | 'completed'
-type ViewMode  = 'list' | 'calendar'
+type ViewMode = 'list' | 'calendar'
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
                      'July','August','September','October','November','December']
@@ -50,7 +50,6 @@ function formatTimestamp(iso: string | null): string {
   return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-/* ── Compliance report ── */
 function ComplianceCheckRow({ result }: { result: CheckResult }) {
   if (result.skipped) {
     return (
@@ -95,7 +94,6 @@ function ComplianceReportPanel({ report }: { report: ComplianceReport }) {
   )
 }
 
-/* ── Criteria feedback panel ── */
 function CriteriaFeedbackPanel({ report }: { report: ScoringReport }) {
   return (
     <div className="criteria-panel">
@@ -123,22 +121,21 @@ function CriteriaFeedbackPanel({ report }: { report: ScoringReport }) {
   )
 }
 
-/* ── List view card ── */
 function AssignmentCard({ a, onCompleted }: { a: Assignment; onCompleted: (id: number) => void }) {
   const init = a.uploadStatus
-  const fileInputRef                        = useRef<HTMLInputElement>(null)
-  const [uploading, setUploading]           = useState(false)
-  const [report, setReport]                 = useState<ComplianceReport | null>(init && !init.turnedIn ? init.complianceReport : null)
-  const [scoring, setScoring]               = useState<ScoringReport | null>(init && !init.turnedIn ? init.scoringReport : null)
-  const [uploadError, setUploadError]       = useState<string | null>(null)
-  const [turningIn, setTurningIn]           = useState(false)
-  const [turnedIn, setTurnedIn]             = useState(init?.turnedIn ?? false)
-  const [submittedAt, setSubmittedAt]       = useState<string | null>(init?.turnedIn ? init.turnedInAt : null)
-  const [isLate, setIsLate]                 = useState(init?.turnedIn ? init.late : false)
-  const [isReopened]                        = useState(init?.reopened ?? false)
-  const [resubmitting, setResubmitting]     = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [report, setReport] = useState<ComplianceReport | null>(init && !init.turnedIn ? init.complianceReport : null)
+  const [scoring, setScoring] = useState<ScoringReport | null>(init && !init.turnedIn ? init.scoringReport : null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [turningIn, setTurningIn] = useState(false)
+  const [turnedIn, setTurnedIn] = useState(init?.turnedIn ?? false)
+  const [submittedAt, setSubmittedAt] = useState<string | null>(init?.turnedIn ? init.turnedInAt : null)
+  const [isLate, setIsLate] = useState(init?.turnedIn ? init.late : false)
+  const [isReopened] = useState(init?.reopened ?? false)
+  const [resubmitting, setResubmitting] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
-  const [textInput, setTextInput]           = useState('')
+  const [textInput, setTextInput] = useState('')
 
   const doUpload = async (file: File) => {
     const HARD_LIMIT = 50 * 1024 * 1024
@@ -148,7 +145,7 @@ function AssignmentCard({ a, onCompleted }: { a: Assignment; onCompleted: (id: n
     if (file.size > limit) {
       setReport(null)
       setUploadError(
-        `"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — too large. ` +
+        `"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB  too large. ` +
         `The maximum allowed for this assignment is ${Math.round(limit / 1024 / 1024)} MB.`,
       )
       return
@@ -272,7 +269,6 @@ function AssignmentCard({ a, onCompleted }: { a: Assignment; onCompleted: (id: n
         <span className="asgn-card-points">{a.maxPoints} pts</span>
       </div>
 
-      {/* Submitted state */}
       {turnedIn && !resubmitting && (
         <div className="asgn-submission-result">
           <div className="asgn-turnedin-badge">
@@ -287,7 +283,6 @@ function AssignmentCard({ a, onCompleted }: { a: Assignment; onCompleted: (id: n
         </div>
       )}
 
-      {/* Resubmit — only available before deadline (or if reopened) */}
       {turnedIn && !resubmitting && canSubmit && (
         <button
           className="asgn-resubmit-btn"
@@ -297,17 +292,15 @@ function AssignmentCard({ a, onCompleted }: { a: Assignment; onCompleted: (id: n
         </button>
       )}
 
-      {/* Deadline locked — no submission on record */}
       {!turnedIn && !canSubmit && (
         <div className="asgn-locked-msg">
           Deadline has passed. Submissions are no longer accepted.
         </div>
       )}
 
-      {/* Reopened notice */}
       {isReopened && isPastDeadline && showForm && (
         <div className="asgn-reopened-note">
-          Re-opened by lecturer — late submission accepted.
+          Re-opened by lecturer  late submission accepted.
         </div>
       )}
 
@@ -367,7 +360,6 @@ function AssignmentCard({ a, onCompleted }: { a: Assignment; onCompleted: (id: n
   )
 }
 
-/* ── Calendar view ── */
 function CalendarView({ assignments }: { assignments: Assignment[] }) {
   const today = new Date()
   const [year,  setYear]  = useState(today.getFullYear())
@@ -376,9 +368,6 @@ function CalendarView({ assignments }: { assignments: Assignment[] }) {
   const byDate = useMemo(() => {
     const map: Record<string, Assignment[]> = {}
     assignments.forEach(a => {
-
-
-      
       const key = a.dueDate.slice(0, 10)
       ;(map[key] ??= []).push(a)
     })
@@ -390,7 +379,7 @@ function CalendarView({ assignments }: { assignments: Assignment[] }) {
 
   const firstDay  = new Date(year, month, 1).getDay()
   const daysInMo  = new Date(year, month + 1, 0).getDate()
-  const cells     = Array.from({ length: firstDay + daysInMo }, (_, i) =>
+  const cells = Array.from({ length: firstDay + daysInMo }, (_, i) =>
     i < firstDay ? null : i - firstDay + 1
   )
 
@@ -424,7 +413,6 @@ function CalendarView({ assignments }: { assignments: Assignment[] }) {
   )
 }
 
-/* ── Main page ── */
 export default function AssignmentsPage() {
   const { assignments, loading, error, markCompleted } = useStudentAssignments()
   const [view,   setView]   = useState<ViewMode>('list')
@@ -442,10 +430,10 @@ export default function AssignmentsPage() {
   }, [assignments, filter, search])
 
   const counts = useMemo(() => ({
-    all:        assignments.length,
-    upcoming:   assignments.filter(a => a.status === 'upcoming').length,
+    all: assignments.length,
+    upcoming: assignments.filter(a => a.status === 'upcoming').length,
     'past-due': assignments.filter(a => a.status === 'past-due').length,
-    completed:  assignments.filter(a => a.status === 'completed').length,
+    completed: assignments.filter(a => a.status === 'completed').length,
   }), [assignments])
 
   if (loading) return <p className="sd-table-empty">Loading assignments…</p>
@@ -453,10 +441,7 @@ export default function AssignmentsPage() {
 
   return (
     <div className="sd-page">
-
-      {/* Controls row */}
       <div className="asgn-controls">
-        {/* Filter tabs */}
         <div className="asgn-tabs">
           {(['all', 'upcoming', 'past-due', 'completed'] as FilterTab[]).map(t => (
             <button
@@ -471,7 +456,6 @@ export default function AssignmentsPage() {
         </div>
 
         <div className="asgn-controls-right">
-          {/* Search */}
           <input
             className="asgn-search"
             type="text"
@@ -479,7 +463,6 @@ export default function AssignmentsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          {/* View toggle */}
           <div className="asgn-view-toggle">
             <button className={`asgn-view-btn ${view === 'list' ? 'active' : ''}`} onClick={() => setView('list')} title="List view">
               <List size={15} />

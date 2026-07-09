@@ -17,17 +17,17 @@ export interface CreatePlatformAdminRequest {
   email: string
 }
 
-export const listPlatformAdmins    = () =>
+export const listPlatformAdmins = () =>
   apiClient.get<PlatformAdmin[]>('/super-admin/platform-admins')
 
-export const createPlatformAdmin   = (data: CreatePlatformAdminRequest) =>
+export const createPlatformAdmin = (data: CreatePlatformAdminRequest) =>
   apiClient.post<PlatformAdmin>('/super-admin/platform-admins', data)
 
-export const blockPlatformAdmin    = (id: number) =>
+export const blockPlatformAdmin = (id: number) =>
   apiClient.patch<PlatformAdmin>(`/super-admin/platform-admins/${id}/block`)
 
-export const unblockPlatformAdmin  = (id: number) =>
+export const unblockPlatformAdmin = (id: number) =>
   apiClient.patch<PlatformAdmin>(`/super-admin/platform-admins/${id}/unblock`)
 
-export const deletePlatformAdmin   = (id: number) =>
+export const deletePlatformAdmin = (id: number) =>
   apiClient.delete(`/super-admin/platform-admins/${id}`)

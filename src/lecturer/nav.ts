@@ -3,15 +3,15 @@ import type { NavItem, SidebarUser } from '../shared/layout/Sidebar'
 
 export function getLecturerNav(announcementUnread = 0): NavItem[] {
   return [
-    { label: 'Dashboard',   icon: Home,          path: '/lecturer',              end: true },
-    { label: 'Timetable',   icon: CalendarDays,  path: '/lecturer/timetable' },
+    { label: 'Dashboard', icon: Home, path: '/lecturer', end: true },
+    { label: 'Timetable', icon: CalendarDays,  path: '/lecturer/timetable' },
     { label: 'Submissions', icon: ClipboardList, path: '/lecturer/submissions' },
-    { label: 'Grade Review', icon: CheckCheck,   path: '/lecturer/grade-review' },
-    { label: 'Attendance',   icon: UserCheck,    path: '/lecturer/attendance' },
+    { label: 'Grade Review', icon: CheckCheck, path: '/lecturer/grade-review' },
+    { label: 'Attendance', icon: UserCheck, path: '/lecturer/attendance' },
     {
       label: 'Announcements',
-      icon:  Megaphone,
-      path:  '/lecturer/announcements',
+      icon: Megaphone,
+      path: '/lecturer/announcements',
       badge: announcementUnread > 0 ? announcementUnread : undefined,
     },
     { label: 'Profile', icon: UserRound, path: '/lecturer/profile' },
@@ -21,7 +21,7 @@ export function getLecturerNav(announcementUnread = 0): NavItem[] {
 export const LECTURER_NAV = getLecturerNav()
 
 export const LECTURER_USER: SidebarUser = {
-  name: 'Dr. Jane Smith',
+  name: 'Avi Doorga',
   role: 'LECTURER',
   institution: 'EPITA',
 }

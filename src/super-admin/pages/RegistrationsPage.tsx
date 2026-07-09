@@ -13,10 +13,10 @@ const FILTERS: Filter[] = ['PENDING', 'APPROVED', 'DECLINED', 'ALL']
 
 export default function RegistrationsPage() {
   const [filter, setFilter]   = useState<Filter>('PENDING')
-  const [rows, setRows]       = useState<RegistrationResponse[]>([])
+  const [rows, setRows] = useState<RegistrationResponse[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState<string | null>(null)
-  const [busyId, setBusyId]   = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<number | null>(null)
 
   const reload = useCallback(() => {
     setLoading(true); setError(null)
@@ -97,7 +97,7 @@ export default function RegistrationsPage() {
                     <td>{r.domain}</td>
                     <td>{r.adminFirstName} {r.adminLastName}</td>
                     <td>{r.adminContactEmail}</td>
-                    <td>{r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '—'}</td>
+                    <td>{r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : ''}</td>
                     <td>
                       {badge(r.status)}
                       {r.status === 'DECLINED' && r.declineReason
@@ -110,7 +110,7 @@ export default function RegistrationsPage() {
                           <button className="sa-btn sa-btn-primary" disabled={busyId === r.id} onClick={() => approve(r)}>Approve</button>
                           <button className="sa-btn sa-btn-danger"  disabled={busyId === r.id} onClick={() => decline(r)}>Decline</button>
                         </>
-                      ) : <span className="sa-sub">—</span>}
+                      ) : <span className="sa-sub"></span>}
                     </td>
                   </tr>
                 ))}

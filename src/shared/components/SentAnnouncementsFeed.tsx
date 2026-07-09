@@ -19,14 +19,13 @@ function audienceLabel(audience: AnnouncementAudience, cohortName?: string | nul
   switch (audience) {
     case 'ALL_UNIVERSITY_STUDENTS':  return 'All university students'
     case 'ALL_UNIVERSITY_LECTURERS': return 'All university lecturers'
-    case 'ALL_COHORT_STUDENTS':      return cohortName ? `Cohort · ${cohortName}` : 'Cohort students'
-    case 'SPECIFIC_STUDENTS':        return 'Specific students'
-    case 'SPECIFIC_LECTURERS':       return 'Specific lecturers'
+    case 'ALL_COHORT_STUDENTS': return cohortName ? `Cohort · ${cohortName}` : 'Cohort students'
+    case 'SPECIFIC_STUDENTS': return 'Specific students'
+    case 'SPECIFIC_LECTURERS': return 'Specific lecturers'
   }
 }
 
 interface Props {
-  /** bump this value to trigger a re-fetch after a new announcement is sent */
   refreshKey?: number
 }
 
@@ -72,7 +71,6 @@ export default function SentAnnouncementsFeed({ refreshKey = 0 }: Props) {
             }}
             onClick={() => setExpanded(open ? null : item.id)}
           >
-            {/* Row */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
               <div style={{
                 flexShrink: 0, width: 32, height: 32, borderRadius: '50%',
@@ -100,7 +98,6 @@ export default function SentAnnouncementsFeed({ refreshKey = 0 }: Props) {
                   </span>
                 </div>
 
-                {/* Expanded message */}
                 {open && (
                   <div style={{
                     marginTop: 10, padding: '10px 12px',

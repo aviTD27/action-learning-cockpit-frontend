@@ -6,12 +6,12 @@ type StatusConfig = { label: string; color: string; bg: string }
 
 function statusConfig(status: string): StatusConfig {
   switch (status) {
-    case 'ONGOING':     return { label: 'Ongoing',     color: '#15803d', bg: '#dcfce7' }
-    case 'COMPLETED':   return { label: 'Completed',   color: '#1d4ed8', bg: '#dbeafe' }
-    case 'GRADUATED':   return { label: 'Graduated',   color: '#a16207', bg: '#fef9c3' }
+    case 'ONGOING': return { label: 'Ongoing', color: '#15803d', bg: '#dcfce7' }
+    case 'COMPLETED': return { label: 'Completed', color: '#1d4ed8', bg: '#dbeafe' }
+    case 'GRADUATED': return { label: 'Graduated', color: '#a16207', bg: '#fef9c3' }
     case 'NOT_STARTED': return { label: 'Not Started', color: '#6b7280', bg: '#f3f4f6' }
-    case 'ARCHIVED':    return { label: 'Archived',    color: '#9ca3af', bg: '#f3f4f6' }
-    default:            return { label: status,        color: '#6b7280', bg: '#f3f4f6' }
+    case 'ARCHIVED': return { label: 'Archived', color: '#9ca3af', bg: '#f3f4f6' }
+    default: return { label: status, color: '#6b7280', bg: '#f3f4f6' }
   }
 }
 
@@ -29,7 +29,7 @@ export default function MyCohortPage() {
   const { cohort, loading, error } = useStudentCohort()
 
   if (loading) return <p className="sd-table-empty">Loading cohort info…</p>
-  if (error)   return <p className="sd-table-empty">{error}</p>
+  if (error) return <p className="sd-table-empty">{error}</p>
   if (!cohort) return <p className="sd-table-empty">You are not currently assigned to a cohort.</p>
 
   const { label, color, bg } = statusConfig(cohort.status)
@@ -37,14 +37,12 @@ export default function MyCohortPage() {
   return (
     <div className="sd-page">
 
-      {/* Cohort info card */}
       <div className="sd-card">
         <div className="sd-card-header">
           <h3 className="sd-card-title"><GraduationCap size={15} /> Cohort Information</h3>
         </div>
         <div style={{ padding: '1.25rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
 
-          {/* Cohort name */}
           <div>
             <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.25rem' }}>
               Cohort
@@ -56,7 +54,6 @@ export default function MyCohortPage() {
 
           <div style={{ height: '1px', background: '#f3f4f6' }} />
 
-          {/* Programme */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
             <BookOpen size={15} color="#9ca3af" />
             <div>
@@ -72,7 +69,6 @@ export default function MyCohortPage() {
             </div>
           </div>
 
-          {/* University */}
           {cohort.universityName && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <University size={15} color="#9ca3af" />
@@ -85,7 +81,6 @@ export default function MyCohortPage() {
             </div>
           )}
 
-          {/* Status */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Status
@@ -101,7 +96,6 @@ export default function MyCohortPage() {
         </div>
       </div>
 
-      {/* Lecturers card */}
       <div className="sd-card">
         <div className="sd-card-header">
           <h3 className="sd-card-title">

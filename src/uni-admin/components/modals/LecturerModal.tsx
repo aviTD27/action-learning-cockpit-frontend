@@ -53,7 +53,7 @@ export default function LecturerModal({ open, existing, programmes, onClose, onS
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         programmeIds,
-        // Never send the email on edit — the login email must stay fixed.
+        // Never send the email on edit  the login email must stay fixed.
         ...(!existing && email.trim() ? { email: email.trim() } : {}),
         ...(phone.trim() ? { phone: phone.trim() } : {}),
         ...(existing ? { status } : {}),

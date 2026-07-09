@@ -59,22 +59,22 @@ export default function AnalyticsPage() {
         <div className="db-kpi-row">
           <div className="db-kpi db-kpi-indigo">
             <div className="db-kpi-label">Average Score</div>
-            <div className="db-kpi-value">{loading || !summary ? '—' : `${summary.avgScorePct}%`}</div>
+            <div className="db-kpi-value">{loading || !summary ? '' : `${summary.avgScorePct}%`}</div>
             <div className="db-kpi-note">across released grades</div>
           </div>
           <div className="db-kpi db-kpi-blue">
             <div className="db-kpi-label">Total Assignments</div>
-            <div className="db-kpi-value">{loading || !summary ? '—' : summary.totalSubmissions}</div>
+            <div className="db-kpi-value">{loading || !summary ? '' : summary.totalSubmissions}</div>
             <div className="db-kpi-note">created for your cohorts</div>
           </div>
           <div className="db-kpi db-kpi-green">
             <div className="db-kpi-label">Released Grades</div>
-            <div className="db-kpi-value">{loading || !summary ? '—' : summary.releasedGrades}</div>
+            <div className="db-kpi-value">{loading || !summary ? '' : summary.releasedGrades}</div>
             <div className="db-kpi-note">visible to students</div>
           </div>
           <div className="db-kpi db-kpi-cyan">
             <div className="db-kpi-label">Graded This Month</div>
-            <div className="db-kpi-value">{loading || !summary ? '—' : summary.gradedThisMonth}</div>
+            <div className="db-kpi-value">{loading || !summary ? '' : summary.gradedThisMonth}</div>
             <div className="db-kpi-note">released this month</div>
           </div>
         </div>

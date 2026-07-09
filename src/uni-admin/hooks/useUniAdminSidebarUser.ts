@@ -9,7 +9,6 @@ function formatRole(role?: string | null) {
     .replace(/\b\w/g, c => c.toUpperCase())
 }
 
-/** Real sidebar user for uni-admin pages (name/role from JWT, university name from the API). */
 export function useUniAdminSidebarUser(): SidebarUser {
   const { firstName, surname, email, role, universityId } = useAuth()
   const [institution, setInstitution] = useState<string | undefined>(undefined)

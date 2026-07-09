@@ -27,7 +27,6 @@ export default function CoursesPage() {
   const activeProgrammes = useMemo(() => programmes.filter(p => p.status === 'ACTIVE'), [programmes])
   const [programmeId, setProgrammeId] = useState<number | ''>('')
 
-  // Default to the first programme once loaded.
   const effectiveProgrammeId = programmeId !== '' ? programmeId
     : (activeProgrammes[0]?.id ?? undefined)
 
@@ -177,7 +176,7 @@ export default function CoursesPage() {
                             {list.map(c => (
                               <tr key={c.id}>
                                 <td className="col-name">{c.name}</td>
-                                <td className="col-muted">{c.code ?? '—'}</td>
+                                <td className="col-muted">{c.code ?? ''}</td>
                                 <td className="col-muted">{c.lecturerName ?? <span style={{ color: '#9ca3af' }}>Unassigned</span>}</td>
                                 <td className="col-muted">{c.studentCount}</td>
                                 <td className="col-muted">{c.assignmentCount}</td>

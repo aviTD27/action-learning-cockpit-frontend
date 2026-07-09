@@ -2,7 +2,7 @@ import { Bell } from 'lucide-react'
 import '../styles/layout.css'
 
 interface Props {
-  title:     string
+  title: string
   subtitle?: string
 }
 

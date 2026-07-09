@@ -280,7 +280,7 @@ export default function ImportCSVModal({ open, mode, programmes, cohorts, onClos
               {results.map(r => (
                 <div className={`ua-csv-row ${r.ok ? 'ua-csv-ok' : 'ua-csv-fail'}`} key={r.line}>
                   {r.ok ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
-                  Row {r.line}: {r.label}{r.ok ? '' : ` — ${r.reason}`}
+                  Row {r.line}: {r.label}{r.ok ? '' : `  ${r.reason}`}
                 </div>
               ))}
             </div>

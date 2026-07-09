@@ -71,7 +71,6 @@ export default function AddStudentModal({ open, onClose, onSave }: Props) {
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
-        {/* Name row */}
         <div className="modal-row">
           <div className="modal-field">
             <label className="modal-label">First Name *</label>
@@ -95,7 +94,6 @@ export default function AddStudentModal({ open, onClose, onSave }: Props) {
           </div>
         </div>
 
-        {/* Email */}
         <div className="modal-field">
           <label className="modal-label">Email Address *</label>
           <input
@@ -108,7 +106,6 @@ export default function AddStudentModal({ open, onClose, onSave }: Props) {
           />
         </div>
 
-        {/* Student ID */}
         <div className="modal-field">
           <label className="modal-label">Student ID *</label>
           <input
@@ -123,7 +120,6 @@ export default function AddStudentModal({ open, onClose, onSave }: Props) {
           </p>
         </div>
 
-        {/* Cohort + Programme */}
         <div className="modal-row">
           <div className="modal-field">
             <label className="modal-label">Cohort *</label>

@@ -18,13 +18,13 @@ function statusOf(a: PlatformAdmin): Status {
 }
 
 export default function PlatformAdminsPage() {
-  const [admins, setAdmins]       = useState<PlatformAdmin[]>([])
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState<string | null>(null)
-  const [busyId, setBusyId]       = useState<number | null>(null)
+  const [admins, setAdmins] = useState<PlatformAdmin[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<number | null>(null)
   const [showModal, setShowModal] = useState(false)
-  const [form, setForm]           = useState<CreatePlatformAdminRequest>(EMPTY_FORM)
-  const [saving, setSaving]       = useState(false)
+  const [form, setForm] = useState<CreatePlatformAdminRequest>(EMPTY_FORM)
+  const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<PlatformAdmin | null>(null)
 
@@ -211,7 +211,7 @@ export default function PlatformAdminsPage() {
             <h2 className="sa-modal-title">Delete Platform Admin?</h2>
             <p style={{ fontSize: 13, color: '#374151', marginBottom: '1.25rem' }}>
               <strong>{confirmDelete.firstName} {confirmDelete.surname}</strong> will be hidden from this dashboard.
-              Their account is <strong>not permanently deleted</strong> — it stays in the database
+              Their account is <strong>not permanently deleted</strong>  it stays in the database
               and can be restored by a developer if needed.
             </p>
             <div className="sa-modal-actions">

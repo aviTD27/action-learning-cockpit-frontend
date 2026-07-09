@@ -8,11 +8,11 @@ function initials(first: string, last: string) {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    ACTIVE:          'sd-badge sd-badge-submitted',
-    SUSPENDED:       'sd-badge sd-badge-past-due',
-    GRADUATED:       'sd-badge sd-badge-graded',
-    WITHDRAWN:       'sd-badge sd-badge-pending',
-    INACTIVE:        'sd-badge sd-badge-pending',
+    ACTIVE: 'sd-badge sd-badge-submitted',
+    SUSPENDED: 'sd-badge sd-badge-past-due',
+    GRADUATED: 'sd-badge sd-badge-graded',
+    WITHDRAWN: 'sd-badge sd-badge-pending',
+    INACTIVE: 'sd-badge sd-badge-pending',
   }
   const cls = map[status.toUpperCase()] ?? 'sd-badge sd-badge-pending'
   return <span className={cls}>{status.charAt(0) + status.slice(1).toLowerCase()}</span>
@@ -27,7 +27,6 @@ export default function ProfilePage() {
   return (
     <div className="sd-page">
 
-      {/* Profile header */}
       <div className="sd-card">
         <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <div style={{
@@ -50,21 +49,19 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Info cards */}
       <div className="sd-two-col">
 
-        {/* Personal info */}
         <div className="sd-card">
           <div className="sd-card-header">
             <p className="sd-card-title"><UserRound size={14} /> Personal Info</p>
           </div>
           <div style={{ padding: '0.25rem 1rem' }}>
             {[
-              { label: 'First name',   value: profile.firstName },
-              { label: 'Last name',    value: profile.lastName  },
-              { label: 'Email',        value: profile.email     },
-              { label: 'Student ref',  value: profile.studentRef },
-              { label: 'Status',       value: <StatusBadge status={profile.status} /> },
+              { label: 'First name', value: profile.firstName },
+              { label: 'Last name', value: profile.lastName  },
+              { label: 'Email', value: profile.email     },
+              { label: 'Student ref', value: profile.studentRef },
+              { label: 'Status', value: <StatusBadge status={profile.status} /> },
             ].map(r => (
               <div key={r.label} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -78,16 +75,15 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Academic info */}
         <div className="sd-card">
           <div className="sd-card-header">
             <p className="sd-card-title"><GraduationCap size={14} /> Academic Info</p>
           </div>
           <div style={{ padding: '0.25rem 1rem' }}>
             {[
-              { label: 'University', icon: Landmark,      value: profile.universityName ?? '—' },
+              { label: 'University', icon: Landmark, value: profile.universityName ?? '' },
               { label: 'Programme',  icon: GraduationCap, value: profile.programmeName          },
-              { label: 'Cohort',     icon: Users,         value: profile.cohortName ?? '—'      },
+              { label: 'Cohort', icon: Users, value: profile.cohortName ?? ''},
             ].map(r => (
               <div key={r.label} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',

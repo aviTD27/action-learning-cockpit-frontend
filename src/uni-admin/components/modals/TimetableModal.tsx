@@ -51,7 +51,6 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
   const searchRef   = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Fetch fresh courses on every open
   useEffect(() => {
     if (!open) return
     getCourses({ universityId: universityId ?? undefined })
@@ -59,7 +58,6 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
       .catch(() => {})
   }, [open, universityId])
 
-  // Reset / populate form on open
   useEffect(() => {
     if (!open) return
     setTitle(existing?.title ?? '')
@@ -70,27 +68,22 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
     setColor(existing?.color ?? PRESET_COLORS[0])
     setCohortId(existing?.cohortId ?? '')
     setLecturerId(existing?.lecturerId ?? '')
-    // Show the existing course name in the search box immediately; selectedCourse
-    // will be resolved against the courses list once it loads (see effect below)
     setCourseSearch(existing?.title ?? '')
     setSelectedCourse(null)
     setDropdownOpen(false)
     setError(null)
   }, [open, existing])
 
-  // Once courses are loaded, find and pre-select the matching course for editing
   useEffect(() => {
     if (!existing || courses.length === 0) return
     const match = courses.find(c => c.name === existing.title)
     if (match) {
       setSelectedCourse(match)
       setCourseSearch(match.name)
-      // Only override lecturerId if the course has one and none is already set
       if (match.lecturerId && !existing.lecturerId) setLecturerId(match.lecturerId)
     }
   }, [courses, existing])
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (
@@ -119,11 +112,10 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
   }
 
   const submit = async () => {
-    // When adding: must pick a course. When editing: title is already set from existing.
     if (!existing && !selectedCourse) { setError('Select a course'); return }
-    if (!title.trim())    { setError('Course / title is required'); return }
-    if (!room.trim())     { setError('Room is required'); return }
-    if (!cohortId)        { setError('Select a cohort'); return }
+    if (!title.trim()) { setError('Course / title is required'); return }
+    if (!room.trim()) { setError('Room is required'); return }
+    if (!cohortId) { setError('Select a cohort'); return }
     if (startTime >= endTime) { setError('End time must be after start time'); return }
 
     setSaving(true)
@@ -153,7 +145,6 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
       <div className="ua-modal" onClick={e => e.stopPropagation()}>
         <h2 className="ua-modal-title">{existing ? 'Edit Timetable Entry' : 'Add Timetable Entry'}</h2>
 
-        {/* ── Course (searchable) — first field ── */}
         <div className="ua-modal-field">
           <label className="ua-modal-label">Course</label>
           <div style={{ position: 'relative' }}>
@@ -195,7 +186,7 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
                   >
                     <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: '#1E3A5F' }}>{c.name}</div>
                     <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 2 }}>
-                      {c.programmeName ?? '—'}
+                      {c.programmeName ?? ''}
                       {c.lecturerName && <> · <span style={{ color: '#6366f1' }}>{c.lecturerName}</span></>}
                     </div>
                   </div>
@@ -204,7 +195,6 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
             )}
           </div>
 
-          {/* Lecturer pill — from selected course, or from existing entry while courses load */}
           {(selectedCourse?.lecturerName ?? existing?.lecturerName) && (
             <div style={{
               marginTop: '0.4rem',
@@ -255,7 +245,6 @@ export default function TimetableModal({ open, existing, cohorts, lecturers, onC
           </select>
         </div>
 
-        {/* Lecturer dropdown — pre-selected from course, still manually changeable */}
         {!selectedCourse && (
           <div className="ua-modal-field">
             <label className="ua-modal-label">Lecturer (optional)</label>
